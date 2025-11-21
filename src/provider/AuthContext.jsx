@@ -7,7 +7,7 @@ const GOOGLE_CLIENT = window.ENV?.GOOGLE_CLIENT;
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const [auth, setAuth] = useState({
-    token_UUID : {}
+    token_UUID : {} 
   });
   const isAuthenticated = Object.keys(auth.token_UUID).length > 0;
   
