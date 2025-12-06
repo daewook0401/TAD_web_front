@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../provider/AuthContext';
+import { authAPI } from '../../api/authAPI';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -33,15 +34,25 @@ const LoginPage = () => {
       return;
     }
 
-    // 임시 로그인 처리 (백엔드 연동 전)
-    if (formData.email === 'test@example.com' && formData.password === 'password123') {
-      login({
-        name: '테스트 사용자',
+    try {
+      const response = await authAPI.login({
         email: formData.email,
+        password: formData.password,
       });
-      navigate('/matches/my');
-    } else {
-      setError('이메일 또는 비밀번호가 올바르지 않습니다');
+
+      if (response.data.success) {
+        login({
+          id: response.data.user.id,
+          name: response.data.user.name,
+          email: response.data.user.email,
+        });
+        localStorage.setItem('token', response.data.token);
+        navigate('/matches/my');
+      } else {
+        setError(response.data.message || '로그인에 실패했습니다');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || '로그인 중 오류가 발생했습니다');
     }
 
     setIsLoading(false);
@@ -89,7 +100,6 @@ const LoginPage = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200"
                 placeholder="example@email.com"
               />
-              <p className="text-xs text-gray-500 mt-1">테스트: test@example.com</p>
             </div>
 
             {/* Password Input */}
@@ -107,7 +117,6 @@ const LoginPage = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200"
                 placeholder="비밀번호를 입력하세요"
               />
-              <p className="text-xs text-gray-500 mt-1">테스트: password123</p>
             </div>
 
             {/* Remember Me & Forgot Password */}

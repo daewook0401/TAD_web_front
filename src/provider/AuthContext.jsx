@@ -7,42 +7,35 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 초기 로드 시 세션스토리지에서 토큰 확인
+  // 초기 로드 시 localStorage에서 사용자 정보와 토큰 복원
   useEffect(() => {
-    const token = sessionStorage.getItem('token_UUID');
-    const userData = sessionStorage.getItem('user');
-    
-    if (token && userData) {
-      try {
+    try {
+      const token = localStorage.getItem('token');
+      const userData = localStorage.getItem('user');
+      
+      if (token && userData) {
         setUser(JSON.parse(userData));
         setIsAuthenticated(true);
-      } catch (error) {
-        console.error('Failed to parse user data:', error);
-        sessionStorage.removeItem('token_UUID');
-        sessionStorage.removeItem('user');
       }
+    } catch (error) {
+      console.error('Failed to restore user session:', error);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
     setIsLoading(false);
   }, []);
 
-  const login = (token_UUID, userData = {}) => {
-    setUser({
-      ...userData,
-      token: token_UUID
-    });
+  const login = (userData) => {
+    setUser(userData);
     setIsAuthenticated(true);
-    sessionStorage.setItem('token_UUID', token_UUID);
-    sessionStorage.setItem('user', JSON.stringify({
-      ...userData,
-      token: token_UUID
-    }));
+    localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
-    sessionStorage.removeItem('token_UUID');
-    sessionStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
   };
 
   const value = {

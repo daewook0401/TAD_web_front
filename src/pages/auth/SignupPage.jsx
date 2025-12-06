@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../provider/AuthContext';
+import { authAPI } from '../../api/authAPI';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
@@ -64,19 +65,37 @@ const SignupPage = () => {
       return;
     }
 
-    // 임시 회원가입 처리 (백엔드 연동 전)
     try {
-      // 임시로 바로 로그인 처리
-      login({
+      const response = await authAPI.signup({
         name: formData.name,
         email: formData.email,
+        password: formData.password,
       });
-      setSuccess('회원가입이 완료되었습니다!');
-      setTimeout(() => {
-        navigate('/');
-      }, 2000);
+
+      if (response.data.success) {
+        // 회원가입 후 자동 로그인
+        const loginResponse = await authAPI.login({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (loginResponse.data.success) {
+          login({
+            id: loginResponse.data.user.id,
+            name: loginResponse.data.user.name,
+            email: loginResponse.data.user.email,
+          });
+          localStorage.setItem('token', loginResponse.data.token);
+          setSuccess('회원가입이 완료되었습니다!');
+          setTimeout(() => {
+            navigate('/');
+          }, 1500);
+        }
+      } else {
+        setError(response.data.message || '회원가입에 실패했습니다');
+      }
     } catch (err) {
-      setError('회원가입 중 오류가 발생했습니다');
+      setError(err.response?.data?.message || '회원가입 중 오류가 발생했습니다');
     }
 
     setIsLoading(false);
