@@ -3,15 +3,10 @@ pipeline {
 
     // ✅ 환경변수는 여기에!
     environment {
-        NVM_DIR      = "~/.nvm"
+        NVM_DIR      = "$HOME/.nvm"
         DEPLOY_FRONT = "/home/daewook/server/tad/deploy/front"
-        FRONT_DIR    = "."   // 레포 루트가 프론트 소스
+        FRONT_DIR    = "front"   // 레포 안에서 프론트 소스 폴더
         BUILD_DIR    = "dist"    // npm run build 결과 폴더
-    }
-
-    triggers {
-        // GitHub webhook을 통한 자동 트리거
-        githubPush()
     }
 
     stages {
@@ -40,12 +35,7 @@ pipeline {
 
         stage('Install & Build') {
             when {
-                anyOf {
-                    branch 'main'
-                    expression { 
-                        return env.CHANGE_TARGET == 'main' && env.CHANGE_BRANCH == 'develop'
-                    }
-                }
+                branch 'main'
             }
             steps {
                 sh """
@@ -61,12 +51,7 @@ pipeline {
 
         stage('Deploy') {
             when {
-                anyOf {
-                    branch 'main'
-                    expression { 
-                        return env.CHANGE_TARGET == 'main' && env.CHANGE_BRANCH == 'develop'
-                    }
-                }
+                branch 'main'
             }
             steps {
                 sh """
@@ -79,19 +64,8 @@ pipeline {
 
                 # nginx에서 읽을 수 있도록 권한 부여
                 chmod -R o+rx ${DEPLOY_FRONT}
-                
-                echo "✅ 배포 완료: ${DEPLOY_FRONT}"
                 """
             }
-        }
-    }
-
-    post {
-        success {
-            echo '✅ 빌드 및 배포 성공!'
-        }
-        failure {
-            echo '❌ 빌드 또는 배포 실패!'
         }
     }
 }

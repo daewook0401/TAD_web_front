@@ -1,6 +1,5 @@
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { AuthProvider } from '../provider/AuthContext';
-import MainLayout from '../components/layout/MainLayout';
+import { AuthProvider } from '../../provider/AuthContext';
 
 function RootLayout({ children }) {
   return (
