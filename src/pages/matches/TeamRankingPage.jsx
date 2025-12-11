@@ -28,7 +28,7 @@ const UserRankingPage = () => {
       'B+': 'text-blue-600 bg-blue-100',
       'B': 'text-purple-600 bg-purple-100',
       'C': 'text-gray-600 bg-gray-100',
-      'D': 'text-gray-400 bg-gray-50',
+      'D': 'text-gray-600 bg-gray-50',
     };
     return tierColors[tier] || 'text-gray-600 bg-gray-100';
   };
@@ -38,7 +38,7 @@ const UserRankingPage = () => {
       'S': 'from-red-400 to-red-600',
       'A+': 'from-orange-400 to-orange-600',
       'A': 'from-yellow-400 to-yellow-600',
-      'B+': 'from-blue-400 to-blue-600',
+      'B+': 'from-blue-600 to-blue-600',
       'B': 'from-purple-400 to-purple-600',
       'C': 'from-gray-400 to-gray-600',
       'D': 'from-gray-300 to-gray-500',
@@ -52,7 +52,7 @@ const UserRankingPage = () => {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <h1 className="text-3xl font-bold text-gray-900">유저 등급</h1>
-          <p className="text-gray-600 mt-2">플레이어들의 등급을 확인하세요</p>
+          <p className="text-gray-700 mt-2">플레이어들의 등급을 확인하세요</p>
         </div>
       </div>
 
@@ -64,7 +64,7 @@ const UserRankingPage = () => {
             onClick={() => setFilterRank('all')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
               filterRank === 'all'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                 : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-600'
             }`}
           >
@@ -76,7 +76,7 @@ const UserRankingPage = () => {
               onClick={() => setFilterRank(tier)}
               className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
                 filterRank === tier
-                  ? `bg-blue-600 text-white`
+                  ? `bg-gradient-to-r from-blue-600 to-purple-600 text-white`
                   : `bg-white text-gray-700 border border-gray-300 hover:border-blue-600`
               }`}
             >
@@ -98,14 +98,14 @@ const UserRankingPage = () => {
                   idx === 0 ? 'md:col-span-1 md:row-span-2' : ''
                 }`}
               >
-                <div className={`bg-gradient-to-br ${getTierBgGradient(user.tier)} p-8 rounded-lg shadow-xl text-center text-white`}>
+                <div className={`bg-gradient-to-br ${getTierBgGradient(user.tier)} p-8 rounded-lg shadow-xl text-center text-white border-2 border-white/30`}>
                   <div className="text-6xl font-bold mb-4">{idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉'}</div>
-                  <h3 className="text-2xl font-bold mb-1">{user.name}</h3>
-                  <p className="text-lg opacity-95 mb-3">{user.rolNickname}</p>
-                  <div className="space-y-2 text-white opacity-95">
-                    <p className="text-sm">평점 {user.rating}</p>
-                    <p className="text-sm">승률 {user.winRate}%</p>
-                    <p className="text-sm font-bold">{user.tier} 등급</p>
+                  <h3 className="text-2xl font-bold mb-1 text-white">{user.name}</h3>
+                  <p className="text-lg mb-3 text-white/90">{user.rolNickname}</p>
+                  <div className="space-y-2 text-white/90">
+                    <p className="text-sm font-medium">평점 {user.rating}</p>
+                    <p className="text-sm font-medium">승률 {user.winRate}%</p>
+                    <p className="text-sm font-bold text-white">{user.tier} 등급</p>
                   </div>
                 </div>
               </div>
@@ -118,44 +118,77 @@ const UserRankingPage = () => {
       <div className="max-w-7xl mx-auto px-6 pb-12">
         <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full table-auto">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">순위</th>
+                <tr className="bg-white border-b border-gray-200">
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">순위</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">사용자명</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">롤 닉네임</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">등급</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">평점</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">경기</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">승률</th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">등급</th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">평점</th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">경기</th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">승률</th>
                 </tr>
               </thead>
+
               <tbody>
                 {filteredUsers.map((user) => (
-                  <tr key={user.rank} className="border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200">
-                    <td className="px-6 py-4 text-sm font-semibold text-gray-900">
-                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600">
-                        {user.rank}
-                      </span>
+                  <tr
+                    key={user.rank}
+                    className="border-b border-gray-200 hover:bg-gray-100 transition-colors duration-200"
+                  >
+                    {/* 순위 */}
+                    <td className="px-6 py-4 text-sm font-semibold">
+                      <div className="flex justify-center">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold border border-blue-300">
+                          {user.rank}
+                        </span>
+                      </div>
                     </td>
-                    <td className="px-6 py-4 text-sm font-bold text-gray-900">{user.name}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700">{user.rolNickname}</td>
-                    <td className="px-6 py-4 text-sm">
-                      <span className={`inline-block px-3 py-1 rounded font-bold text-xs ${getTierColor(user.tier)}`}>
-                        {user.tier}
-                      </span>
+
+                    {/* 사용자명 */}
+                    <td className="px-6 py-4 text-sm font-bold text-gray-900">
+                      <div className="flex items-center">{user.name}</div>
                     </td>
-                    <td className="px-6 py-4 text-sm font-bold text-gray-900">{user.rating}</td>
+
+                    {/* 롤 닉네임 */}
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      <span className="text-green-600 font-semibold">{user.wins}</span>
-                      <span className="text-gray-400"> / </span>
-                      <span className="text-red-600 font-semibold">{user.losses}</span>
+                      <div className="flex items-center">{user.rolNickname}</div>
                     </td>
+
+                    {/* 등급 */}
                     <td className="px-6 py-4 text-sm">
-                      <div className="flex items-center gap-2">
+                      <div className="flex justify-center">
+                        <span
+                          className={`inline-block px-3 py-1 rounded font-bold text-xs ${getTierColor(
+                            user.tier,
+                          )}`}
+                        >
+                          {user.tier}
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* 평점 */}
+                    <td className="px-6 py-4 text-sm font-bold text-gray-900">
+                      <div className="flex justify-center">{user.rating}</div>
+                    </td>
+
+                    {/* 경기 */}
+                    <td className="px-6 py-4 text-sm">
+                      <div className="flex justify-center gap-1 font-semibold">
+                        <span className="text-green-600">{user.wins}</span>
+                        <span className="text-gray-500">/</span>
+                        <span className="text-red-600">{user.losses}</span>
+                      </div>
+                    </td>
+
+                    {/* 승률 */}
+                    <td className="px-6 py-4 text-sm">
+                      <div className="flex items-center justify-center gap-2">
                         <div className="w-16 bg-gray-200 rounded-full h-2">
                           <div
-                            className="bg-green-600 h-2 rounded-full"
+                            className="bg-green-500 h-2 rounded-full"
                             style={{ width: `${user.winRate}%` }}
                           ></div>
                         </div>
@@ -170,9 +203,10 @@ const UserRankingPage = () => {
         </div>
       </div>
 
+
       {/* Tier Distribution */}
       <div className="max-w-7xl mx-auto px-6 pb-12">
-        <div className="bg-white rounded-lg shadow p-8 border border-gray-200">
+        <div className="bg-gray-50  rounded-lg shadow p-8 border border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">등급 분포</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             {['S', 'A+', 'A', 'B+', 'B', 'C', 'D'].map((tier) => {

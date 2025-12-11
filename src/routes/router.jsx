@@ -9,6 +9,9 @@ import SearchMatchesPage from '../pages/matches/SearchMatchesPage';
 import TeamRankingPage from '../pages/matches/TeamRankingPage';
 import LoginPage from '../pages/auth/LoginPage';
 import SignupPage from '../pages/auth/SignupPage';
+import AboutPage from '../pages/AboutPage';
+import FAQPage from '../pages/FAQPage';
+import ContactPage from '../pages/ContactPage';
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +28,14 @@ export const router = createBrowserRouter([
       {
         path: '/info/:category',
         element: <BoardPage />,
+      },
+      {
+        path: '/board',
+        element: <BoardPage />,
+      },
+      {
+        path: '/matches',
+        element: <MyMatchesPage />,
       },
       {
         path: '/matches/my',
@@ -46,23 +57,18 @@ export const router = createBrowserRouter([
         path: '/signup',
         element: <SignupPage />,
       },
-      // 추후 추가될 페이지들
-      // {
-      //   path: '/about',
-      //   element: <AboutPage />,
-      // },
-      // {
-      //   path: '/faq',
-      //   element: <FAQPage />,
-      // },
-      // {
-      //   path: '/contact',
-      //   element: <ContactPage />,
-      // },
-      // {
-      //   path: '/mypage',
-      //   element: <MyPage />,
-      // },
+      {
+        path: '/about',
+        element: <AboutPage />,
+      },
+      {
+        path: '/faq',
+        element: <FAQPage />,
+      },
+      {
+        path: '/contact',
+        element: <ContactPage />,
+      },
     ],
   },
 ]);

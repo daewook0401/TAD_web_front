@@ -59,18 +59,18 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
         <div className="text-center">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             TAD
           </h2>
           <p className="mt-2 text-gray-600">게임 전적 관리 플랫폼</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 space-y-6">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 space-y-6">
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-gray-900">로그인</h1>
             <p className="text-gray-600">TAD에 로그인하세요</p>
@@ -79,7 +79,7 @@ const LoginPage = () => {
           {/* Error Message */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-sm text-red-700">{error}</p>
+              <p className="text-sm text-red-600">{error}</p>
             </div>
           )}
 
@@ -97,7 +97,7 @@ const LoginPage = () => {
                 autoComplete="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
                 placeholder="example@email.com"
               />
             </div>
@@ -114,7 +114,7 @@ const LoginPage = () => {
                 autoComplete="current-password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200"
+                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all duration-200 text-gray-900 placeholder-gray-400"
                 placeholder="비밀번호를 입력하세요"
               />
             </div>
@@ -124,7 +124,7 @@ const LoginPage = () => {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 rounded border-gray-300 accent-blue-600"
+                  className="w-4 h-4 rounded border-gray-300 bg-white accent-blue-600"
                   defaultChecked
                 />
                 <span className="text-sm text-gray-700">로그인 상태 유지</span>
@@ -138,7 +138,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:scale-105 hover:from-blue-700 hover:to-purple-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isLoading ? '로그인 중...' : '로그인'}
             </button>
@@ -147,7 +147,7 @@ const LoginPage = () => {
           {/* Divider */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-white text-gray-500">또는</span>
@@ -198,11 +198,11 @@ const LoginPage = () => {
             </Link>
           </p>
           <p>
-            <Link to="#" className="hover:text-gray-900">
+            <Link to="#" className="hover:text-blue-700">
               이용약관
             </Link>
             {' • '}
-            <Link to="#" className="hover:text-gray-900">
+            <Link to="#" className="hover:text-blue-700">
               개인정보처리방침
             </Link>
           </p>
