@@ -134,8 +134,8 @@ function FAQPage() {
               onClick={() => setActiveCategory(category.id)}
               className={`px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2 ${
                 activeCategory === category.id
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 scale-105'
-                  : 'bg-gray-50 hover:bg-gray-100'
+                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white scale-105'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:border-blue-600'
               }`}
             >
               <span>{category.icon}</span>
@@ -151,7 +151,7 @@ function FAQPage() {
             return (
               <div
                 key={index}
-                className="bg-gray-50  rounded-xl border border-gray-200 overflow-hidden"
+                className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
               >
                 <button
                   onClick={() => toggleItem(activeCategory, index)}
@@ -173,14 +173,14 @@ function FAQPage() {
         </div>
 
         {/* Contact Section */}
-        <div className="mt-16 text-center bg-gray-50  rounded-xl p-8 border border-gray-200">
+        <div className="mt-16 text-center bg-white rounded-xl p-8 border border-gray-200 shadow-sm">
           <h2 className="text-2xl font-bold mb-4">찾으시는 답변이 없나요?</h2>
           <p className="text-gray-700 mb-6">
             문의 페이지를 통해 직접 질문해주시면 빠르게 답변 드리겠습니다.
           </p>
           <a
             href="/contact"
-            className="inline-block px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-semibold hover:scale-105 transition-transform"
+            className="inline-block px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:scale-105 hover:from-blue-700 hover:to-purple-700 transition-all"
           >
             문의하기
           </a>
