@@ -18,9 +18,6 @@ pipeline {
         }
 
         stage('Setup Node (nvm)') {
-            when {
-                branch 'main'   // main 브랜치일 때만 실행
-            }
             steps {
                 sh """
                 . $NVM_DIR/nvm.sh
