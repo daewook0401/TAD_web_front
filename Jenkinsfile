@@ -5,8 +5,13 @@ pipeline {
     environment {
         NVM_DIR      = "$HOME/.nvm"
         DEPLOY_FRONT = "/home/daewook/server/tad/deploy/front"
-        FRONT_DIR    = "front"   // 레포 안에서 프론트 소스 폴더
+        FRONT_DIR    = "."   // 레포 루트가 프론트 소스
         BUILD_DIR    = "dist"    // npm run build 결과 폴더
+    }
+
+    triggers {
+        // GitHub webhook을 통한 자동 트리거
+        githubPush()
     }
 
     stages {
@@ -34,9 +39,6 @@ pipeline {
         }
 
         stage('Install & Build') {
-            when {
-                branch 'main'
-            }
             steps {
                 sh """
                 . $NVM_DIR/nvm.sh
@@ -50,9 +52,6 @@ pipeline {
         }
 
         stage('Deploy') {
-            when {
-                branch 'main'
-            }
             steps {
                 sh """
                 # 배포 폴더 생성 및 초기화
@@ -64,8 +63,19 @@ pipeline {
 
                 # nginx에서 읽을 수 있도록 권한 부여
                 chmod -R o+rx ${DEPLOY_FRONT}
+                
+                echo "✅ 배포 완료: ${DEPLOY_FRONT}"
                 """
             }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ 빌드 및 배포 성공!'
+        }
+        failure {
+            echo '❌ 빌드 또는 배포 실패!'
         }
     }
 }
