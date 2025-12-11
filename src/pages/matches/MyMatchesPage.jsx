@@ -48,8 +48,8 @@ const MyMatchesPage = () => {
               <p className="text-gray-600 mt-2">당신의 게임 경기 기록을 확인하세요</p>
             </div>
             {isAuthenticated && (
-              <div className="bg-blue-50 rounded-lg p-4">
-                <p className="text-sm text-gray-600">사용자</p>
+              <div className="bg-blue-600 rounded-lg p-4 border border-blue-700">
+                <p className="text-sm text-blue-100">사용자</p>
                 <p className="text-xl font-bold text-gray-900">{user?.name || '사용자'}</p>
               </div>
             )}
@@ -60,23 +60,23 @@ const MyMatchesPage = () => {
       {/* Stats Cards */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <p className="text-gray-600 text-sm mb-2">총 경기</p>
             <p className="text-3xl font-bold text-gray-900">{stats.totalMatches}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <p className="text-gray-600 text-sm mb-2">승리</p>
             <p className="text-3xl font-bold text-green-600">{stats.wins}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <p className="text-gray-600 text-sm mb-2">패배</p>
             <p className="text-3xl font-bold text-red-600">{stats.losses}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <p className="text-gray-600 text-sm mb-2">승률</p>
             <p className="text-3xl font-bold text-blue-600">{stats.winRate}%</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <p className="text-gray-600 text-sm mb-2">평균 K/D/A</p>
             <p className="text-3xl font-bold text-purple-600">{stats.avgKda}</p>
           </div>
@@ -91,7 +91,7 @@ const MyMatchesPage = () => {
             onClick={() => setFilterGame('all')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
               filterGame === 'all'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-gray-900'
                 : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-600'
             }`}
           >
@@ -101,8 +101,8 @@ const MyMatchesPage = () => {
             onClick={() => setFilterGame('League of Legends')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
               filterGame === 'League of Legends'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-600'
+                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-gray-900'
+                : 'bg-gray-50 text-gray-700 border border-gray-300 hover:border-blue-500'
             }`}
           >
             League of Legends
@@ -111,8 +111,8 @@ const MyMatchesPage = () => {
             onClick={() => setFilterGame('Mapleland')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
               filterGame === 'Mapleland'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-600'
+                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-gray-900'
+                : 'bg-gray-50 text-gray-700 border border-gray-300 hover:border-blue-500'
             }`}
           >
             Mapleland
@@ -122,11 +122,11 @@ const MyMatchesPage = () => {
 
       {/* Matches Table */}
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
+        <div className="bg-gray-50  rounded-lg shadow border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
+                <tr className="bg-white border-b border-gray-200">
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">날짜</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">게임</th>
                   <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">결과</th>
@@ -139,14 +139,14 @@ const MyMatchesPage = () => {
               <tbody>
                 {filteredMatches.length > 0 ? (
                   filteredMatches.map((match) => (
-                    <tr key={match.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200">
+                    <tr key={match.id} className="border-b border-gray-200 hover:bg-gray-100 transition-colors duration-200">
                       <td className="px-6 py-4 text-sm text-gray-700">{match.date}</td>
                       <td className="px-6 py-4 text-sm font-medium text-gray-900">{match.game}</td>
                       <td className="px-6 py-4 text-sm">
                         <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
                           match.result === '승리'
-                            ? 'bg-green-100 text-green-700'
-                            : 'bg-red-100 text-red-700'
+                            ? 'bg-green-500 text-green-400'
+                            : 'bg-red-500 text-red-400'
                         }`}>
                           {match.result}
                         </span>
@@ -155,7 +155,7 @@ const MyMatchesPage = () => {
                       <td className="px-6 py-4 text-sm font-semibold text-gray-900">{match.kda}</td>
                       <td className="px-6 py-4 text-sm text-gray-700">{match.duration}</td>
                       <td className="px-6 py-4 text-sm">
-                        <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">
+                        <span className="inline-block px-3 py-1 bg-blue-500 text-blue-600 rounded text-xs font-semibold border border-blue-500">
                           {match.tier}
                         </span>
                       </td>
@@ -163,7 +163,7 @@ const MyMatchesPage = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan="7" className="px-6 py-8 text-center text-gray-600">
                       경기 기록이 없습니다
                     </td>
                   </tr>

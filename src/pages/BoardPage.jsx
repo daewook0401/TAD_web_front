@@ -44,15 +44,15 @@ const BoardPage = () => {
   ]);
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       {/* Header Section */}
-      <section className="bg-gradient-to-r from-gray-50 to-blue-50 py-12 border-b border-gray-200">
+      <section className="bg-gradient-to-r from-blue-50 to-purple-50 py-12 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-4 mb-4">
             <span className="text-4xl">{currentCategory.icon}</span>
             <div>
               <h1 className="text-4xl font-bold text-gray-900">{currentCategory.name}</h1>
-              <p className="text-gray-600 mt-2">게임 정보와 팁을 공유하는 게시판입니다</p>
+              <p className="text-gray-700 mt-2">게임 정보와 팁을 공유하는 게시판입니다</p>
             </div>
           </div>
         </div>
@@ -66,7 +66,7 @@ const BoardPage = () => {
               to="/info/lol"
               className={`px-6 py-3 text-sm font-semibold border-b-2 transition-all duration-200 whitespace-nowrap ${
                 category === 'lol'
-                  ? 'border-blue-600 text-blue-600'
+                  ? 'border-blue-500 text-blue-600'
                   : 'border-transparent text-gray-600 hover:text-blue-600'
               }`}
             >
@@ -76,7 +76,7 @@ const BoardPage = () => {
               to="/info/maple"
               className={`px-6 py-3 text-sm font-semibold border-b-2 transition-all duration-200 whitespace-nowrap ${
                 category === 'maple'
-                  ? 'border-green-600 text-green-600'
+                  ? 'border-green-500 text-green-600'
                   : 'border-transparent text-gray-600 hover:text-green-600'
               }`}
             >
@@ -86,7 +86,7 @@ const BoardPage = () => {
               to="/info/other"
               className={`px-6 py-3 text-sm font-semibold border-b-2 transition-all duration-200 whitespace-nowrap ${
                 category === 'other'
-                  ? 'border-purple-600 text-purple-600'
+                  ? 'border-purple-500 text-purple-600'
                   : 'border-transparent text-gray-600 hover:text-purple-600'
               }`}
             >
@@ -101,7 +101,7 @@ const BoardPage = () => {
         <div className="max-w-7xl mx-auto px-6">
           {/* Write Button */}
           <div className="mb-8 flex justify-end">
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200">
+            <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200">
               새 게시물 작성
             </button>
           </div>
@@ -110,13 +110,13 @@ const BoardPage = () => {
           <div className="space-y-4">
             {posts.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">작성된 게시물이 없습니다</p>
+                <p className="text-gray-600 text-lg">작성된 게시물이 없습니다</p>
               </div>
             ) : (
               posts.map((post) => (
                 <div
                   key={post.id}
-                  className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                  className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md hover:border-blue-600 transition-all duration-200 cursor-pointer"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-grow">
@@ -134,7 +134,7 @@ const BoardPage = () => {
                       </div>
                     </div>
                     <div className="flex-shrink-0 text-right">
-                      <div className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                      <div className="inline-block px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs font-semibold border border-blue-300">
                         {post.replies > 0 ? post.replies : '0'}
                       </div>
                     </div>
@@ -146,17 +146,17 @@ const BoardPage = () => {
 
           {/* Pagination */}
           <div className="mt-12 flex justify-center gap-2">
-            <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
               이전
             </button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg">1</button>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            <button className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-gray-900 rounded-lg">1</button>
+            <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
               2
             </button>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
               3
             </button>
-            <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+            <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
               다음
             </button>
           </div>

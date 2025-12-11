@@ -3,32 +3,53 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../provider/AuthContext';
 
 const Header = () => {
-  const location = useLocation();
-  const { user, isAuthenticated, logout } = useAuth();
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const location = useLocation();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const navItems = [
-    { label: '홈', path: '/', hasDropdown: false },
-    {
-      label: '내전 전적',
-      path: '/matches',
+    { 
+      label: '소개', 
+      path: '/about', 
+      hasDropdown: false 
+    },
+    { 
+      label: '내전 전적', 
+      path: '/matches/my',
       hasDropdown: true,
       subItems: [
         { label: '내 전적 확인', path: '/matches/my' },
-        { label: '전적 검색', path: '/matches/search' },
-        { label: '팀 랭킹', path: '/matches/team' },
+        { label: '전적 확인', path: '/matches/search' },
+        { label: '유저 등급', path: '/matches/team' },
       ]
     },
-    {
-      label: '정보 글',
-      path: '/info',
-      hasDropdown: false
+    { 
+      label: '정보', 
+      path: '/info', 
+      hasDropdown: true,
+      subItems: [
+        { label: '롤', path: '/info/lol' },
+        { label: '메이플랜드', path: '/info/maple' },
+        { label: '기타', path: '/info/other' },
+      ]
     },
-    { label: '게시판', path: '/board', hasDropdown: false },
-    { label: '소개', path: '/about', hasDropdown: false },
-    { label: 'FAQ', path: '/faq', hasDropdown: false },
-    { label: '문의', path: '/contact', hasDropdown: false },
+    { 
+      label: 'FAQ', 
+      path: '/faq', 
+      hasDropdown: true,
+      subItems: [
+        { label: '자주 묻는 질문', path: '/faq/general' },
+        { label: '계정 관련', path: '/faq/account' },
+        { label: '기술 지원', path: '/faq/technical' },
+        { label: '결제 관련', path: '/faq/payment' },
+      ]
+    },
+    { 
+      label: '문의', 
+      path: '/contact', 
+      hasDropdown: false 
+    },
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -88,7 +109,7 @@ const Header = () => {
                         key={subItem.path}
                         to={subItem.path}
                         className={`block px-6 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors duration-200 ${
-                          index !== item.subItems.length - 1 ? 'border-b border-gray-200' : ''
+                          index !== item.subItems.length - 1 ? 'border-b border-gray-100' : ''
                         } ${index === 0 ? 'rounded-t-lg' : ''} ${
                           index === item.subItems.length - 1 ? 'rounded-b-lg' : ''
                         }`}
@@ -107,9 +128,9 @@ const Header = () => {
               <div className="relative">
                 <button
                   onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200 border border-gray-200"
+                  className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-sm font-bold">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
                     {user?.name?.charAt(0) || 'U'}
                   </div>
                   <span className="text-sm font-medium text-gray-700 hidden sm:inline">
@@ -133,10 +154,10 @@ const Header = () => {
                 </button>
 
                 {isUserDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
                     <Link
                       to="/mypage"
-                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors duration-200"
+                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
                       onClick={() => setIsUserDropdownOpen(false)}
                     >
                       마이페이지
@@ -146,7 +167,7 @@ const Header = () => {
                         logout();
                         setIsUserDropdownOpen(false);
                       }}
-                      className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200 border-t border-gray-200"
+                      className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200 border-t border-gray-100"
                     >
                       로그아웃
                     </button>
@@ -163,7 +184,7 @@ const Header = () => {
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:scale-105 hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200"
                 >
                   회원가입
                 </Link>

@@ -4,7 +4,7 @@ pipeline {
     // ✅ 환경변수는 여기에!
     environment {
         NVM_DIR      = "$HOME/.nvm"
-        DEPLOY_FRONT = "/home/daewook/server/tad/deploy/front"
+        DEPLOY_FRONT = "/deploy/front"
         FRONT_DIR    = "."   // 레포 루트가 프론트 소스
         BUILD_DIR    = "dist"    // npm run build 결과 폴더
     }
@@ -54,14 +54,13 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh """
-                # 배포 폴더 생성 및 초기화
-                mkdir -p ${DEPLOY_FRONT}
-                rm -rf ${DEPLOY_FRONT}/*
-
+                # 배포 폴더 초기화 (디렉토리는 이미 볼륨으로 존재)
+                rm -rf ${DEPLOY_FRONT}/* || true
+        
                 # dist 안의 파일들을 통째로 배포 경로에 복사
                 cp -r ${FRONT_DIR}/${BUILD_DIR}/* ${DEPLOY_FRONT}/
-
-                # nginx에서 읽을 수 있도록 권한 부여
+        
+                # nginx에서 읽을 수 있도록 권한 부여 (필요하면 유지)
                 chmod -R o+rx ${DEPLOY_FRONT}
                 
                 echo "✅ 배포 완료: ${DEPLOY_FRONT}"

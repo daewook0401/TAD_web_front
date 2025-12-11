@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const HomePage = () => {
@@ -20,35 +20,32 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-gray-50 min-h-screen">
       {/* Welcome Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-white to-gray-50 py-20">
-        <div className="absolute top-0 right-0 -z-10 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
-        <div className="absolute bottom-0 left-0 -z-10 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
-
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="relative overflow-hidden py-20 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="w-full px-6">
           <div className="text-center space-y-6">
             <div className="space-y-3">
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900">
                 환영합니다.
               </h1>
-              <h2 className="text-3xl lg:text-4xl font-semibold text-gray-700">
+              <h2 className="text-3xl lg:text-4xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 TAD 사이트입니다
               </h2>
             </div>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-700 max-w-2xl mx-auto">
               당신의 게임 전적을 한곳에서 관리하고, 실시간으로 분석하며, 다른 플레이어들과 소통하세요.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
               <Link
                 to="/signup"
-                className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:scale-105 hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
               >
                 시작하기
               </Link>
               <Link
                 to="/about"
-                className="px-8 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition-colors duration-200"
+                className="px-8 py-3 border-2 border-gray-300 text-gray-700 bg-white rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition-colors duration-200"
               >
                 자세히 알아보기
               </Link>
@@ -58,8 +55,8 @@ const HomePage = () => {
       </section>
 
       {/* Recent Matches Table */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-20">
+        <div className="w-full px-6">
           <div className="mb-12">
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -74,7 +71,7 @@ const HomePage = () => {
               </Link>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
@@ -94,8 +91,8 @@ const HomePage = () => {
                         <td className="px-6 py-4 text-sm">
                           <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
                             match.result === '승리'
-                              ? 'bg-green-100 text-green-700'
-                              : 'bg-red-100 text-red-700'
+                              ? 'bg-green-100 text-green-700 border border-green-300'
+                              : 'bg-red-100 text-red-700 border border-red-300'
                           }`}>
                             {match.result}
                           </span>
@@ -114,7 +111,7 @@ const HomePage = () => {
 
       {/* Information Articles Table */}
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
+        <div className="w-full px-6">
           <div className="mb-12">
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -129,11 +126,11 @@ const HomePage = () => {
               </Link>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
+            <div className="bg-gray-50 rounded-lg border border-gray-200 shadow-sm overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="bg-gray-50 border-b border-gray-200">
+                    <tr className="bg-gray-100 border-b border-gray-200">
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">카테고리</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">제목</th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">작성자</th>
@@ -143,9 +140,9 @@ const HomePage = () => {
                   </thead>
                   <tbody>
                     {infoData.map((article) => (
-                      <tr key={article.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200">
+                      <tr key={article.id} className="border-b border-gray-200 hover:bg-white transition-colors duration-200">
                         <td className="px-6 py-4 text-sm">
-                          <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+                          <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 border border-blue-300 rounded-full text-xs font-semibold">
                             {article.category}
                           </span>
                         </td>
