@@ -4,7 +4,7 @@ pipeline {
     // ✅ 환경변수는 여기에!
     environment {
         NVM_DIR      = "$HOME/.nvm"
-        DEPLOY_FRONT = "/home/daewook/server/tad/deploy/front"
+        DEPLOY_FRONT = "/deploy/front"
         FRONT_DIR    = "."   // 레포 루트가 프론트 소스
         BUILD_DIR    = "dist"    // npm run build 결과 폴더
     }
