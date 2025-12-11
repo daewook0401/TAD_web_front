@@ -52,14 +52,6 @@ pipeline {
         }
 
         stage('Deploy') {
-            when {
-                anyOf {
-                    branch 'main'
-                    expression { 
-                        return env.CHANGE_TARGET == 'main' && env.CHANGE_BRANCH == 'develop'
-                    }
-                }
-            }
             steps {
                 sh """
                 # 배포 폴더 생성 및 초기화
