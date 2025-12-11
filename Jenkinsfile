@@ -39,14 +39,6 @@ pipeline {
         }
 
         stage('Install & Build') {
-            when {
-                anyOf {
-                    branch 'main'
-                    expression { 
-                        return env.CHANGE_TARGET == 'main' && env.CHANGE_BRANCH == 'develop'
-                    }
-                }
-            }
             steps {
                 sh """
                 . $NVM_DIR/nvm.sh
