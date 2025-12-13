@@ -57,7 +57,7 @@ function ContactPage() {
           </p>
           <button
             onClick={() => setSubmitted(false)}
-            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:scale-105 hover:from-blue-700 hover:to-purple-700 transition-all"
+            className="px-8 py-3 bg-gradient-to-r from-blue-400 to-purple-400 text-white rounded-lg font-semibold hover:scale-105 hover:from-blue-500 hover:to-purple-500 transition-all"
           >
             다른 문의 작성
           </button>
@@ -71,7 +71,7 @@ function ContactPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
             문의하기
           </h1>
           <p className="text-xl text-gray-700">
@@ -194,7 +194,7 @@ function ContactPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-semibold text-lg hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="w-full py-4 bg-gradient-to-r from-blue-400 to-purple-400 text-white rounded-lg font-semibold text-lg hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {loading ? '전송 중...' : '문의 보내기'}
             </button>
@@ -202,8 +202,8 @@ function ContactPage() {
         </div>
 
         {/* Additional Info */}
-        <div className="mt-8 bg-blue-900 border border-blue-700 rounded-xl p-6">
-          <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+        <div className="mt-8 bg-blue-100 border border-blue-300 rounded-xl p-6">
+          <h3 className="font-bold text-lg mb-2 flex items-center gap-2 text-blue-900">
             <span>💡</span>
             <span>문의 전 확인해주세요</span>
           </h3>

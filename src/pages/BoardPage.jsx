@@ -101,7 +101,7 @@ const BoardPage = () => {
         <div className="max-w-7xl mx-auto px-6">
           {/* Write Button */}
           <div className="mb-8 flex justify-end">
-            <button className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200">
+            <button className="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-all duration-200">
               새 게시물 작성
             </button>
           </div>
@@ -149,7 +149,7 @@ const BoardPage = () => {
             <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
               이전
             </button>
-            <button className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-gray-900 rounded-lg">1</button>
+            <button className="px-4 py-2 bg-gradient-to-r from-blue-400 to-purple-400 text-white rounded-lg">1</button>
             <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">
               2
             </button>
