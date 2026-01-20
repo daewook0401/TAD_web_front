@@ -7,8 +7,6 @@ import BoardPage from '../pages/BoardPage';
 import MyMatchesPage from '../pages/matches/MyMatchesPage';
 import SearchMatchesPage from '../pages/matches/SearchMatchesPage';
 import TeamRankingPage from '../pages/matches/TeamRankingPage';
-import LoginPage from '../pages/auth/LoginPage';
-import SignupPage from '../pages/auth/SignupPage';
 import AboutPage from '../pages/AboutPage';
 import FAQPage from '../pages/FAQPage';
 import ContactPage from '../pages/ContactPage';
@@ -48,14 +46,6 @@ export const router = createBrowserRouter([
       {
         path: '/matches/team',
         element: <TeamRankingPage />,
-      },
-      {
-        path: '/login',
-        element: <LoginPage />,
-      },
-      {
-        path: '/signup',
-        element: <SignupPage />,
       },
       {
         path: '/about',
