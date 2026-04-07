@@ -63,7 +63,7 @@ const LoginPage = () => {
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
         <div className="text-center">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold text-blue-300">
             TAD
           </h2>
           <p className="mt-2 text-gray-600">게임 전적 관리 플랫폼</p>

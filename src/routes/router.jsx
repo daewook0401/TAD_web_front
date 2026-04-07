@@ -10,6 +10,8 @@ import TeamRankingPage from '../pages/matches/TeamRankingPage';
 import AboutPage from '../pages/AboutPage';
 import FAQPage from '../pages/FAQPage';
 import ContactPage from '../pages/ContactPage';
+import LoginPage from '../pages/auth/LoginPage';
+import SignupPage from '../pages/auth/SignupPage';
 
 export const router = createBrowserRouter([
   {
@@ -25,10 +27,14 @@ export const router = createBrowserRouter([
       },
       {
         path: '/info/:category',
-        element: <BoardPage />,
+        element: <BoardPage type="info" />,
       },
       {
         path: '/board',
+        element: <BoardPage />,
+      },
+      {
+        path: '/board/:category',
         element: <BoardPage />,
       },
       {
@@ -58,6 +64,14 @@ export const router = createBrowserRouter([
       {
         path: '/contact',
         element: <ContactPage />,
+      },
+      {
+        path: '/login',
+        element: <LoginPage />,
+      },
+      {
+        path: '/signup',
+        element: <SignupPage />,
       },
     ],
   },
