@@ -6,117 +6,85 @@ const InfoPage = () => {
     {
       id: 'lol',
       name: '롤',
-      icon: '🎮',
-      description: '롤(League of Legends) 게임에 대한 정보를 공유합니다',
+      code: 'LOL',
+      description: '패치 노트, 메타 분석, 챔피언 공략을 빠르게 훑어보세요.',
       postCount: 245,
-      color: 'blue'
+      accent: 'bg-blue-100 text-blue-600 border-blue-300',
     },
     {
       id: 'maple',
       name: '메이플랜드',
-      icon: '🍁',
-      description: '메이플랜드 게임에 대한 정보를 공유합니다',
+      code: 'ML',
+      description: '사냥터, 직업별 성장 루트, 보스 준비 정보를 정리합니다.',
       postCount: 128,
-      color: 'green'
+      accent: 'bg-green-100 text-green-600 border-green-300',
     },
     {
-      id: 'other',
-      name: '기타',
-      icon: '⭐',
-      description: '다른 게임들에 대한 정보를 공유합니다',
+      id: 'free',
+      name: '자유',
+      code: 'FR',
+      description: '게임 전반에 대한 팁과 커뮤니티성 정보를 자유롭게 모읍니다.',
       postCount: 89,
-      color: 'purple'
+      accent: 'bg-purple-100 text-purple-600 border-purple-300',
     },
+  ];
+
+  const features = [
+    { title: '읽기 쉬운 정보', description: '게시판과 분리해 다시 찾아볼 만한 글만 모으는 구조입니다.' },
+    { title: '게임별 분류', description: '롤, 메이플랜드, 자유 카테고리를 독립적으로 탐색할 수 있습니다.' },
+    { title: '가벼운 커뮤니티', description: '복잡한 기능보다 빠른 진입과 깔끔한 목록 경험에 집중했습니다.' },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <section className="bg-gradient-to-br from-blue-50 to-purple-50 py-16 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">정보</h1>
-          <p className="text-xl text-gray-700">
-            다양한 게임들에 대한 정보와 팁을 공유하고 커뮤니티와 소통하세요
+      <section className="bg-gradient-to-br from-blue-50 to-purple-50 px-6 py-16">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-sm font-bold uppercase tracking-[0.28em] text-blue-600">Game Intel</p>
+          <h1 className="mt-4 text-5xl font-black tracking-tight text-gray-900 lg:text-6xl">정보 허브</h1>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-gray-600">
+            게임별로 흩어진 공략과 업데이트를 한곳에 모아, 필요한 정보만 빠르게 확인할 수 있게 구성했습니다.
           </p>
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                to={`/info/${category.id}`}
-                className="group bg-white border border-gray-200 rounded-xl p-8 hover:shadow-xl transition-all duration-300 hover:border-blue-600"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <span className="text-5xl">{category.icon}</span>
-                  <span className={`inline-block px-3 py-1 bg-${category.color}-500 text-${category.color}-400 border border-${category.color}-500 rounded-full text-xs font-semibold`}>
-                    {category.postCount}개 게시물
-                  </span>
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors mb-3">
-                  {category.name}
-                </h3>
-                <p className="text-gray-700 leading-relaxed mb-6">
-                  {category.description}
-                </p>
-                <div className="flex items-center text-blue-600 font-semibold group-hover:translate-x-2 transition-transform duration-200">
-                  보기
-                  <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </Link>
-            ))}
-          </div>
+      <section className="px-6 py-12">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-5 md:grid-cols-3">
+          {categories.map((category) => (
+            <Link
+              key={category.id}
+              to={`/info/${category.id}`}
+              className="group rounded-[2rem] border border-gray-200 bg-white p-7 shadow-sm transition-all duration-200 hover:border-blue-300"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-black tracking-[0.24em] text-gray-500">{category.code}</span>
+                <span className={`rounded-full border px-3 py-1 text-xs font-bold ${category.accent}`}>
+                  {category.postCount} posts
+                </span>
+              </div>
+              <h3 className="mt-8 text-3xl font-black text-gray-900">{category.name}</h3>
+              <p className="mt-4 min-h-20 leading-7 text-gray-600">{category.description}</p>
+              <div className="mt-6 text-sm font-bold text-blue-600">
+                정보글 보기
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="bg-gray-50 py-16">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">
-            이 게시판의 특징
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-gray-50  p-8 rounded-xl border border-gray-200">
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4 border border-blue-500">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+      <section className="px-6 pb-16">
+        <div className="mx-auto max-w-7xl rounded-[2rem] border border-gray-200 bg-white p-8 shadow-sm">
+          <div className="mb-8">
+            <p className="text-sm font-bold text-blue-600">Structure</p>
+            <h2 className="mt-2 text-3xl font-black text-gray-900">정보글의 기준</h2>
+          </div>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            {features.map((feature) => (
+              <div key={feature.title} className="rounded-3xl border border-gray-200 bg-gray-50 p-6">
+                <div className="mb-5 h-1.5 w-12 rounded-full bg-blue-500" />
+                <h3 className="text-xl font-black text-gray-900">{feature.title}</h3>
+                <p className="mt-3 leading-7 text-gray-600">{feature.description}</p>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">커뮤니티 소통</h3>
-              <p className="text-gray-700">
-                다른 플레이어들과 게임 정보, 팁, 경험을 공유하세요
-              </p>
-            </div>
-
-            <div className="bg-gray-50  p-8 rounded-xl border border-gray-200">
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4 border border-blue-500">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C6.5 6.253 2 10.998 2 17s4.5 10.747 10 10.747c5.5 0 10-4.998 10-10.747 0-6.002-4.5-10.747-10-10.747z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">최신 정보</h3>
-              <p className="text-gray-700">
-                게임의 최신 업데이트와 변경사항을 빠르게 확인할 수 있습니다
-              </p>
-            </div>
-
-            <div className="bg-gray-50  p-8 rounded-xl border border-gray-200">
-              <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4 border border-blue-500">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">전문 가이드</h3>
-              <p className="text-gray-700">
-                프로게이머들의 전략과 가이드를 배울 수 있습니다
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>

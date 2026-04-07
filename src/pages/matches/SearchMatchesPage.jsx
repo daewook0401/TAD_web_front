@@ -31,17 +31,17 @@ const SearchMatchesPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <h1 className="text-3xl font-bold text-gray-900">전적 확인</h1>
-          <p className="text-gray-700 mt-2">다른 플레이어의 전적을 검색해보세요</p>
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-12">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-sm font-bold uppercase tracking-[0.28em] text-blue-600">Player Search</p>
+          <h1 className="mt-4 text-4xl font-black text-gray-900 lg:text-6xl">전적 확인</h1>
+          <p className="mt-4 text-lg text-gray-600">플레이어 이름으로 기록, 승률, 최근 흐름을 빠르게 확인하세요.</p>
         </div>
       </div>
 
       {/* Search Section */}
       <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="bg-white rounded-lg shadow-sm p-8 border border-gray-200">
+        <div className="bg-white rounded-[2rem] shadow-sm p-8 border border-gray-200">
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-900 mb-3">플레이어 검색</label>
             <div className="flex gap-3">
@@ -51,11 +51,11 @@ const SearchMatchesPage = () => {
                 onChange={(e) => setSearchPlayer(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="플레이어 이름을 입력하세요 (예: ProGamer123)"
-                className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
+                className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
               />
               <button
                 onClick={handleSearch}
-                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200"
+                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold transition-all duration-200"
               >
                 검색
               </button>
@@ -74,7 +74,7 @@ const SearchMatchesPage = () => {
                     setSearchResult(player);
                     setHasSearched(true);
                   }}
-                  className="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg transition-colors duration-200 border border-gray-300"
+                  className="px-4 py-2 bg-white text-gray-700 text-sm font-bold rounded-xl transition-colors duration-200 border border-gray-300"
                 >
                   {player.name}
                 </button>
@@ -90,29 +90,29 @@ const SearchMatchesPage = () => {
           {searchResult ? (
             <div className="space-y-8">
               {/* Player Profile */}
-              <div className="bg-gray-50  rounded-lg shadow-lg p-8 border border-gray-200">
+              <div className="bg-white rounded-[2rem] shadow-lg p-8 border border-gray-200">
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                   <div className="md:col-span-2">
-                    <div className="w-32 h-32 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center text-gray-900 text-4xl font-bold mb-4">
+                    <div className="w-32 h-32 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center text-white text-4xl font-black mb-4">
                       {searchResult.name.charAt(0)}
                     </div>
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">{searchResult.name}</h2>
                     <p className="text-sm text-gray-700">주 게임: {searchResult.mainGame}</p>
                   </div>
                   <div className="md:col-span-3 grid grid-cols-2 gap-4">
-                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
                       <p className="text-gray-600 text-sm mb-1">총 경기</p>
                       <p className="text-3xl font-bold text-gray-900">{searchResult.totalMatches}</p>
                     </div>
-                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
                       <p className="text-gray-600 text-sm mb-1">승률</p>
                       <p className="text-3xl font-bold text-green-400">{searchResult.winRate}%</p>
                     </div>
-                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
                       <p className="text-gray-600 text-sm mb-1">평균 K/D/A</p>
                       <p className="text-3xl font-bold text-blue-600">{searchResult.avgKda}</p>
                     </div>
-                    <div className="bg-white rounded-lg p-4 border border-gray-200">
+                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
                       <p className="text-gray-600 text-sm mb-1">현재 티어</p>
                       <p className="text-3xl font-bold text-purple-400">{searchResult.tier}</p>
                     </div>
@@ -122,7 +122,7 @@ const SearchMatchesPage = () => {
 
               {/* Detailed Stats */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-gray-50  rounded-lg shadow p-6 border border-gray-200">
+                <div className="bg-white rounded-[2rem] shadow p-6 border border-gray-200">
                   <h3 className="text-xl font-bold text-gray-900 mb-6">게임별 통계</h3>
                   <div className="space-y-4">
                     <div>
@@ -146,7 +146,7 @@ const SearchMatchesPage = () => {
                   </div>
                 </div>
 
-                <div className="bg-gray-50  rounded-lg shadow p-6 border border-gray-200">
+                <div className="bg-white rounded-[2rem] shadow p-6 border border-gray-200">
                   <h3 className="text-xl font-bold text-gray-900 mb-6">최근 7일</h3>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -170,7 +170,7 @@ const SearchMatchesPage = () => {
               </div>
             </div>
           ) : (
-            <div className="bg-gray-50  rounded-lg shadow-lg p-12 border border-gray-200 text-center">
+            <div className="bg-white rounded-[2rem] shadow-lg p-12 border border-gray-200 text-center">
               <svg className="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>

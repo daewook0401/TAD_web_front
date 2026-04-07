@@ -7,11 +7,11 @@ import BoardPage from '../pages/BoardPage';
 import MyMatchesPage from '../pages/matches/MyMatchesPage';
 import SearchMatchesPage from '../pages/matches/SearchMatchesPage';
 import TeamRankingPage from '../pages/matches/TeamRankingPage';
-import LoginPage from '../pages/auth/LoginPage';
-import SignupPage from '../pages/auth/SignupPage';
 import AboutPage from '../pages/AboutPage';
 import FAQPage from '../pages/FAQPage';
 import ContactPage from '../pages/ContactPage';
+import LoginPage from '../pages/auth/LoginPage';
+import SignupPage from '../pages/auth/SignupPage';
 
 export const router = createBrowserRouter([
   {
@@ -27,10 +27,14 @@ export const router = createBrowserRouter([
       },
       {
         path: '/info/:category',
-        element: <BoardPage />,
+        element: <BoardPage type="info" />,
       },
       {
         path: '/board',
+        element: <BoardPage />,
+      },
+      {
+        path: '/board/:category',
         element: <BoardPage />,
       },
       {
@@ -50,14 +54,6 @@ export const router = createBrowserRouter([
         element: <TeamRankingPage />,
       },
       {
-        path: '/login',
-        element: <LoginPage />,
-      },
-      {
-        path: '/signup',
-        element: <SignupPage />,
-      },
-      {
         path: '/about',
         element: <AboutPage />,
       },
@@ -68,6 +64,14 @@ export const router = createBrowserRouter([
       {
         path: '/contact',
         element: <ContactPage />,
+      },
+      {
+        path: '/login',
+        element: <LoginPage />,
+      },
+      {
+        path: '/signup',
+        element: <SignupPage />,
       },
     ],
   },

@@ -7,7 +7,7 @@ function AboutPage() {
       <section className="relative py-20 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-50 to-purple-50"></div>
         <div className="relative max-w-6xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-blue-300">
             TAD에 오신 것을 환영합니다
           </h1>
           <p className="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto">
@@ -107,7 +107,7 @@ function AboutPage() {
               },
             ].map((item, index) => (
               <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4 text-white">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-bold mb-2">{item.title}</h3>
@@ -144,13 +144,13 @@ function AboutPage() {
           <div className="flex gap-4 justify-center flex-wrap">
             <a
               href="/signup"
-              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-semibold text-lg hover:scale-105 transition-transform"
+              className="px-8 py-3 bg-gradient-to-r from-blue-400 to-purple-400 text-white rounded-lg font-semibold text-lg hover:scale-105 transition-transform"
             >
               회원가입
             </a>
             <a
               href="/matches/search"
-              className="px-8 py-3 bg-gray-700 rounded-lg font-semibold text-lg hover:bg-gray-600 transition-colors"
+              className="px-8 py-3 bg-gray-300 text-gray-800 rounded-lg font-semibold text-lg hover:bg-gray-400 transition-colors"
             >
               전적 검색
             </a>

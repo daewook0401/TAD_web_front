@@ -39,17 +39,17 @@ const MyMatchesPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header Section */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-between">
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-12">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">내 전적 확인</h1>
-              <p className="text-gray-600 mt-2">당신의 게임 경기 기록을 확인하세요</p>
+              <p className="text-sm font-bold uppercase tracking-[0.28em] text-blue-600">My Match Log</p>
+              <h1 className="mt-4 text-4xl font-black text-gray-900 lg:text-6xl">내 전적 확인</h1>
+              <p className="mt-4 text-lg text-gray-600">최근 경기 흐름과 핵심 지표를 한 번에 확인하세요.</p>
             </div>
             {isAuthenticated && (
-              <div className="bg-blue-600 rounded-lg p-4 border border-blue-700">
-                <p className="text-sm text-blue-100">사용자</p>
+              <div className="rounded-2xl border border-blue-300 bg-blue-100 px-5 py-4">
+                <p className="text-sm font-bold text-blue-600">사용자</p>
                 <p className="text-xl font-bold text-gray-900">{user?.name || '사용자'}</p>
               </div>
             )}
@@ -60,23 +60,23 @@ const MyMatchesPage = () => {
       {/* Stats Cards */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
             <p className="text-gray-600 text-sm mb-2">총 경기</p>
             <p className="text-3xl font-bold text-gray-900">{stats.totalMatches}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
             <p className="text-gray-600 text-sm mb-2">승리</p>
             <p className="text-3xl font-bold text-green-600">{stats.wins}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
             <p className="text-gray-600 text-sm mb-2">패배</p>
             <p className="text-3xl font-bold text-red-600">{stats.losses}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
             <p className="text-gray-600 text-sm mb-2">승률</p>
             <p className="text-3xl font-bold text-blue-600">{stats.winRate}%</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
             <p className="text-gray-600 text-sm mb-2">평균 K/D/A</p>
             <p className="text-3xl font-bold text-purple-600">{stats.avgKda}</p>
           </div>
@@ -85,13 +85,13 @@ const MyMatchesPage = () => {
 
       {/* Filter Section */}
       <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 rounded-3xl border border-gray-200 bg-white p-3">
           <span className="text-sm font-semibold text-gray-700">게임 필터:</span>
           <button
             onClick={() => setFilterGame('all')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+            className={`px-4 py-2 rounded-xl font-bold transition-colors duration-200 ${
               filterGame === 'all'
-                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-gray-900'
+                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                 : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-600'
             }`}
           >
@@ -99,9 +99,9 @@ const MyMatchesPage = () => {
           </button>
           <button
             onClick={() => setFilterGame('League of Legends')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+            className={`px-4 py-2 rounded-xl font-bold transition-colors duration-200 ${
               filterGame === 'League of Legends'
-                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-gray-900'
+                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                 : 'bg-gray-50 text-gray-700 border border-gray-300 hover:border-blue-500'
             }`}
           >
@@ -109,9 +109,9 @@ const MyMatchesPage = () => {
           </button>
           <button
             onClick={() => setFilterGame('Mapleland')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors duration-200 ${
+            className={`px-4 py-2 rounded-xl font-bold transition-colors duration-200 ${
               filterGame === 'Mapleland'
-                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-gray-900'
+                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
                 : 'bg-gray-50 text-gray-700 border border-gray-300 hover:border-blue-500'
             }`}
           >
@@ -122,7 +122,8 @@ const MyMatchesPage = () => {
 
       {/* Matches Table */}
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="bg-gray-50  rounded-lg shadow border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-[2rem] shadow border border-gray-200 overflow-hidden p-3">
+          <div className="overflow-hidden rounded-2xl border border-gray-200">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -170,6 +171,7 @@ const MyMatchesPage = () => {
                 )}
               </tbody>
             </table>
+          </div>
           </div>
         </div>
       </div>

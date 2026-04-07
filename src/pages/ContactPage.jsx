@@ -49,7 +49,7 @@ function ContactPage() {
   if (submitted) {
     return (
       <div className="min-h-screen bg-gray-50 text-gray-900 flex items-center justify-center px-4">
-        <div className="max-w-md w-full bg-gray-50  rounded-2xl p-8 border border-gray-200 text-center">
+        <div className="max-w-md w-full bg-white rounded-2xl p-8 border border-gray-200 shadow-lg text-center">
           <div className="text-6xl mb-6">✅</div>
           <h2 className="text-3xl font-bold mb-4">문의가 접수되었습니다!</h2>
           <p className="text-gray-700 mb-8">
@@ -57,7 +57,7 @@ function ContactPage() {
           </p>
           <button
             onClick={() => setSubmitted(false)}
-            className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-semibold hover:scale-105 transition-transform"
+            className="px-8 py-3 bg-gradient-to-r from-blue-400 to-purple-400 text-white rounded-lg font-semibold hover:scale-105 hover:from-blue-500 hover:to-purple-500 transition-all"
           >
             다른 문의 작성
           </button>
@@ -71,7 +71,7 @@ function ContactPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-blue-300">
             문의하기
           </h1>
           <p className="text-xl text-gray-700">
@@ -81,17 +81,17 @@ function ContactPage() {
 
         <div className="grid md:grid-cols-3 gap-8 mb-12">
           {/* Contact Info Cards */}
-          <div className="bg-gray-50  rounded-xl p-6 border border-gray-200 text-center hover:border-blue-500 transition-all">
+          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm text-center hover:border-blue-600 hover:shadow-md transition-all">
             <div className="text-4xl mb-4">📧</div>
             <h3 className="font-bold text-lg mb-2">이메일</h3>
             <p className="text-gray-600 text-sm">support@tad.com</p>
           </div>
-          <div className="bg-gray-50  rounded-xl p-6 border border-gray-200 text-center hover:border-blue-500 transition-all">
+          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm text-center hover:border-blue-600 hover:shadow-md transition-all">
             <div className="text-4xl mb-4">💬</div>
             <h3 className="font-bold text-lg mb-2">Discord</h3>
             <p className="text-gray-600 text-sm">TAD Official Server</p>
           </div>
-          <div className="bg-gray-50  rounded-xl p-6 border border-gray-200 text-center hover:border-blue-500 transition-all">
+          <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm text-center hover:border-blue-600 hover:shadow-md transition-all">
             <div className="text-4xl mb-4">⏰</div>
             <h3 className="font-bold text-lg mb-2">응답 시간</h3>
             <p className="text-gray-600 text-sm">평균 24시간 이내</p>
@@ -99,7 +99,7 @@ function ContactPage() {
         </div>
 
         {/* Contact Form */}
-        <div className="bg-gray-50  rounded-2xl p-8 border border-gray-200">
+        <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Name & Email */}
             <div className="grid md:grid-cols-2 gap-6">
@@ -194,7 +194,7 @@ function ContactPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg font-semibold text-lg hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="w-full py-4 bg-gradient-to-r from-blue-400 to-purple-400 text-white rounded-lg font-semibold text-lg hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {loading ? '전송 중...' : '문의 보내기'}
             </button>
@@ -202,8 +202,8 @@ function ContactPage() {
         </div>
 
         {/* Additional Info */}
-        <div className="mt-8 bg-blue-900 border border-blue-700 rounded-xl p-6">
-          <h3 className="font-bold text-lg mb-2 flex items-center gap-2">
+        <div className="mt-8 bg-blue-100 border border-blue-300 rounded-xl p-6">
+          <h3 className="font-bold text-lg mb-2 flex items-center gap-2 text-blue-900">
             <span>💡</span>
             <span>문의 전 확인해주세요</span>
           </h3>
