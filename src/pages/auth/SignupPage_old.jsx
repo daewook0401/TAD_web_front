@@ -102,42 +102,42 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
+    <div >
+      <div >
         {/* Logo */}
-        <div className="text-center">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+        <div >
+          <h2 >
             TAD
           </h2>
-          <p className="mt-2 text-gray-300">게임 전적 관리 플랫폼</p>
+          <p >게임 전적 관리 플랫폼</p>
         </div>
 
         {/* Card */}
-        <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-700 p-8 space-y-6">
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-white">회원가입</h1>
-            <p className="text-gray-300">TAD에 새로운 계정을 만드세요</p>
+        <div >
+          <div >
+            <h1 >회원가입</h1>
+            <p >TAD에 새로운 계정을 만드세요</p>
           </div>
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4">
-              <p className="text-sm text-red-400">{error}</p>
+            <div >
+              <p >{error}</p>
             </div>
           )}
 
           {/* Success Message */}
           {success && (
-            <div className="bg-green-500/20 border border-green-500/50 rounded-lg p-4">
-              <p className="text-sm text-green-400">{success}</p>
+            <div >
+              <p >{success}</p>
             </div>
           )}
 
           {/* Signup Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} >
             {/* Name Input */}
             <div>
-              <label htmlFor="name" className="block text-sm font-semibold text-gray-200 mb-2">
+              <label htmlFor="name" >
                 사용자명
               </label>
               <input
@@ -147,14 +147,14 @@ const SignupPage = () => {
                 autoComplete="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white placeholder-gray-500"
+                
                 placeholder="사용자명을 입력하세요"
               />
             </div>
 
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-200 mb-2">
+              <label htmlFor="email" >
                 이메일
               </label>
               <input
@@ -164,14 +164,14 @@ const SignupPage = () => {
                 autoComplete="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white placeholder-gray-500"
+                
                 placeholder="example@email.com"
               />
             </div>
 
             {/* Password Input */}
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-200 mb-2">
+              <label htmlFor="password" >
                 비밀번호
               </label>
               <input
@@ -181,15 +181,15 @@ const SignupPage = () => {
                 autoComplete="new-password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white placeholder-gray-500"
+                
                 placeholder="최소 8자 이상"
               />
-              <p className="text-xs text-gray-400 mt-1">최소 8자 이상의 비밀번호를 입력하세요</p>
+              <p >최소 8자 이상의 비밀번호를 입력하세요</p>
             </div>
 
             {/* Confirm Password Input */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-200 mb-2">
+              <label htmlFor="confirmPassword" >
                 비밀번호 확인
               </label>
               <input
@@ -199,27 +199,27 @@ const SignupPage = () => {
                 autoComplete="new-password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-white placeholder-gray-500"
+                
                 placeholder="비밀번호를 다시 입력하세요"
               />
             </div>
 
             {/* Terms Agreement */}
-            <div className="space-y-3 py-2">
-              <label className="flex items-start gap-3 cursor-pointer">
+            <div >
+              <label >
                 <input
                   type="checkbox"
                   name="agreeTerms"
                   checked={formData.agreeTerms}
                   onChange={handleChange}
-                  className="w-5 h-5 rounded border-gray-600 accent-blue-500 mt-0.5 flex-shrink-0"
+                  
                 />
-                <span className="text-sm text-gray-300">
-                  <Link to="#" className="text-blue-400 hover:text-blue-300 font-medium">
+                <span >
+                  <Link to="#" >
                     이용약관
                   </Link>
                   과{' '}
-                  <Link to="#" className="text-blue-400 hover:text-blue-300 font-medium">
+                  <Link to="#" >
                     개인정보처리방침
                   </Link>
                   에 동의합니다
@@ -231,25 +231,25 @@ const SignupPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+              
             >
               {isLoading ? '가입 중...' : '회원가입'}
             </button>
           </form>
 
           {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-700"></div>
+          <div >
+            <div >
+              <div ></div>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-800/50 text-gray-400">또는</span>
+            <div >
+              <span >또는</span>
             </div>
           </div>
 
           {/* Social Signup */}
-          <button className="w-full py-3 px-4 border border-gray-600 rounded-lg hover:bg-gray-700/50 transition-colors duration-200 flex items-center justify-center gap-2 font-medium text-gray-200">
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
+          <button >
+            <svg  viewBox="0 0 24 24">
               <path
                 fill="currentColor"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -271,10 +271,10 @@ const SignupPage = () => {
           </button>
 
           {/* Login Link */}
-          <div className="text-center">
-            <p className="text-gray-300">
+          <div >
+            <p >
               이미 계정이 있으신가요?{' '}
-              <Link to="/login" className="text-blue-400 hover:text-blue-300 font-semibold">
+              <Link to="/login" >
                 로그인
               </Link>
             </p>
@@ -282,8 +282,8 @@ const SignupPage = () => {
         </div>
 
         {/* Footer */}
-        <div className="text-center text-sm text-gray-400">
-          <Link to="/" className="text-blue-400 hover:text-blue-300">
+        <div >
+          <Link to="/" >
             홈으로 돌아가기
           </Link>
         </div>

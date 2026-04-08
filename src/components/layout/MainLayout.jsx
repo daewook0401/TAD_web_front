@@ -2,12 +2,13 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from './Header';
 import Footer from './Footer';
+import '../../styles/layout/MainLayout.css';
 
 const MainLayout = () => {
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="main-layout">
       <Header />
-      <main className="flex-grow">
+      <main className="main-layout__content">
         <Outlet />
       </main>
       <Footer />

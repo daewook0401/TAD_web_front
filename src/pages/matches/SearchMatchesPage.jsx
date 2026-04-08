@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../../styles/pages/MatchesPages.css';
 
 const SearchMatchesPage = () => {
   const [searchPlayer, setSearchPlayer] = useState('');
@@ -30,42 +31,37 @@ const SearchMatchesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-12">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-sm font-bold uppercase tracking-[0.28em] text-blue-600">Player Search</p>
-          <h1 className="mt-4 text-4xl font-black text-gray-900 lg:text-6xl">전적 확인</h1>
-          <p className="mt-4 text-lg text-gray-600">플레이어 이름으로 기록, 승률, 최근 흐름을 빠르게 확인하세요.</p>
+    <div className="matches-page">
+      {/* Hero Section */}
+      <section className="matches-hero">
+        <div className="matches-hero__container">
+          <span className="matches-hero__eyebrow">Player Search</span>
+          <h1 className="matches-hero__title">전적 확인</h1>
+          <p className="matches-hero__description">플레이어 이름으로 기록, 승률, 최근 흐름을 빠르게 확인하세요.</p>
         </div>
-      </div>
+      </section>
 
       {/* Search Section */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="bg-white rounded-[2rem] shadow-sm p-8 border border-gray-200">
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-900 mb-3">플레이어 검색</label>
-            <div className="flex gap-3">
-              <input
-                type="text"
-                value={searchPlayer}
-                onChange={(e) => setSearchPlayer(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="플레이어 이름을 입력하세요 (예: ProGamer123)"
-                className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-500"
-              />
-              <button
-                onClick={handleSearch}
-                className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold transition-all duration-200"
-              >
-                검색
-              </button>
-            </div>
+      <section className="matches-search">
+        <div className="matches-search__container">
+          <label className="matches-search__label">플레이어 검색</label>
+          <div className="matches-search__input-group">
+            <input
+              type="text"
+              value={searchPlayer}
+              onChange={(e) => setSearchPlayer(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="플레이어 이름을 입력하세요 (예: ProGamer123)"
+              className="matches-search__input"
+            />
+            <button onClick={handleSearch} className="matches-search__btn">
+              검색
+            </button>
           </div>
 
-          {/* Suggested Players */}
           <div>
-            <p className="text-sm font-semibold text-gray-900 mb-3">인기 플레이어 예시</p>
-            <div className="flex flex-wrap gap-2">
+            <p className="matches-search__suggestions-label">인기 플레이어 예시</p>
+            <div className="matches-search__suggestions">
               {playerDatabase.map((player) => (
                 <button
                   key={player.id}
@@ -74,7 +70,7 @@ const SearchMatchesPage = () => {
                     setSearchResult(player);
                     setHasSearched(true);
                   }}
-                  className="px-4 py-2 bg-white text-gray-700 text-sm font-bold rounded-xl transition-colors duration-200 border border-gray-300"
+                  className="matches-search__suggestion"
                 >
                   {player.name}
                 </button>
@@ -82,103 +78,107 @@ const SearchMatchesPage = () => {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Search Results */}
       {hasSearched && (
-        <div className="max-w-7xl mx-auto px-6 pb-12">
-          {searchResult ? (
-            <div className="space-y-8">
-              {/* Player Profile */}
-              <div className="bg-white rounded-[2rem] shadow-lg p-8 border border-gray-200">
-                <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
-                  <div className="md:col-span-2">
-                    <div className="w-32 h-32 bg-gradient-to-br from-blue-600 to-purple-600 rounded-3xl flex items-center justify-center text-white text-4xl font-black mb-4">
-                      {searchResult.name.charAt(0)}
-                    </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">{searchResult.name}</h2>
-                    <p className="text-sm text-gray-700">주 게임: {searchResult.mainGame}</p>
-                  </div>
-                  <div className="md:col-span-3 grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-                      <p className="text-gray-600 text-sm mb-1">총 경기</p>
-                      <p className="text-3xl font-bold text-gray-900">{searchResult.totalMatches}</p>
-                    </div>
-                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-                      <p className="text-gray-600 text-sm mb-1">승률</p>
-                      <p className="text-3xl font-bold text-green-400">{searchResult.winRate}%</p>
-                    </div>
-                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-                      <p className="text-gray-600 text-sm mb-1">평균 K/D/A</p>
-                      <p className="text-3xl font-bold text-blue-600">{searchResult.avgKda}</p>
-                    </div>
-                    <div className="bg-gray-50 rounded-2xl p-4 border border-gray-200">
-                      <p className="text-gray-600 text-sm mb-1">현재 티어</p>
-                      <p className="text-3xl font-bold text-purple-400">{searchResult.tier}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Detailed Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-white rounded-[2rem] shadow p-6 border border-gray-200">
-                  <h3 className="text-xl font-bold text-gray-900 mb-6">게임별 통계</h3>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-gray-700 font-medium">League of Legends</p>
-                        <p className="text-sm text-gray-600">155 경기</p>
+        <section className="matches-results">
+          <div className="matches-results__container">
+            {searchResult ? (
+              <>
+                {/* Player Profile */}
+                <div className="player-profile">
+                  <div className="player-profile__inner">
+                    <div className="player-profile__header">
+                      <div className="player-profile__avatar">
+                        {searchResult.name.charAt(0)}
                       </div>
-                      <div className="w-full bg-gray-700 rounded-full h-2">
-                        <div className="bg-blue-500 h-2 rounded-full" style={{ width: '66%' }}></div>
+                      <div>
+                        <h2 className="player-profile__name">{searchResult.name}</h2>
+                        <p className="player-profile__game">주 게임: {searchResult.mainGame}</p>
                       </div>
                     </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-gray-700 font-medium">Mapleland</p>
-                        <p className="text-sm text-gray-600">79 경기</p>
+                    <div className="player-profile__stats">
+                      <div className="player-stat">
+                        <p className="player-stat__label">총 경기</p>
+                        <p className="player-stat__value">{searchResult.totalMatches}</p>
                       </div>
-                      <div className="w-full bg-gray-700 rounded-full h-2">
-                        <div className="bg-purple-500 h-2 rounded-full" style={{ width: '34%' }}></div>
+                      <div className="player-stat">
+                        <p className="player-stat__label">승률</p>
+                        <p className="player-stat__value">{searchResult.winRate}%</p>
+                      </div>
+                      <div className="player-stat">
+                        <p className="player-stat__label">평균 K/D/A</p>
+                        <p className="player-stat__value">{searchResult.avgKda}</p>
+                      </div>
+                      <div className="player-stat">
+                        <p className="player-stat__label">현재 티어</p>
+                        <p className="player-stat__value">{searchResult.tier}</p>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-[2rem] shadow p-6 border border-gray-200">
-                  <h3 className="text-xl font-bold text-gray-900 mb-6">최근 7일</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <p className="text-gray-700">이번 주 경기</p>
-                      <p className="text-2xl font-bold text-gray-900">23</p>
+                {/* Detailed Stats */}
+                <div className="matches-stats-grid">
+                  <div className="stats-card">
+                    <h3 className="stats-card__title">게임별 통계</h3>
+                    <div className="stats-card__games">
+                      <div className="game-stat">
+                        <div className="game-stat__header">
+                          <p className="game-stat__name">League of Legends</p>
+                          <p className="game-stat__count">155 경기</p>
+                        </div>
+                        <div className="game-stat__bar">
+                          <div className="game-stat__fill" style={{ width: '66%' }}></div>
+                        </div>
+                      </div>
+                      <div className="game-stat">
+                        <div className="game-stat__header">
+                          <p className="game-stat__name">Mapleland</p>
+                          <p className="game-stat__count">79 경기</p>
+                        </div>
+                        <div className="game-stat__bar">
+                          <div className="game-stat__fill" style={{ width: '34%' }}></div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <p className="text-gray-700">승리</p>
-                      <p className="text-2xl font-bold text-green-400">14</p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <p className="text-gray-700">패배</p>
-                      <p className="text-2xl font-bold text-red-400">9</p>
-                    </div>
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                      <p className="text-gray-700 font-medium">승률</p>
-                      <p className="text-2xl font-bold text-blue-600">60.9%</p>
+                  </div>
+
+                  <div className="stats-card">
+                    <h3 className="stats-card__title">최근 7일</h3>
+                    <div className="stats-card__weekly">
+                      <div className="weekly-stat">
+                        <p className="weekly-stat__label">이번 주 경기</p>
+                        <p className="weekly-stat__value">23</p>
+                      </div>
+                      <div className="weekly-stat">
+                        <p className="weekly-stat__label">승리</p>
+                        <p className="weekly-stat__value">14</p>
+                      </div>
+                      <div className="weekly-stat">
+                        <p className="weekly-stat__label">패배</p>
+                        <p className="weekly-stat__value">9</p>
+                      </div>
+                      <div className="weekly-stat">
+                        <p className="weekly-stat__label">승률</p>
+                        <p className="weekly-stat__value">60.9%</p>
+                      </div>
                     </div>
                   </div>
                 </div>
+              </>
+            ) : (
+              <div className="matches-empty">
+                <svg className="matches-empty__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <h3 className="matches-empty__title">검색 결과 없음</h3>
+                <p className="matches-empty__description">"{searchPlayer}"에 해당하는 플레이어를 찾을 수 없습니다.</p>
               </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-[2rem] shadow-lg p-12 border border-gray-200 text-center">
-              <svg className="w-16 h-16 text-gray-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">검색 결과 없음</h3>
-              <p className="text-gray-600">"{searchPlayer}"에 해당하는 플레이어를 찾을 수 없습니다.</p>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        </section>
       )}
     </div>
   );

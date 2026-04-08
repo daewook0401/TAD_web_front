@@ -24,16 +24,16 @@ const UserHeader = () => {
     navi(path);
   };
   return (
-    <header className="w-full shadow-md bg-white z-50 relative">
+    <header >
       {/* 상단 헤더 */}
-      <div className="max-w-screen-xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div >
         {/* 로고 */}
-        <div className="flex items-center space-x-2 cursor-pointer" onClick={() => navi("/")}>
-          <img src={logo} alt="TADlogo" className="h-14 w-auto" onClick={() => handleMenuClick("/")}/>
+        <div  onClick={() => navi("/")}>
+          <img src={logo} alt="TADlogo"  onClick={() => handleMenuClick("/")}/>
         </div>
 
         {/* PC 전용 내비게이션 */}
-        <nav className="hidden md:flex space-x-4 items-center list-none">
+        <nav >
           <ListItem onClick={() => handleMenuClick("/")}>소개</ListItem>
           <ListItem onClick={() => handleMenuClick("/dashboard")}>대시보드</ListItem>
           <ListItem onClick={clickBoardItem}>게시판</ListItem>
@@ -42,7 +42,7 @@ const UserHeader = () => {
         </nav>
 
         {/* 로그인/회원가입 버튼 (PC) */}
-        <div className="hidden md:flex items-center space-x-3">
+        <div >
           {!auth.isAuthenticated ? (
             <>
               <Login/>
@@ -51,21 +51,21 @@ const UserHeader = () => {
             <>
               {(auth.loginInfo.memberRole === "ROLE_COMMON") ? (
                 <button
-                  className="cursor-pointer px-4 py-2 rounded-lg bg-main text-black"
+                  
                   onClick={() => navi("/mypage")}
                 >
                   마이페이지
                 </button>
               ) : (
                 <button
-                  className="cursor-pointer px-4 py-2 rounded-lg bg-main text-black"
+                  
                   onClick={() => navi("/admin")}
                 >
                   관리자 페이지
                 </button>
               )}
               <button
-                className="cursor-pointer px-4 py-2 rounded-lg bg-sub text-black"
+                
                 onClick={logout}
               >
                 로그아웃
@@ -75,9 +75,9 @@ const UserHeader = () => {
         </div>
 
         {/* 모바일 햄버거 메뉴 */}
-        <div className="md:hidden">
+        <div >
           <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2"
+            <svg  fill="none" stroke="currentColor" strokeWidth="2"
               viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round"
                 d="M4 6h16M4 12h16M4 18h16" />
@@ -88,34 +88,34 @@ const UserHeader = () => {
 
       {/* 모바일 메뉴 */}
       {isMobileMenuOpen && (
-        <div className="md:hidden px-6 py-4 bg-white border-t">
-          <ul className="space-y-2 list-none">
-            <li className="cursor-pointer" onClick={() => handleMenuClick("/")}>소개</li>
-            <li className="cursor-pointer" onClick={() => handleMenuClick("/dashboard")}>대시보드</li>
-            <li className="cursor-pointer" onClick={clickBoardItem}>게시판</li>
-            <li className="cursor-pointer" onClick={() => handleMenuClick("/notice")}>공지사항</li>
-            <li className="cursor-pointer" onClick={() => handleMenuClick("/frequencyAskPage")}>문의하기</li>
+        <div >
+          <ul >
+            <li  onClick={() => handleMenuClick("/")}>소개</li>
+            <li  onClick={() => handleMenuClick("/dashboard")}>대시보드</li>
+            <li  onClick={clickBoardItem}>게시판</li>
+            <li  onClick={() => handleMenuClick("/notice")}>공지사항</li>
+            <li  onClick={() => handleMenuClick("/frequencyAskPage")}>문의하기</li>
           </ul>
-          <div className="mt-4 border-t pt-4 space-y-2">
+          <div >
             {!auth.isAuthenticated ? (
               <>
                 <Login/>
-                <button className="w-full px-4 py-2 bg-sub text-black rounded-lg" onClick={() => navi("/signup")}>
+                <button  onClick={() => navi("/signup")}>
                   회원가입
                 </button>
               </>
             ) : (
               <>
                 {auth.loginInfo.memberRole === "ROLE_COMMON" ? (
-                  <button className="w-full px-4 py-2 bg-main text-white rounded-lg" onClick={() => navi("/mypage")}>
+                  <button  onClick={() => navi("/mypage")}>
                     마이페이지
                   </button>
                 ) : (
-                  <button className="w-full px-4 py-2 bg-main text-white rounded-lg" onClick={() => navi("/admin")}>
+                  <button  onClick={() => navi("/admin")}>
                     관리자 페이지
                   </button>
                 )}
-                <button className="w-full px-4 py-2 bg-sub text-white rounded-lg" onClick={logout}>
+                <button  onClick={logout}>
                   로그아웃
                 </button>
               </>
@@ -126,13 +126,13 @@ const UserHeader = () => {
 
       {/* 게시판 서브 메뉴 (PC only) */}
       {subNav && (
-        <div className="w-full border-t border-gray-200 hidden md:block">
-          <nav className="flex items-center justify-center px-6 py-2 bg-white">
-            <ul className="flex space-x-4 text-gray-600 list-none">
-              <li className="cursor-pointer hover:text-green-600" onClick={() => navi("/auth-board")}>인증게시판</li>
-              <li className="cursor-pointer hover:text-green-600" onClick={() => navi("/community/free")}>자유게시판</li>
-              <li className="cursor-pointer hover:text-green-600" onClick={() => navi("/community/qna")}>질문 게시판</li>
-              <li className="cursor-pointer hover:text-green-600" onClick={() => navi("/community/tips")}>팁</li>
+        <div >
+          <nav >
+            <ul >
+              <li  onClick={() => navi("/auth-board")}>인증게시판</li>
+              <li  onClick={() => navi("/community/free")}>자유게시판</li>
+              <li  onClick={() => navi("/community/qna")}>질문 게시판</li>
+              <li  onClick={() => navi("/community/tips")}>팁</li>
             </ul>
           </nav>
         </div>

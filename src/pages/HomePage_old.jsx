@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const HomePage = () => {
@@ -20,35 +20,35 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 min-h-screen">
+    <div >
       {/* Welcome Section */}
-      <section className="relative overflow-hidden py-20">
-        <div className="absolute top-0 right-0 -z-10 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 -z-10 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl"></div>
+      <section >
+        <div ></div>
+        <div ></div>
 
-        <div className="w-full px-6">
-          <div className="text-center space-y-6">
-            <div className="space-y-3">
-              <h1 className="text-5xl lg:text-6xl font-bold text-white">
+        <div >
+          <div >
+            <div >
+              <h1 >
                 환영합니다.
               </h1>
-              <h2 className="text-3xl lg:text-4xl font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+              <h2 >
                 TAD 사이트입니다
               </h2>
             </div>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+            <p >
               당신의 게임 전적을 한곳에서 관리하고, 실시간으로 분석하며, 다른 플레이어들과 소통하세요.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
+            <div >
               <Link
                 to="/signup"
-                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg font-semibold hover:scale-105 transition-transform duration-200"
+                
               >
                 시작하기
               </Link>
               <Link
                 to="/about"
-                className="px-8 py-3 border-2 border-gray-600 text-gray-300 rounded-lg font-semibold hover:border-blue-500 hover:text-blue-400 transition-colors duration-200"
+                
               >
                 자세히 알아보기
               </Link>
@@ -58,50 +58,46 @@ const HomePage = () => {
       </section>
 
       {/* Recent Matches Table */}
-      <section className="py-20 bg-gray-800">
-        <div className="w-full px-6">
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-8">
+      <section >
+        <div >
+          <div >
+            <div >
               <div>
-                <h2 className="text-3xl lg:text-4xl font-bold text-white mb-2">최근 내전 전적</h2>
-                <p className="text-gray-400">최근 경기 기록을 확인하세요</p>
+                <h2 >최근 내전 전적</h2>
+                <p >최근 경기 기록을 확인하세요</p>
               </div>
               <Link
                 to="/matches/my"
-                className="px-6 py-2 text-blue-400 font-semibold hover:text-blue-300 transition-colors duration-200"
+                
               >
                 전체보기 →
               </Link>
             </div>
 
-            <div className="bg-gray-800 backdrop-blur-lg rounded-lg border border-gray-700 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
+            <div >
+              <div >
+                <table >
                   <thead>
-                    <tr className="bg-gray-900 border-b border-gray-700">
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">날짜</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">게임</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">결과</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">K/D/A</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">게임시간</th>
+                    <tr >
+                      <th >날짜</th>
+                      <th >게임</th>
+                      <th >결과</th>
+                      <th >K/D/A</th>
+                      <th >게임시간</th>
                     </tr>
                   </thead>
                   <tbody>
                     {matchesData.map((match) => (
-                      <tr key={match.id} className="border-b border-gray-700 hover:bg-gray-700 transition-colors duration-200">
-                        <td className="px-6 py-4 text-sm text-gray-300">{match.date}</td>
-                        <td className="px-6 py-4 text-sm font-medium text-white">{match.game}</td>
-                        <td className="px-6 py-4 text-sm">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                            match.result === '승리'
-                              ? 'bg-green-500 text-green-400 border border-green-500'
-                              : 'bg-red-500 text-red-400 border border-red-500'
-                          }`}>
+                      <tr key={match.id} >
+                        <td >{match.date}</td>
+                        <td >{match.game}</td>
+                        <td >
+                          <span >
                             {match.result}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-300">{match.kda}</td>
-                        <td className="px-6 py-4 text-sm text-gray-300">{match.duration}</td>
+                        <td >{match.kda}</td>
+                        <td >{match.duration}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -113,46 +109,46 @@ const HomePage = () => {
       </section>
 
       {/* Information Articles Table */}
-      <section className="py-20">
-        <div className="w-full px-6">
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-8">
+      <section >
+        <div >
+          <div >
+            <div >
               <div>
-                <h2 className="text-3xl lg:text-4xl font-bold text-white mb-2">최신 정보 글</h2>
-                <p className="text-gray-400">게임 정보와 팁을 확인하세요</p>
+                <h2 >최신 정보 글</h2>
+                <p >게임 정보와 팁을 확인하세요</p>
               </div>
               <Link
                 to="/info"
-                className="px-6 py-2 text-blue-400 font-semibold hover:text-blue-300 transition-colors duration-200"
+                
               >
                 전체보기 →
               </Link>
             </div>
 
-            <div className="bg-gray-800 backdrop-blur-lg rounded-lg border border-gray-700 overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
+            <div >
+              <div >
+                <table >
                   <thead>
-                    <tr className="bg-gray-900 border-b border-gray-700">
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">카테고리</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">제목</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">작성자</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">조회수</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-200">날짜</th>
+                    <tr >
+                      <th >카테고리</th>
+                      <th >제목</th>
+                      <th >작성자</th>
+                      <th >조회수</th>
+                      <th >날짜</th>
                     </tr>
                   </thead>
                   <tbody>
                     {infoData.map((article) => (
-                      <tr key={article.id} className="border-b border-gray-700 hover:bg-gray-700 transition-colors duration-200">
-                        <td className="px-6 py-4 text-sm">
-                          <span className="inline-block px-3 py-1 bg-blue-500 text-blue-400 border border-blue-500 rounded-full text-xs font-semibold">
+                      <tr key={article.id} >
+                        <td >
+                          <span >
                             {article.category}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-sm font-medium text-white">{article.title}</td>
-                        <td className="px-6 py-4 text-sm text-gray-300">{article.author}</td>
-                        <td className="px-6 py-4 text-sm text-gray-300">{article.views.toLocaleString()}</td>
-                        <td className="px-6 py-4 text-sm text-gray-300">{article.date}</td>
+                        <td >{article.title}</td>
+                        <td >{article.author}</td>
+                        <td >{article.views.toLocaleString()}</td>
+                        <td >{article.date}</td>
                       </tr>
                     ))}
                   </tbody>

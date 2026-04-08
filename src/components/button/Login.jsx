@@ -5,11 +5,11 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../../provider/AuthContext";
 
 const Login = () => {
-  const { login, logout } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
   const API_URL = window.ENV?.API_URL;
   const navigate = useNavigate();
   // 💡 [해결] setMsg를 선언합니다.
-  const [msg, setMsg] = useState("");
+  const [, setMsg] = useState("");
   const handleGoogleSuccess = (credentialResponse) => {
     axios.post(`${API_URL}auth/google-login`, {
       token: credentialResponse.credential,
