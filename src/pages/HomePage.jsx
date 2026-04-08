@@ -182,7 +182,7 @@ const HomePage = () => {
                 <h2 className="table-card__title">최신 정보 글</h2>
                 <p className="table-card__subtitle">게임별 업데이트와 팁을 빠르게 확인하세요.</p>
               </div>
-              <Link to="/info" className="table-card__link">
+              <Link to="/board" className="table-card__link">
                 전체보기
               </Link>
             </div>
