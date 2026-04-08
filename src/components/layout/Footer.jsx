@@ -1,57 +1,48 @@
 import React from 'react';
+import '../../styles/layout/Footer.css';
 
 const Footer = () => {
   return (
-    <footer className="bg-white border-t border-gray-200 mt-20 w-full">
-      <div className="w-full px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-full">
+    <footer className="site-footer">
+      <div className="footer__inner">
+        <div className="footer__grid">
           {/* Brand */}
-          <div className="col-span-1 md:col-span-1">
-            <div className="text-xl font-bold text-blue-300/85 mb-4">
+          <div className="footer__brand">
+            <div className="footer__logo">
               TAD
             </div>
-            <p className="text-sm text-gray-600">
+            <p className="footer__description">
               현대적이고 깔끔한 게임 전적 관리 시스템
             </p>
           </div>
 
           {/* Links */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">서비스</h3>
-            <ul className="space-y-2">
-              <li><a href="/about" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">소개</a></li>
-              <li><a href="/matches" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">전적</a></li>
-              <li><a href="/info" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">정보</a></li>
-            </ul>
-          </div>
-
-          {/* Support */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">지원</h3>
-            <ul className="space-y-2">
-              <li><a href="/faq" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">FAQ</a></li>
-              <li><a href="/contact" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">문의</a></li>
+            <h3 className="footer__section-title">서비스</h3>
+            <ul className="footer__links">
+              <li><a href="/matches" className="footer__link">전적</a></li>
+              <li><a href="/board" className="footer__link">게시판</a></li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">연락처</h3>
-            <ul className="space-y-2">
-              <li><a href="mailto:support@tad.com" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">support@tad.com</a></li>
-              <li><a href="#" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">Discord</a></li>
+            <h3 className="footer__section-title">연락처</h3>
+            <ul className="footer__links">
+              <li><a href="mailto:support@tad.com" className="footer__link">support@tad.com</a></li>
+              <li><a href="#" className="footer__link">Discord</a></li>
             </ul>
           </div>
         </div>
 
         {/* Bottom Section */}
-        <div className="mt-8 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-gray-600">
+        <div className="footer__bottom">
+          <p className="footer__copyright">
             © 2025 TAD. All rights reserved.
           </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">개인정보처리방침</a>
-            <a href="#" className="text-sm text-gray-600 hover:text-blue-600 transition-colors">이용약관</a>
+          <div className="footer__legal">
+            <a href="#" className="footer__legal-link">개인정보처리방침</a>
+            <a href="#" className="footer__legal-link">이용약관</a>
           </div>
         </div>
       </div>

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../provider/AuthContext';
+import '../../styles/pages/MatchesPages.css';
 
 const MyMatchesPage = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const [filterGame, setFilterGame] = useState('all');
 
-  // 로그인되지 않으면 로그인 페이지로 이동
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login', { replace: true });
@@ -38,133 +38,113 @@ const MyMatchesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-12">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="text-sm font-bold uppercase tracking-[0.28em] text-blue-600">My Match Log</p>
-              <h1 className="mt-4 text-4xl font-black text-gray-900 lg:text-6xl">내 전적 확인</h1>
-              <p className="mt-4 text-lg text-gray-600">최근 경기 흐름과 핵심 지표를 한 번에 확인하세요.</p>
-            </div>
-            {isAuthenticated && (
-              <div className="rounded-2xl border border-blue-300 bg-blue-100 px-5 py-4">
-                <p className="text-sm font-bold text-blue-600">사용자</p>
-                <p className="text-xl font-bold text-gray-900">{user?.name || '사용자'}</p>
-              </div>
-            )}
+    <div className="matches-page">
+      {/* Hero Section */}
+      <section className="matches-hero">
+        <div className="matches-hero__container matches-hero__container--split">
+          <div>
+            <span className="matches-hero__eyebrow">My Match Log</span>
+            <h1 className="matches-hero__title">내 전적 확인</h1>
+            <p className="matches-hero__description">최근 경기 흐름과 핵심 지표를 한 번에 확인하세요.</p>
           </div>
+          {isAuthenticated && (
+            <div className="matches-hero__user">
+              <p className="matches-hero__user-label">사용자</p>
+              <p className="matches-hero__user-name">{user?.name || '사용자'}</p>
+            </div>
+          )}
         </div>
-      </div>
+      </section>
 
       {/* Stats Cards */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
-            <p className="text-gray-600 text-sm mb-2">총 경기</p>
-            <p className="text-3xl font-bold text-gray-900">{stats.totalMatches}</p>
+      <section className="my-stats">
+        <div className="my-stats__grid">
+          <div className="my-stats__card">
+            <p className="my-stats__label">총 경기</p>
+            <p className="my-stats__value">{stats.totalMatches}</p>
           </div>
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
-            <p className="text-gray-600 text-sm mb-2">승리</p>
-            <p className="text-3xl font-bold text-green-600">{stats.wins}</p>
+          <div className="my-stats__card">
+            <p className="my-stats__label">승리</p>
+            <p className="my-stats__value my-stats__value--win">{stats.wins}</p>
           </div>
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
-            <p className="text-gray-600 text-sm mb-2">패배</p>
-            <p className="text-3xl font-bold text-red-600">{stats.losses}</p>
+          <div className="my-stats__card">
+            <p className="my-stats__label">패배</p>
+            <p className="my-stats__value my-stats__value--loss">{stats.losses}</p>
           </div>
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
-            <p className="text-gray-600 text-sm mb-2">승률</p>
-            <p className="text-3xl font-bold text-blue-600">{stats.winRate}%</p>
+          <div className="my-stats__card">
+            <p className="my-stats__label">승률</p>
+            <p className="my-stats__value">{stats.winRate}%</p>
           </div>
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-200 p-6">
-            <p className="text-gray-600 text-sm mb-2">평균 K/D/A</p>
-            <p className="text-3xl font-bold text-purple-600">{stats.avgKda}</p>
+          <div className="my-stats__card">
+            <p className="my-stats__label">평균 K/D/A</p>
+            <p className="my-stats__value">{stats.avgKda}</p>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Filter Section */}
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center gap-3 rounded-3xl border border-gray-200 bg-white p-3">
-          <span className="text-sm font-semibold text-gray-700">게임 필터:</span>
+      <section className="matches-filter">
+        <div className="matches-filter__container">
+          <span className="matches-filter__label">게임 필터:</span>
           <button
             onClick={() => setFilterGame('all')}
-            className={`px-4 py-2 rounded-xl font-bold transition-colors duration-200 ${
-              filterGame === 'all'
-                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-600'
-            }`}
+            className={`matches-filter__btn ${filterGame === 'all' ? 'matches-filter__btn--active' : ''}`}
           >
             전체
           </button>
           <button
             onClick={() => setFilterGame('League of Legends')}
-            className={`px-4 py-2 rounded-xl font-bold transition-colors duration-200 ${
-              filterGame === 'League of Legends'
-                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                : 'bg-gray-50 text-gray-700 border border-gray-300 hover:border-blue-500'
-            }`}
+            className={`matches-filter__btn ${filterGame === 'League of Legends' ? 'matches-filter__btn--active' : ''}`}
           >
             League of Legends
           </button>
           <button
             onClick={() => setFilterGame('Mapleland')}
-            className={`px-4 py-2 rounded-xl font-bold transition-colors duration-200 ${
-              filterGame === 'Mapleland'
-                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                : 'bg-gray-50 text-gray-700 border border-gray-300 hover:border-blue-500'
-            }`}
+            className={`matches-filter__btn ${filterGame === 'Mapleland' ? 'matches-filter__btn--active' : ''}`}
           >
             Mapleland
           </button>
         </div>
-      </div>
+      </section>
 
       {/* Matches Table */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="bg-white rounded-[2rem] shadow border border-gray-200 overflow-hidden p-3">
-          <div className="overflow-hidden rounded-2xl border border-gray-200">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+      <section className="matches-table">
+        <div className="matches-table__container">
+          <div className="matches-table__wrapper">
+            <table className="matches-table__table">
               <thead>
-                <tr className="bg-white border-b border-gray-200">
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">날짜</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">게임</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">결과</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">챔피언/직업</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">K/D/A</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">게임시간</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">티어</th>
+                <tr className="matches-table__header-row">
+                  <th className="matches-table__th">날짜</th>
+                  <th className="matches-table__th">게임</th>
+                  <th className="matches-table__th">결과</th>
+                  <th className="matches-table__th">챔피언/직업</th>
+                  <th className="matches-table__th">K/D/A</th>
+                  <th className="matches-table__th">게임시간</th>
+                  <th className="matches-table__th">티어</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredMatches.length > 0 ? (
                   filteredMatches.map((match) => (
-                    <tr key={match.id} className="border-b border-gray-200 hover:bg-gray-100 transition-colors duration-200">
-                      <td className="px-6 py-4 text-sm text-gray-700">{match.date}</td>
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{match.game}</td>
-                      <td className="px-6 py-4 text-sm">
-                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                          match.result === '승리'
-                            ? 'bg-green-500 text-green-400'
-                            : 'bg-red-500 text-red-400'
-                        }`}>
+                    <tr key={match.id} className="matches-table__row">
+                      <td className="matches-table__td">{match.date}</td>
+                      <td className="matches-table__td">{match.game}</td>
+                      <td className="matches-table__td">
+                        <span className={`matches-table__result ${match.result === '승리' ? 'matches-table__result--win' : 'matches-table__result--loss'}`}>
                           {match.result}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-700">{match.champion}</td>
-                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">{match.kda}</td>
-                      <td className="px-6 py-4 text-sm text-gray-700">{match.duration}</td>
-                      <td className="px-6 py-4 text-sm">
-                        <span className="inline-block px-3 py-1 bg-blue-500 text-blue-600 rounded text-xs font-semibold border border-blue-500">
-                          {match.tier}
-                        </span>
+                      <td className="matches-table__td">{match.champion}</td>
+                      <td className="matches-table__td matches-table__td--kda">{match.kda}</td>
+                      <td className="matches-table__td">{match.duration}</td>
+                      <td className="matches-table__td">
+                        <span className="matches-table__tier">{match.tier}</span>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="px-6 py-8 text-center text-gray-600">
+                    <td colSpan="7" className="matches-table__empty">
                       경기 기록이 없습니다
                     </td>
                   </tr>
@@ -172,9 +152,8 @@ const MyMatchesPage = () => {
               </tbody>
             </table>
           </div>
-          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

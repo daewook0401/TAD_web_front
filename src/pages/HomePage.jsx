@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/pages/HomePage.css';
 
 const HomePage = () => {
   const summaryCards = [
@@ -40,82 +41,67 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50 px-6 py-24">
-        <div className="absolute left-1/2 top-10 h-72 w-72 -translate-x-1/2 rounded-full bg-blue-500/20 blur-3xl" />
-        <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="space-y-8">
-            <div className="inline-flex rounded-full border border-blue-300 bg-white/70 px-4 py-2 text-sm font-semibold text-blue-600 backdrop-blur-md">
+    <div className="home-page">
+      {/* Hero Section */}
+      <section className="hero">
+        <div className="hero__background" />
+        <div className="hero__container">
+          <div className="hero__content">
+            <div className="hero__badge">
               내전 기록, 커뮤니티, 랭킹을 한 번에
             </div>
 
-            <div className="space-y-5">
-              <h1 className="max-w-4xl text-5xl font-black leading-tight tracking-tight text-gray-900 lg:text-7xl">
-                게임 기록을 더 보기 좋게,
-                <span className="block text-blue-300">TAD에서 정리하세요.</span>
-              </h1>
-              <p className="max-w-2xl text-lg leading-8 text-gray-600">
-                흩어진 내전 기록과 게임 정보를 깔끔한 대시보드로 모았습니다. 지금은 보여주는 힘에 집중한, 가볍고 세련된 게임 허브입니다.
-              </p>
-            </div>
+            <h1 className="hero__title">
+              게임 기록을 더 보기 좋게,
+              <span className="hero__title-accent">TAD에서 정리하세요.</span>
+            </h1>
+            <p className="hero__description">
+              흩어진 내전 기록과 게임 정보를 깔끔한 대시보드로 모았습니다. 지금은 보여주는 힘에 집중한, 가볍고 세련된 게임 허브입니다.
+            </p>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Link
-                to="/matches/search"
-                className="rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-7 py-3 text-center text-sm font-bold text-white transition-transform duration-200 hover:scale-[1.02]"
-              >
+            <div className="hero__actions">
+              <Link to="/matches/search" className="hero__btn-primary">
                 전적 둘러보기
               </Link>
-              <Link
-                to="/board/lol"
-                className="rounded-xl border border-gray-300 bg-white px-7 py-3 text-center text-sm font-bold text-gray-700 transition-colors duration-200 hover:border-blue-300 hover:text-blue-600"
-              >
+              <Link to="/board/lol" className="hero__btn-secondary">
                 커뮤니티 보기
               </Link>
             </div>
 
-            <div className="grid max-w-3xl grid-cols-1 gap-4 pt-4 sm:grid-cols-3">
+            <div className="hero__stats">
               {summaryCards.map((card) => (
-                <div key={card.label} className="rounded-2xl border border-gray-200 bg-white/70 p-5 backdrop-blur-md">
-                  <p className="text-sm font-medium text-gray-500">{card.label}</p>
-                  <p className="mt-2 text-3xl font-black text-gray-900">{card.value}</p>
-                  <p className="mt-1 text-xs text-gray-500">{card.description}</p>
+                <div key={card.label} className="hero__stat">
+                  <p className="hero__stat-label">{card.label}</p>
+                  <p className="hero__stat-value">{card.value}</p>
+                  <p className="hero__stat-desc">{card.description}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-gray-200 bg-white/70 p-5 shadow-xl backdrop-blur-md">
-            <div className="rounded-[1.5rem] border border-gray-200 bg-gray-50 p-5">
-              <div className="mb-5 flex items-center justify-between">
+          <div className="hero__preview">
+            <div className="hero__preview-card">
+              <div className="hero__preview-header">
                 <div>
-                  <p className="text-sm font-semibold text-blue-600">Live Preview</p>
-                  <h2 className="text-2xl font-black text-gray-900">오늘의 전적 흐름</h2>
+                  <p className="hero__preview-title">Live Preview</p>
+                  <h2 className="hero__preview-subtitle">오늘의 전적 흐름</h2>
                 </div>
-                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-600">
-                  Demo
-                </span>
+                <span className="hero__preview-badge">Demo</span>
               </div>
 
-              <div className="space-y-3">
+              <div className="hero__preview-list">
                 {matchesData.slice(0, 3).map((match) => (
-                  <div key={match.id} className="rounded-2xl border border-gray-200 bg-white p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-bold text-gray-900">{match.game}</p>
-                        <p className="text-xs text-gray-500">{match.date} · {match.duration}</p>
-                      </div>
-                      <span className={`rounded-full px-3 py-1 text-xs font-bold ${
-                        match.result === '승리'
-                          ? 'bg-green-100 text-green-700 border border-green-300'
-                          : 'bg-red-100 text-red-700 border border-red-300'
-                      }`}>
-                        {match.result}
-                      </span>
+                  <div key={match.id} className="match-item">
+                    <div className="match-item__info">
+                      <p className="match-item__game">{match.game}</p>
+                      <p className="match-item__meta">{match.date} · {match.duration}</p>
                     </div>
-                    <div className="mt-4 flex items-end justify-between">
-                      <p className="text-xs font-semibold text-gray-500">KDA</p>
-                      <p className="text-2xl font-black text-blue-300">{match.kda}</p>
+                    <span className={`match-item__result ${match.result === '승리' ? 'match-item__result--win' : 'match-item__result--lose'}`}>
+                      {match.result}
+                    </span>
+                    <div className="match-item__kda">
+                      <p className="match-item__kda-label">KDA</p>
+                      <p className="match-item__kda-value">{match.kda}</p>
                     </div>
                   </div>
                 ))}
@@ -125,115 +111,109 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section className="px-6 py-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+      {/* Features Section */}
+      <section className="features">
+        <div className="features__container">
+          <div className="features__grid">
             {featureCards.map((feature) => (
-              <div key={feature.title} className="rounded-3xl border border-gray-200 bg-white p-7 shadow-sm">
-                <div className="mb-5 h-1.5 w-12 rounded-full bg-blue-500" />
-                <h3 className="text-xl font-black text-gray-900">{feature.title}</h3>
-                <p className="mt-3 leading-7 text-gray-600">{feature.description}</p>
+              <div key={feature.title} className="feature-card">
+                <div className="feature-card__icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                  </svg>
+                </div>
+                <h3 className="feature-card__title">{feature.title}</h3>
+                <p className="feature-card__description">{feature.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="px-6 pb-20">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-12 rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-8">
+      {/* Tables Section */}
+      <section className="tables-section">
+        <div className="tables-section__container">
+          {/* Matches Table */}
+          <div className="table-card">
+            <div className="table-card__header">
               <div>
-                <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-2">최근 내전 전적</h2>
-                <p className="text-gray-600">승패와 KDA를 한눈에 훑어보세요.</p>
+                <h2 className="table-card__title">최근 내전 전적</h2>
+                <p className="table-card__subtitle">승패와 KDA를 한눈에 훑어보세요.</p>
               </div>
-              <Link
-                to="/matches/my"
-                className="px-6 py-2 text-blue-600 font-bold transition-colors duration-200"
-              >
+              <Link to="/matches/my" className="table-card__link">
                 전체보기
               </Link>
             </div>
 
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-gray-50 border-b border-gray-200">
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">날짜</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">게임</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">결과</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">K/D/A</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">게임시간</th>
+            <div className="table-card__body">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>날짜</th>
+                    <th>게임</th>
+                    <th>결과</th>
+                    <th>K/D/A</th>
+                    <th>게임시간</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {matchesData.map((match) => (
+                    <tr key={match.id}>
+                      <td>{match.date}</td>
+                      <td>{match.game}</td>
+                      <td>
+                        <span className={`match-item__result ${match.result === '승리' ? 'match-item__result--win' : 'match-item__result--lose'}`}>
+                          {match.result}
+                        </span>
+                      </td>
+                      <td>{match.kda}</td>
+                      <td>{match.duration}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {matchesData.map((match) => (
-                      <tr key={match.id} className="border-b border-gray-200 hover:bg-gray-50 transition-colors duration-200">
-                        <td className="px-6 py-4 text-sm text-gray-700">{match.date}</td>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{match.game}</td>
-                        <td className="px-6 py-4 text-sm">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
-                            match.result === '승리'
-                              ? 'bg-green-100 text-green-700 border border-green-300'
-                              : 'bg-red-100 text-red-700 border border-red-300'
-                          }`}>
-                            {match.result}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-700">{match.kda}</td>
-                        <td className="px-6 py-4 text-sm text-gray-700">{match.duration}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-gray-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-8">
+          {/* Info Table */}
+          <div className="table-card">
+            <div className="table-card__header">
               <div>
-                <h2 className="text-3xl lg:text-4xl font-black text-gray-900 mb-2">최신 정보 글</h2>
-                <p className="text-gray-600">게임별 업데이트와 팁을 빠르게 확인하세요.</p>
+                <h2 className="table-card__title">최신 정보 글</h2>
+                <p className="table-card__subtitle">게임별 업데이트와 팁을 빠르게 확인하세요.</p>
               </div>
-              <Link
-                to="/info"
-                className="px-6 py-2 text-blue-600 font-bold transition-colors duration-200"
-              >
+              <Link to="/info" className="table-card__link">
                 전체보기
               </Link>
             </div>
 
-            <div className="bg-gray-50 rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="bg-gray-100 border-b border-gray-200">
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">카테고리</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">제목</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">작성자</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">조회수</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">날짜</th>
+            <div className="table-card__body">
+              <table className="data-table">
+                <thead>
+                  <tr>
+                    <th>카테고리</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>조회수</th>
+                    <th>날짜</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {infoData.map((article) => (
+                    <tr key={article.id}>
+                      <td>
+                        <span className={`data-table__category ${article.category === 'League of Legends' ? 'data-table__category--lol' : 'data-table__category--maple'}`}>
+                          {article.category === 'League of Legends' ? 'LoL' : 'Maple'}
+                        </span>
+                      </td>
+                      <td>{article.title}</td>
+                      <td>{article.author}</td>
+                      <td>{article.views.toLocaleString()}</td>
+                      <td>{article.date}</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {infoData.map((article) => (
-                      <tr key={article.id} className="border-b border-gray-200 hover:bg-white transition-colors duration-200">
-                        <td className="px-6 py-4 text-sm">
-                          <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 border border-blue-300 rounded-full text-xs font-semibold">
-                            {article.category}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{article.title}</td>
-                        <td className="px-6 py-4 text-sm text-gray-700">{article.author}</td>
-                        <td className="px-6 py-4 text-sm text-gray-700">{article.views.toLocaleString()}</td>
-                        <td className="px-6 py-4 text-sm text-gray-700">{article.date}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

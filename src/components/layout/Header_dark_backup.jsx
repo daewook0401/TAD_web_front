@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../provider/AuthContext';
 
 const Header = () => {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
-  const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
 
   const navItems = [
@@ -52,42 +51,32 @@ const Header = () => {
     },
   ];
 
-  const isActive = (path) => location.pathname === path;
-
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-      <nav className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="flex-shrink-0">
-            <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+    <header >
+      <nav >
+        <div >
+          <Link to="/" >
+            <div >
               TAD
             </div>
           </Link>
 
-          <div className="hidden md:flex items-center space-x-0 relative">
+          <div >
             {navItems.map((item) => (
               <div
                 key={item.path}
-                className="relative group"
+                
                 onMouseEnter={() => item.hasDropdown && setActiveDropdown(item.path)}
                 onMouseLeave={() => setActiveDropdown(null)}
               >
                 <Link
                   to={item.path}
-                  className={`px-6 py-4 text-sm font-medium transition-all duration-200 flex items-center gap-1 h-full border-b-2 ${
-                    isActive(item.path)
-                      ? 'text-blue-600 border-blue-600'
-                      : activeDropdown === item.path
-                      ? 'text-blue-600 border-blue-600'
-                      : 'text-gray-700 border-transparent hover:text-blue-600'
-                  }`}
+                  
                 >
                   {item.label}
                   {item.hasDropdown && (
                     <svg
-                      className={`w-4 h-4 transition-transform duration-200 ${
-                        activeDropdown === item.path ? 'rotate-180' : ''
-                      }`}
+                      
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -102,17 +91,13 @@ const Header = () => {
                   )}
                 </Link>
 
-                {item.hasDropdown && (
-                  <div className="absolute left-0 w-48 bg-white rounded-b-lg shadow-lg border border-t-0 border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pt-0">
-                    {item.subItems.map((subItem, index) => (
+                {item.hasDropdown && activeDropdown === item.path && (
+                  <div >
+                    {item.subItems.map((subItem) => (
                       <Link
                         key={subItem.path}
                         to={subItem.path}
-                        className={`block px-6 py-3 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors duration-200 ${
-                          index !== item.subItems.length - 1 ? 'border-b border-gray-100' : ''
-                        } ${index === 0 ? 'rounded-t-lg' : ''} ${
-                          index === item.subItems.length - 1 ? 'rounded-b-lg' : ''
-                        }`}
+                        
                       >
                         {subItem.label}
                       </Link>
@@ -123,23 +108,21 @@ const Header = () => {
             ))}
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div >
             {isAuthenticated ? (
-              <div className="relative">
+              <div >
                 <button
                   onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-                  className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors duration-200"
+                  
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
+                  <div >
                     {user?.name?.charAt(0) || 'U'}
                   </div>
-                  <span className="text-sm font-medium text-gray-700 hidden sm:inline">
+                  <span >
                     {user?.name || '사용자'}
                   </span>
                   <svg
-                    className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${
-                      isUserDropdownOpen ? 'rotate-180' : ''
-                    }`}
+                    
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -154,10 +137,10 @@ const Header = () => {
                 </button>
 
                 {isUserDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
+                  <div >
                     <Link
                       to="/mypage"
-                      className="block px-4 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
+                      
                       onClick={() => setIsUserDropdownOpen(false)}
                     >
                       마이페이지
@@ -167,7 +150,7 @@ const Header = () => {
                         logout();
                         setIsUserDropdownOpen(false);
                       }}
-                      className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors duration-200 border-t border-gray-100"
+                      
                     >
                       로그아웃
                     </button>
@@ -175,16 +158,16 @@ const Header = () => {
                 )}
               </div>
             ) : (
-              <div className="flex items-center space-x-3">
+              <div >
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors duration-200"
+                  
                 >
                   로그인
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                  
                 >
                   회원가입
                 </Link>
@@ -192,9 +175,9 @@ const Header = () => {
             )}
           </div>
 
-          <button className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+          <button >
             <svg
-              className="w-6 h-6 text-gray-700"
+              
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

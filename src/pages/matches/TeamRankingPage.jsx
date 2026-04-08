@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../../styles/pages/MatchesPages.css';
 
 const UserRankingPage = () => {
   const [filterRank, setFilterRank] = useState('all');
@@ -20,53 +21,29 @@ const UserRankingPage = () => {
 
   const filteredUsers = filterRank === 'all' ? users : users.filter(u => u.tier === filterRank);
 
-  const getTierColor = (tier) => {
-    const tierColors = {
-      'S': 'text-blue-600 bg-blue-100 border border-blue-300',
-      'A+': 'text-cyan-600 bg-cyan-100 border border-cyan-300',
-      'A': 'text-blue-600 bg-blue-100 border border-blue-300',
-      'B+': 'text-blue-600 bg-blue-100 border border-blue-300',
-      'B': 'text-purple-600 bg-purple-100 border border-purple-300',
-      'C': 'text-gray-600 bg-gray-100 border border-gray-300',
-      'D': 'text-gray-600 bg-gray-50 border border-gray-300',
-    };
-    return tierColors[tier] || 'text-gray-600 bg-gray-100 border border-gray-300';
-  };
-
-  const getTierBgGradient = (tier) => {
-    const gradients = {
-      'S': 'from-blue-600 to-purple-600',
-      'A+': 'from-blue-500 to-purple-500',
-      'A': 'from-blue-400 to-purple-400',
-      'B+': 'from-blue-600 to-purple-600',
-      'B': 'from-blue-500 to-purple-500',
-      'C': 'from-slate-500 to-slate-700',
-      'D': 'from-slate-600 to-slate-800',
-    };
-    return gradients[tier] || 'from-slate-500 to-slate-700';
+  const getTierClass = (tier) => {
+    const tierMap = { 'S': 'tier-s', 'A+': 'tier-a-plus', 'A': 'tier-a', 'B+': 'tier-b-plus', 'B': 'tier-b', 'C': 'tier-c', 'D': 'tier-d' };
+    return tierMap[tier] || '';
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 px-6 py-12">
-        <div className="max-w-7xl mx-auto">
-          <p className="text-sm font-bold uppercase tracking-[0.28em] text-blue-600">Ranking Board</p>
-          <h1 className="mt-4 text-4xl font-black text-gray-900 lg:text-6xl">유저 등급</h1>
-          <p className="mt-4 text-lg text-gray-600">내전 기록 기반의 플레이어 등급과 승률을 비교하세요.</p>
+    <div className="matches-page">
+      {/* Hero Section */}
+      <section className="matches-hero">
+        <div className="matches-hero__container">
+          <span className="matches-hero__eyebrow">Ranking Board</span>
+          <h1 className="matches-hero__title">유저 등급</h1>
+          <p className="matches-hero__description">내전 기록 기반의 플레이어 등급과 승률을 비교하세요.</p>
         </div>
-      </div>
+      </section>
 
       {/* Filter Section */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex items-center gap-3 flex-wrap rounded-3xl border border-gray-200 bg-white p-3">
-          <span className="text-sm font-semibold text-gray-700">등급 필터:</span>
+      <section className="matches-filter">
+        <div className="matches-filter__container">
+          <span className="matches-filter__label">등급 필터:</span>
           <button
             onClick={() => setFilterRank('all')}
-            className={`px-4 py-2 rounded-xl font-bold transition-colors duration-200 ${
-              filterRank === 'all'
-                ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                : 'bg-white text-gray-700 border border-gray-300 hover:border-blue-600'
-            }`}
+            className={`matches-filter__btn ${filterRank === 'all' ? 'matches-filter__btn--active' : ''}`}
           >
             전체
           </button>
@@ -74,128 +51,80 @@ const UserRankingPage = () => {
             <button
               key={tier}
               onClick={() => setFilterRank(tier)}
-              className={`px-4 py-2 rounded-xl font-bold transition-colors duration-200 ${
-                filterRank === tier
-                  ? `bg-gradient-to-r from-blue-600 to-purple-600 text-white`
-                  : `bg-white text-gray-700 border border-gray-300 hover:border-blue-600`
-              }`}
+              className={`matches-filter__btn ${filterRank === tier ? 'matches-filter__btn--active' : ''}`}
             >
               {tier}
             </button>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* Top 3 Podium */}
-      <div className="max-w-7xl mx-auto px-6 pb-12">
-        <div className="mb-12">
-          <h2 className="text-2xl font-black text-gray-900 mb-6">상위 유저</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {filteredUsers.slice(0, 3).map((user, idx) => (
-              <div
-                key={user.rank}
-                className={`relative rounded-[2rem] overflow-hidden transition-transform duration-300 hover:scale-[1.02] ${
-                  idx === 0 ? 'md:col-span-1 md:row-span-2' : ''
-                }`}
-              >
-                <div className={`bg-gradient-to-br ${getTierBgGradient(user.tier)} p-8 rounded-[2rem] shadow-xl text-center text-white border border-blue-300`}>
-                  <div className="mb-5 inline-flex h-16 w-16 items-center justify-center rounded-2xl border border-white/20 bg-white/10 text-2xl font-black">
+      <section className="ranking-podium">
+        <div className="ranking-podium__container">
+          <h2 className="ranking-podium__title">상위 유저</h2>
+          <div className="ranking-podium__grid">
+            {filteredUsers.slice(0, 3).map((user, index) => (
+              <div key={user.rank} className={`ranking-podium__card ranking-podium__card--${index + 1}`}>
+                <div className="ranking-podium__inner">
+                  <div className={`ranking-podium__rank ranking-podium__rank--${index + 1}`}>
                     #{user.rank}
                   </div>
-                  <h3 className="text-2xl font-black mb-1 text-white">{user.name}</h3>
-                  <p className="text-lg mb-3 text-white/80">{user.rolNickname}</p>
-                  <div className="space-y-2 text-white/80">
-                    <p className="text-sm font-medium">평점 {user.rating}</p>
-                    <p className="text-sm font-medium">승률 {user.winRate}%</p>
-                    <p className="text-sm font-black text-white">{user.tier} 등급</p>
+                  <h3 className="ranking-podium__name">{user.name}</h3>
+                  <p className="ranking-podium__nickname">{user.rolNickname}</p>
+                  <div className="ranking-podium__stats">
+                    <p className="ranking-podium__stat">평점 {user.rating}</p>
+                    <p className="ranking-podium__stat">승률 {user.winRate}%</p>
+                    <p className={`ranking-podium__tier ${getTierClass(user.tier)}`}>{user.tier} 등급</p>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Full Rankings Table */}
-      <div className="max-w-7xl mx-auto px-6 pb-12">
-        <div className="bg-white rounded-[2rem] shadow border border-gray-200 overflow-hidden p-3">
-          <div className="overflow-hidden rounded-2xl border border-gray-200">
-          <div className="overflow-x-auto">
-            <table className="w-full table-auto">
+      <section className="matches-table">
+        <div className="matches-table__container">
+          <div className="matches-table__wrapper">
+            <table className="matches-table__table">
               <thead>
-                <tr className="bg-white border-b border-gray-200">
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">순위</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">사용자명</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">롤 닉네임</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">등급</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">평점</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">경기</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">승률</th>
+                <tr className="matches-table__header-row">
+                  <th className="matches-table__th">순위</th>
+                  <th className="matches-table__th">사용자명</th>
+                  <th className="matches-table__th">롤 닉네임</th>
+                  <th className="matches-table__th">등급</th>
+                  <th className="matches-table__th">평점</th>
+                  <th className="matches-table__th">경기</th>
+                  <th className="matches-table__th">승률</th>
                 </tr>
               </thead>
-
               <tbody>
                 {filteredUsers.map((user) => (
-                  <tr
-                    key={user.rank}
-                    className="border-b border-gray-200 hover:bg-gray-100 transition-colors duration-200"
-                  >
-                    {/* 순위 */}
-                    <td className="px-6 py-4 text-sm font-semibold">
-                      <div className="flex justify-center">
-                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 font-bold border border-blue-300">
-                          {user.rank}
-                        </span>
-                      </div>
+                  <tr key={user.rank} className="matches-table__row">
+                    <td className="matches-table__td">
+                      <span className={`ranking-badge ranking-badge--${user.rank <= 3 ? user.rank : 'default'}`}>
+                        {user.rank}
+                      </span>
                     </td>
-
-                    {/* 사용자명 */}
-                    <td className="px-6 py-4 text-sm font-bold text-gray-900">
-                      <div className="flex items-center">{user.name}</div>
+                    <td className="matches-table__td matches-table__td--name">{user.name}</td>
+                    <td className="matches-table__td matches-table__td--nickname">{user.rolNickname}</td>
+                    <td className="matches-table__td">
+                      <span className={`tier-badge ${getTierClass(user.tier)}`}>{user.tier}</span>
                     </td>
-
-                    {/* 롤 닉네임 */}
-                    <td className="px-6 py-4 text-sm text-gray-700">
-                      <div className="flex items-center">{user.rolNickname}</div>
+                    <td className="matches-table__td matches-table__td--rating">{user.rating}</td>
+                    <td className="matches-table__td">
+                      <span className="matches-table__wins">{user.wins}</span>
+                      <span className="matches-table__separator">/</span>
+                      <span className="matches-table__losses">{user.losses}</span>
                     </td>
-
-                    {/* 등급 */}
-                    <td className="px-6 py-4 text-sm">
-                      <div className="flex justify-center">
-                        <span
-                          className={`inline-block px-3 py-1 rounded-full font-bold text-xs ${getTierColor(
-                            user.tier,
-                          )}`}
-                        >
-                          {user.tier}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* 평점 */}
-                    <td className="px-6 py-4 text-sm font-bold text-gray-900">
-                      <div className="flex justify-center">{user.rating}</div>
-                    </td>
-
-                    {/* 경기 */}
-                    <td className="px-6 py-4 text-sm">
-                      <div className="flex justify-center gap-1 font-semibold">
-                        <span className="text-blue-600">{user.wins}</span>
-                        <span className="text-gray-500">/</span>
-                        <span className="text-gray-600">{user.losses}</span>
-                      </div>
-                    </td>
-
-                    {/* 승률 */}
-                    <td className="px-6 py-4 text-sm">
-                      <div className="flex items-center justify-center gap-2">
-                        <div className="w-16 bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-blue-500 h-2 rounded-full"
-                            style={{ width: `${user.winRate}%` }}
-                          ></div>
+                    <td className="matches-table__td">
+                      <div className="winrate-cell">
+                        <div className="winrate-bar">
+                          <div className="winrate-bar__fill" style={{ width: `${user.winRate}%` }}></div>
                         </div>
-                        <span className="font-semibold text-gray-900">{user.winRate}%</span>
+                        <span className="winrate-cell__value">{user.winRate}%</span>
                       </div>
                     </td>
                   </tr>
@@ -203,29 +132,27 @@ const UserRankingPage = () => {
               </tbody>
             </table>
           </div>
-          </div>
         </div>
-      </div>
-
+      </section>
 
       {/* Tier Distribution */}
-      <div className="max-w-7xl mx-auto px-6 pb-12">
-        <div className="bg-white rounded-[2rem] shadow p-8 border border-gray-200">
-          <h2 className="text-2xl font-black text-gray-900 mb-6">등급 분포</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+      <section className="tier-distribution">
+        <div className="tier-distribution__container">
+          <h2 className="tier-distribution__title">등급 분포</h2>
+          <div className="tier-distribution__grid">
             {['S', 'A+', 'A', 'B+', 'B', 'C', 'D'].map((tier) => {
               const count = users.filter(u => u.tier === tier).length;
               return (
-                <div key={tier} className={`rounded-2xl border border-gray-200 p-4 text-center ${getTierColor(tier)}`}>
-                  <p className="font-bold text-lg mb-1">{tier}</p>
-                  <p className="font-bold text-2xl">{count}</p>
-                  <p className="text-xs opacity-75 mt-1">유저</p>
+                <div key={tier} className={`tier-distribution__card ${getTierClass(tier)}`}>
+                  <p className="tier-distribution__tier">{tier}</p>
+                  <p className="tier-distribution__count">{count}</p>
+                  <p className="tier-distribution__label">유저</p>
                 </div>
               );
             })}
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

@@ -2,14 +2,10 @@ import { createBrowserRouter } from 'react-router-dom';
 import RootLayout from '../components/layout/RootLayout';
 import MainLayout from '../components/layout/MainLayout';
 import HomePage from '../pages/HomePage';
-import InfoPage from '../pages/InfoPage';
 import BoardPage from '../pages/BoardPage';
 import MyMatchesPage from '../pages/matches/MyMatchesPage';
 import SearchMatchesPage from '../pages/matches/SearchMatchesPage';
 import TeamRankingPage from '../pages/matches/TeamRankingPage';
-import AboutPage from '../pages/AboutPage';
-import FAQPage from '../pages/FAQPage';
-import ContactPage from '../pages/ContactPage';
 import LoginPage from '../pages/auth/LoginPage';
 import SignupPage from '../pages/auth/SignupPage';
 
@@ -20,14 +16,6 @@ export const router = createBrowserRouter([
       {
         path: '/',
         element: <HomePage />,
-      },
-      {
-        path: '/info',
-        element: <InfoPage />,
-      },
-      {
-        path: '/info/:category',
-        element: <BoardPage type="info" />,
       },
       {
         path: '/board',
@@ -52,18 +40,6 @@ export const router = createBrowserRouter([
       {
         path: '/matches/team',
         element: <TeamRankingPage />,
-      },
-      {
-        path: '/about',
-        element: <AboutPage />,
-      },
-      {
-        path: '/faq',
-        element: <FAQPage />,
-      },
-      {
-        path: '/contact',
-        element: <ContactPage />,
       },
       {
         path: '/login',
