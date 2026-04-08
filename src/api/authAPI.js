@@ -18,6 +18,15 @@ export const authAPI = {
   
   // 토큰 갱신
   refreshToken: (refreshToken) => api.post('/auth/refresh', { refreshToken }),
+
+  // 내 프로필 조회
+  getMyProfile: () => api.get('/auth/me'),
+
+  // 프로필 수정
+  updateMyProfile: (data) => api.put('/auth/me', data),
+
+  // 비밀번호 변경
+  changePassword: (data) => api.put('/auth/me/password', data),
 };
 
 export default authAPI;

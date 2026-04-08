@@ -183,6 +183,20 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--color-gray-700);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.header__admin-badge {
+  display: inline-block;
+  background: var(--color-red-500, #ef4444);
+  color: var(--color-white);
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: var(--radius-full, 9999px);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.4;
 }
 
 .header__user-icon {

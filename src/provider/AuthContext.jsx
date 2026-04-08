@@ -8,11 +8,11 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 초기 로드 시 localStorage에서 사용자 정보와 토큰 복원
+  // 초기 로드 시 sessionStorage에서 사용자 정보와 토큰 복원
   useEffect(() => {
     try {
-      const token = localStorage.getItem('token');
-      const userData = localStorage.getItem('user');
+      const token = sessionStorage.getItem('accessToken');
+      const userData = sessionStorage.getItem('user');
       
       if (token && userData) {
         setUser(JSON.parse(userData));
@@ -20,23 +20,35 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Failed to restore user session:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('refreshToken');
+      sessionStorage.removeItem('user');
     }
     setIsLoading(false);
   }, []);
 
-  const login = (userData) => {
+  const login = (userData, tokens) => {
     setUser(userData);
     setIsAuthenticated(true);
-    localStorage.setItem('user', JSON.stringify(userData));
+    sessionStorage.setItem('user', JSON.stringify(userData));
+    if (tokens?.accessToken) {
+      sessionStorage.setItem('accessToken', tokens.accessToken);
+    }
+    if (tokens?.refreshToken) {
+      sessionStorage.setItem('refreshToken', tokens.refreshToken);
+    }
   };
 
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('refreshToken');
+    sessionStorage.removeItem('user');
+  };
+
+  const isAdmin = () => {
+    return user?.roles?.includes('ROLE_ADMIN') || false;
   };
 
   const value = {
@@ -44,7 +56,8 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated,
     isLoading,
     login,
-    logout
+    logout,
+    isAdmin,
   };
 
   return (

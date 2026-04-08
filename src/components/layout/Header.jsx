@@ -6,7 +6,7 @@ import '../../styles/layout/Header.css';
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, isAdmin } = useAuth();
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -108,10 +108,11 @@ const Header = () => {
                 className="header__user-btn"
               >
                 <div className="header__user-avatar">
-                  {user?.name?.charAt(0) || 'U'}
+                  {user?.nickname?.charAt(0) || 'U'}
                 </div>
                 <span className="header__user-name">
-                  {user?.name || '사용자'}
+                  {user?.nickname || '사용자'}
+                  {isAdmin() && <span className="header__admin-badge">관리자</span>}
                 </span>
                 <svg
                   className="header__user-icon"
