@@ -8,16 +8,23 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
+    'Content-Type': 'application/json;charset=UTF-8',
+    'Accept': 'application/json;charset=UTF-8',
   },
 });
+
+// 인증이 필요 없는 엔드포인트
+const PUBLIC_ENDPOINTS = ['/auth/login', '/auth/signup', '/auth/mail', '/auth/mail/verify', '/auth/refresh'];
 
 // Request interceptor - 토큰 자동 추가
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const isPublic = PUBLIC_ENDPOINTS.some((endpoint) => config.url?.includes(endpoint));
+    if (!isPublic) {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
