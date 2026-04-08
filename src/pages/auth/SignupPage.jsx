@@ -6,7 +6,7 @@ import '../../styles/pages/AuthPages.css';
 
 const SignupPage = () => {
   const [formData, setFormData] = useState({
-    name: '',
+    nickname: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -125,8 +125,14 @@ const SignupPage = () => {
     setError('');
     setSuccess('');
 
-    if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
+    if (!formData.nickname || !formData.email || !formData.password || !formData.confirmPassword) {
       setError('모든 필드를 입력해주세요');
+      setIsLoading(false);
+      return;
+    }
+
+    if (formData.nickname.length < 2 || formData.nickname.length > 20) {
+      setError('닉네임은 2자 이상 20자 이하로 입력해주세요');
       setIsLoading(false);
       return;
     }
@@ -165,7 +171,7 @@ const SignupPage = () => {
 
     try {
       const response = await authAPI.signup({
-        name: formData.name,
+        nickname: formData.nickname,
         email: formData.email,
         password: formData.password,
       });
@@ -179,7 +185,7 @@ const SignupPage = () => {
         if (loginResponse.data.success) {
           login({
             id: loginResponse.data.user.id,
-            name: loginResponse.data.user.name,
+            nickname: loginResponse.data.user.nickname,
             email: loginResponse.data.user.email,
           });
           localStorage.setItem('token', loginResponse.data.token);
@@ -230,18 +236,19 @@ const SignupPage = () => {
 
           {/* Signup Form */}
           <form onSubmit={handleSubmit} className="auth-form">
-            {/* Name Input */}
+            {/* Nickname Input */}
             <div className="auth-input-group">
-              <label htmlFor="name" className="auth-label">이름</label>
+              <label htmlFor="nickname" className="auth-label">닉네임</label>
               <input
-                id="name"
-                name="name"
+                id="nickname"
+                name="nickname"
                 type="text"
-                autoComplete="name"
-                value={formData.name}
+                autoComplete="nickname"
+                value={formData.nickname}
                 onChange={handleChange}
                 className="auth-input"
-                placeholder="홍길동"
+                placeholder="2~20자 닉네임을 입력하세요"
+                maxLength={20}
               />
             </div>
 
