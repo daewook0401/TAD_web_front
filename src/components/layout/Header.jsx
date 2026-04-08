@@ -159,7 +159,8 @@ const Header = () => {
         <button
           className="header__mobile-btn"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="메뉴 열기"
+          aria-label={isMobileMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
+          aria-expanded={isMobileMenuOpen}
         >
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {isMobileMenuOpen ? (
