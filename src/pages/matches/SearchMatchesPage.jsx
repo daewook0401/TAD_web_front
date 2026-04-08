@@ -24,7 +24,7 @@ const SearchMatchesPage = () => {
     setHasSearched(true);
   };
 
-  const handleKeyPress = (e) => {
+  const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
@@ -50,7 +50,7 @@ const SearchMatchesPage = () => {
               type="text"
               value={searchPlayer}
               onChange={(e) => setSearchPlayer(e.target.value)}
-              onKeyDown={handleKeyPress}
+              onKeyDown={handleKeyDown}
               placeholder="플레이어 이름을 입력하세요 (예: ProGamer123)"
               className="matches-search__input"
             />
