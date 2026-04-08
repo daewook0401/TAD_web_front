@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../provider/AuthContext';
 import { authAPI } from '../../api/authAPI';
@@ -12,11 +12,39 @@ const SignupPage = () => {
     confirmPassword: '',
     agreeTerms: false,
   });
+  
+  // 이메일 인증 관련 상태
+  const [verificationCode, setVerificationCode] = useState('');
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [isCodeSent, setIsCodeSent] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationTimer, setVerificationTimer] = useState(0);
+  
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  // 인증 타이머
+  useEffect(() => {
+    let interval;
+    if (verificationTimer > 0) {
+      interval = setInterval(() => {
+        setVerificationTimer((prev) => prev - 1);
+      }, 1000);
+    } else if (verificationTimer === 0 && isCodeSent) {
+      // 타이머 만료 시 재발송 가능
+    }
+    return () => clearInterval(interval);
+  }, [verificationTimer, isCodeSent]);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -24,7 +52,71 @@ const SignupPage = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
+    
+    // 이메일 변경 시 인증 상태 초기화
+    if (name === 'email') {
+      setIsEmailVerified(false);
+      setIsCodeSent(false);
+      setVerificationCode('');
+      setVerificationTimer(0);
+    }
+    
     setError('');
+  };
+
+  // 인증 코드 발송
+  const handleSendVerificationCode = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email) {
+      setError('이메일을 입력해주세요');
+      return;
+    }
+    if (!emailRegex.test(formData.email)) {
+      setError('유효한 이메일 형식을 입력해주세요');
+      return;
+    }
+
+    setIsSendingCode(true);
+    setError('');
+
+    try {
+      // 인증 코드 발송
+      await authAPI.sendVerificationCode(formData.email);
+      setIsCodeSent(true);
+      setVerificationTimer(180); // 3분 타이머
+      setSuccess('인증 코드가 이메일로 발송되었습니다');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || '인증 코드 발송에 실패했습니다');
+    }
+
+    setIsSendingCode(false);
+  };
+
+  // 인증 코드 확인
+  const handleVerifyCode = async () => {
+    if (!verificationCode) {
+      setError('인증 코드를 입력해주세요');
+      return;
+    }
+
+    setIsVerifying(true);
+    setError('');
+
+    try {
+      const response = await authAPI.verifyEmailCode(formData.email, verificationCode);
+      if (response.data.verified) {
+        setIsEmailVerified(true);
+        setSuccess('이메일 인증이 완료되었습니다');
+        setTimeout(() => setSuccess(''), 3000);
+      } else {
+        setError('인증 코드가 일치하지 않습니다');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || '인증 확인에 실패했습니다');
+    }
+
+    setIsVerifying(false);
   };
 
   const handleSubmit = async (e) => {
@@ -35,6 +127,13 @@ const SignupPage = () => {
 
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       setError('모든 필드를 입력해주세요');
+      setIsLoading(false);
+      return;
+    }
+
+    // 이메일 인증 확인
+    if (!isEmailVerified) {
+      setError('이메일 인증을 완료해주세요');
       setIsLoading(false);
       return;
     }
@@ -146,20 +245,65 @@ const SignupPage = () => {
               />
             </div>
 
-            {/* Email Input */}
+            {/* Email Input with Verification */}
             <div className="auth-input-group">
               <label htmlFor="email" className="auth-label">이메일</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="auth-input"
-                placeholder="example@email.com"
-              />
+              <div className="auth-input-with-btn">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`auth-input ${isEmailVerified ? 'auth-input--verified' : ''}`}
+                  placeholder="example@email.com"
+                  disabled={isEmailVerified}
+                />
+                <button
+                  type="button"
+                  onClick={handleSendVerificationCode}
+                  disabled={isSendingCode || isEmailVerified || (verificationTimer > 0)}
+                  className="auth-verify-btn"
+                >
+                  {isSendingCode ? '발송 중...' : isEmailVerified ? '인증완료' : verificationTimer > 0 ? formatTime(verificationTimer) : '인증요청'}
+                </button>
+              </div>
+              {isEmailVerified && (
+                <span className="auth-verified-badge">✓ 인증됨</span>
+              )}
             </div>
+
+            {/* Verification Code Input */}
+            {isCodeSent && !isEmailVerified && (
+              <div className="auth-input-group auth-verification-group">
+                <label htmlFor="verificationCode" className="auth-label">인증 코드</label>
+                <div className="auth-input-with-btn">
+                  <input
+                    id="verificationCode"
+                    type="text"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    className="auth-input"
+                    placeholder="6자리 인증 코드"
+                    maxLength={6}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleVerifyCode}
+                    disabled={isVerifying || !verificationCode}
+                    className="auth-verify-btn"
+                  >
+                    {isVerifying ? '확인 중...' : '확인'}
+                  </button>
+                </div>
+                <span className="auth-timer-hint">
+                  {verificationTimer > 0 
+                    ? `남은 시간: ${formatTime(verificationTimer)}` 
+                    : '인증 시간이 만료되었습니다. 다시 요청해주세요.'}
+                </span>
+              </div>
+            )}
 
             {/* Password Input */}
             <div className="auth-input-group">

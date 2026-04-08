@@ -1,16 +1,29 @@
-import React, { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { boardAPI } from '../api/boardAPI';
 import '../styles/pages/BoardPage.css';
 
 const BoardPage = () => {
   const { category } = useParams();
-  const [postTypeFilter, setPostTypeFilter] = useState('all'); // all, free, info
-
-  const categories = {
-    lol: { name: '롤', icon: 'https://drive.towardadiamond.com/tad/category-icons/lol.webp', color: 'lol', summary: '메타, 챔피언, 내전 전략', isImage: true },
-    maple: { name: '메이플랜드', icon: 'https://drive.towardadiamond.com/tad/category-icons/maple-land.webp', color: 'maple', summary: '사냥터, 보스, 육성 루트', isImage: true },
-    free: { name: '자유', icon: 'FR', color: 'free', summary: '잡담, 모집, 자유 주제', isImage: false },
-  };
+  const navigate = useNavigate();
+  
+  // 카테고리 상태
+  const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  
+  // 게시글 상태
+  const [posts, setPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(true);
+  const [postTypeFilter, setPostTypeFilter] = useState('all');
+  
+  // 페이지네이션 상태
+  const [pagination, setPagination] = useState({
+    page: 0,
+    size: 20,
+    totalElements: 0,
+    totalPages: 0,
+    hasNext: false,
+  });
 
   const postTypeLabels = {
     all: '전체',
@@ -18,129 +31,163 @@ const BoardPage = () => {
     info: '정보글',
   };
 
-  const activeCategory = category && categories[category] ? category : 'lol';
-  const currentCategory = categories[activeCategory];
+  // 카테고리 로드
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await boardAPI.getCategories();
+        setCategories(response.data);
+      } catch (error) {
+        console.error('카테고리 로드 실패:', error);
+      } finally {
+        setCategoriesLoading(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
-  // 샘플 게시물 데이터 (postType 추가: free/info)
-  const posts = [
-    {
-      id: 1,
-      title: '최고의 초반 전략 공유합니다',
-      author: '게임마스터',
-      date: '2025-12-06',
-      views: 342,
-      replies: 28,
-      category: 'lol',
-      postType: 'free',
-      tag: '전략',
-    },
-    {
-      id: 2,
-      title: '롤 패치 14.24 핵심 변경점 정리',
-      author: '패치봇',
-      date: '2025-12-05',
-      views: 891,
-      replies: 52,
-      category: 'lol',
-      postType: 'info',
-      tag: '패치노트',
-    },
-    {
-      id: 3,
-      title: '오늘 저녁 내전 파티 구합니다',
-      author: '내전러',
-      date: '2025-12-05',
-      views: 156,
-      replies: 12,
-      category: 'lol',
-      postType: 'free',
-      tag: '모집',
-    },
-    {
-      id: 4,
-      title: '시즌15 티어별 추천 챔피언 가이드',
-      author: '공략왕',
-      date: '2025-12-04',
-      views: 1205,
-      replies: 87,
-      category: 'lol',
-      postType: 'info',
-      tag: '가이드',
-    },
-    {
-      id: 5,
-      title: '메이플랜드 파티 구해요',
-      author: '관리자',
-      date: '2025-12-05',
-      views: 512,
-      replies: 45,
-      category: 'maple',
-      postType: 'free',
-      tag: '모집',
-    },
-    {
-      id: 6,
-      title: '메이플랜드 사냥터 추천 루트',
-      author: '정보통',
-      date: '2025-12-04',
-      views: 678,
-      replies: 33,
-      category: 'maple',
-      postType: 'info',
-      tag: '가이드',
-    },
-    {
-      id: 7,
-      title: '요즘 재밌는 게임 추천해주세요',
-      author: '게임덕후',
-      date: '2025-12-04',
-      views: 289,
-      replies: 15,
-      category: 'free',
-      postType: 'free',
-      tag: '잡담',
-    },
-    {
-      id: 8,
-      title: '게임 녹화 프로그램 비교 정리',
-      author: '테크가이',
-      date: '2025-12-03',
-      views: 445,
-      replies: 21,
-      category: 'free',
-      postType: 'info',
-      tag: '팁',
-    },
-  ];
+  // 현재 활성 카테고리 결정
+  const activeCategory = category || (categories.length > 0 ? categories[0]?.categoryKey : 'lol');
+  const currentCategory = categories.find(c => c.categoryKey === activeCategory);
 
-  // 카테고리 + 글 타입 필터링
-  const filteredPosts = posts.filter((post) => {
-    const categoryMatch = post.category === activeCategory;
-    const typeMatch = postTypeFilter === 'all' || post.postType === postTypeFilter;
-    return categoryMatch && typeMatch;
-  });
+  // 게시글 로드
+  useEffect(() => {
+    const fetchPosts = async () => {
+      if (!activeCategory) return;
+      
+      setPostsLoading(true);
+      try {
+        const response = await boardAPI.getPosts({
+          categoryKey: activeCategory,
+          postType: postTypeFilter,
+          page: pagination.page,
+          size: pagination.size,
+        });
+        
+        setPosts(response.data.items || []);
+        setPagination(prev => ({
+          ...prev,
+          totalElements: response.data.totalElements,
+          totalPages: response.data.totalPages,
+          hasNext: response.data.hasNext,
+        }));
+      } catch (error) {
+        console.error('게시글 로드 실패:', error);
+        setPosts([]);
+      } finally {
+        setPostsLoading(false);
+      }
+    };
+    
+    fetchPosts();
+  }, [activeCategory, postTypeFilter, pagination.page, pagination.size]);
+
+  // 카테고리 변경 시 필터/페이지 초기화
+  const handleCategoryChange = (categoryKey) => {
+    setPostTypeFilter('all');
+    setPagination(prev => ({ ...prev, page: 0 }));
+    navigate(`/board/${categoryKey}`);
+  };
+
+  // 필터 변경
+  const handleFilterChange = (type) => {
+    setPostTypeFilter(type);
+    setPagination(prev => ({ ...prev, page: 0 }));
+  };
+
+  // 페이지 변경
+  const handlePageChange = (newPage) => {
+    if (newPage >= 0 && newPage < pagination.totalPages) {
+      setPagination(prev => ({ ...prev, page: newPage }));
+    }
+  };
+
+  // 날짜 포맷
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ko-KR');
+  };
+
+  // 페이지 버튼 생성
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    const { page, totalPages } = pagination;
+    
+    // 이전 버튼
+    buttons.push(
+      <button
+        key="prev"
+        className="board-pagination__btn"
+        onClick={() => handlePageChange(page - 1)}
+        disabled={page === 0}
+      >
+        이전
+      </button>
+    );
+    
+    // 페이지 번호 (최대 5개)
+    const startPage = Math.max(0, page - 2);
+    const endPage = Math.min(totalPages, startPage + 5);
+    
+    for (let i = startPage; i < endPage; i++) {
+      buttons.push(
+        <button
+          key={i}
+          className={`board-pagination__btn ${page === i ? 'board-pagination__btn--active' : ''}`}
+          onClick={() => handlePageChange(i)}
+        >
+          {i + 1}
+        </button>
+      );
+    }
+    
+    // 다음 버튼
+    buttons.push(
+      <button
+        key="next"
+        className="board-pagination__btn"
+        onClick={() => handlePageChange(page + 1)}
+        disabled={!pagination.hasNext}
+      >
+        다음
+      </button>
+    );
+    
+    return buttons;
+  };
+
+  if (categoriesLoading) {
+    return (
+      <div className="board-page">
+        <div className="board-loading">로딩 중...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="board-page">
-      {/* Category Nav - 헤더 바로 아래 */}
+      {/* Category Nav */}
       <nav className="board-nav">
         <div className="board-nav__container">
           <div className="board-nav__tabs">
-            {Object.entries(categories).map(([categoryKey, categoryItem]) => (
+            {categories.map((cat) => (
               <Link
-                key={categoryKey}
-                to={`/board/${categoryKey}`}
-                className={`board-nav__tab ${activeCategory === categoryKey ? 'board-nav__tab--active' : ''}`}
-                onClick={() => setPostTypeFilter('all')}
+                key={cat.categoryKey}
+                to={`/board/${cat.categoryKey}`}
+                className={`board-nav__tab ${activeCategory === cat.categoryKey ? 'board-nav__tab--active' : ''}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleCategoryChange(cat.categoryKey);
+                }}
               >
-                <span className={`board-nav__icon board-nav__icon--${categoryItem.color}`}>
-                  {categoryItem.isImage ? (
-                    <img src={categoryItem.icon} alt={categoryItem.name} className="board-nav__icon-img" />
+                <span className={`board-nav__icon board-nav__icon--${cat.categoryKey}`}>
+                  {cat.iconUrl ? (
+                    <img src={cat.iconUrl} alt={cat.name} className="board-nav__icon-img" />
                   ) : (
-                    categoryItem.icon
+                    cat.name.substring(0, 2).toUpperCase()
                   )}
                 </span>
-                <span className="board-nav__label">{categoryItem.name}</span>
+                <span className="board-nav__label">{cat.name}</span>
               </Link>
             ))}
           </div>
@@ -152,10 +199,10 @@ const BoardPage = () => {
         <div className="board-posts__container">
           <div className="board-posts__header">
             <div>
-              <h1 className="board-posts__title">{currentCategory.name} 게시판</h1>
-              <p className="board-posts__subtitle">{currentCategory.summary}</p>
+              <h1 className="board-posts__title">{currentCategory?.name || ''} 게시판</h1>
+              <p className="board-posts__subtitle">{currentCategory?.summary || ''}</p>
             </div>
-            <span className="board-posts__count">{filteredPosts.length} posts</span>
+            <span className="board-posts__count">{pagination.totalElements} posts</span>
           </div>
 
           {/* Post Type Filter */}
@@ -165,7 +212,7 @@ const BoardPage = () => {
                 <button
                   key={typeKey}
                   className={`board-filter__btn ${postTypeFilter === typeKey ? 'board-filter__btn--active' : ''}`}
-                  onClick={() => setPostTypeFilter(typeKey)}
+                  onClick={() => handleFilterChange(typeKey)}
                 >
                   {label}
                 </button>
@@ -175,42 +222,40 @@ const BoardPage = () => {
           </div>
 
           <div className="board-posts__list">
-            {filteredPosts.length === 0 ? (
+            {postsLoading ? (
+              <div className="board-posts__empty">로딩 중...</div>
+            ) : posts.length === 0 ? (
               <div className="board-posts__empty">작성된 게시물이 없습니다</div>
             ) : (
-              filteredPosts.map((post) => (
+              posts.map((post) => (
                 <article key={post.id} className="post-item">
                   <div className="post-item__inner">
                     <div>
                       <div className="post-item__meta">
+                        {post.notice && <span className="post-item__notice">공지</span>}
                         <span className={`post-item__type post-item__type--${post.postType}`}>
                           {post.postType === 'info' ? '정보' : '자유'}
                         </span>
-                        <span className="post-item__tag">{post.tag}</span>
-                        <span className="post-item__date">{post.date}</span>
+                        {post.tag && <span className="post-item__tag">{post.tag}</span>}
+                        <span className="post-item__date">{formatDate(post.createdAt)}</span>
                       </div>
                       <h3 className="post-item__title">{post.title}</h3>
                       <p className="post-item__info">
-                        {post.author} · 조회 {post.views.toLocaleString()} · 댓글 {post.replies}
+                        {post.authorNickname} · 조회 {post.viewCount.toLocaleString()} · 댓글 {post.replyCount}
                       </p>
                     </div>
-                    <span className="post-item__read-btn">읽기</span>
+                    <Link to={`/board/post/${post.id}`} className="post-item__read-btn">읽기</Link>
                   </div>
                 </article>
               ))
             )}
           </div>
 
-          <div className="board-pagination">
-            {['이전', '1', '2', '3', '다음'].map((label) => (
-              <button
-                key={label}
-                className={`board-pagination__btn ${label === '1' ? 'board-pagination__btn--active' : ''}`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          {pagination.totalPages > 0 && (
+            <div className="board-pagination">
+              {renderPaginationButtons()}
+            </div>
+          )}
         </div>
       </section>
     </div>
