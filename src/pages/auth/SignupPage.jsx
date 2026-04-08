@@ -187,8 +187,11 @@ const SignupPage = () => {
             id: loginResponse.data.user.id,
             nickname: loginResponse.data.user.nickname,
             email: loginResponse.data.user.email,
+            roles: loginResponse.data.user.roles,
+          }, {
+            accessToken: loginResponse.data.accessToken,
+            refreshToken: loginResponse.data.refreshToken,
           });
-          localStorage.setItem('token', loginResponse.data.token);
           setSuccess('회원가입이 완료되었습니다!');
           setTimeout(() => {
             navigate('/');

@@ -43,10 +43,13 @@ const LoginPage = () => {
       if (response.data.success) {
         login({
           id: response.data.user.id,
-          name: response.data.user.name,
+          nickname: response.data.user.nickname,
           email: response.data.user.email,
+          roles: response.data.user.roles,
+        }, {
+          accessToken: response.data.accessToken,
+          refreshToken: response.data.refreshToken,
         });
-        localStorage.setItem('token', response.data.token);
         navigate('/matches/my');
       } else {
         setError(response.data.message || '로그인에 실패했습니다');
