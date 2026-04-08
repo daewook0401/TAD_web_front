@@ -50,7 +50,7 @@ const SearchMatchesPage = () => {
               type="text"
               value={searchPlayer}
               onChange={(e) => setSearchPlayer(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
               placeholder="플레이어 이름을 입력하세요 (예: ProGamer123)"
               className="matches-search__input"
             />

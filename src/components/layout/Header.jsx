@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../provider/AuthContext';
 import '../../styles/layout/Header.css';
 
 const Header = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
     {
       label: '내전 전적',
       path: '/matches/search',
+      basePath: '/matches',
       hasDropdown: true,
       subItems: [
         { label: '내 전적 확인', path: '/matches/my', requiresAuth: true },
@@ -23,6 +26,7 @@ const Header = () => {
     {
       label: '게시판',
       path: '/board',
+      basePath: '/board',
       hasDropdown: true,
       subItems: [
         { label: '롤 게시판', path: '/board/lol' },
@@ -32,12 +36,21 @@ const Header = () => {
     },
   ];
 
+  const isActiveLink = (basePath) => {
+    return location.pathname.startsWith(basePath);
+  };
+
   const handleSubItemClick = (e, subItem) => {
     if (subItem.requiresAuth && !isAuthenticated) {
       e.preventDefault();
       alert('로그인이 필요한 서비스입니다.');
       navigate('/');
     }
+    setIsMobileMenuOpen(false);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
   };
 
   return (
@@ -46,7 +59,7 @@ const Header = () => {
       onMouseLeave={() => setActiveDropdown(null)}
     >
       <nav className="header__nav">
-        <Link to="/" className="header__logo">
+        <Link to="/" className="header__logo" onClick={closeMobileMenu}>
           <span className="header__logo-text">TAD</span>
         </Link>
 
@@ -57,7 +70,10 @@ const Header = () => {
               className="header__menu-item"
               onMouseEnter={() => setActiveDropdown(item.hasDropdown ? item.path : null)}
             >
-              <Link to={item.path} className="header__menu-link">
+              <Link
+                to={item.path}
+                className={`header__menu-link ${isActiveLink(item.basePath) ? 'header__menu-link--active' : ''}`}
+              >
                 {item.label}
               </Link>
               
@@ -140,17 +156,86 @@ const Header = () => {
           )}
         </div>
 
-        <button className="header__mobile-btn">
+        <button
+          className="header__mobile-btn"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="메뉴 열기"
+        >
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
+            {isMobileMenuOpen ? (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            ) : (
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            )}
           </svg>
         </button>
       </nav>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="header__mobile-menu">
+          <div className="header__mobile-menu-inner">
+            {navItems.map((item) => (
+              <div key={item.path} className="header__mobile-section">
+                <Link
+                  to={item.path}
+                  className={`header__mobile-link header__mobile-link--main ${isActiveLink(item.basePath) ? 'header__mobile-link--active' : ''}`}
+                  onClick={closeMobileMenu}
+                >
+                  {item.label}
+                </Link>
+                {item.subItems && (
+                  <div className="header__mobile-subitems">
+                    {item.subItems.map((subItem) => (
+                      <Link
+                        key={subItem.path}
+                        to={subItem.path}
+                        className="header__mobile-link"
+                        onClick={(e) => handleSubItemClick(e, subItem)}
+                      >
+                        {subItem.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+            
+            <div className="header__mobile-actions">
+              {isAuthenticated ? (
+                <>
+                  <Link to="/mypage" className="header__mobile-link" onClick={closeMobileMenu}>
+                    마이페이지
+                  </Link>
+                  <button
+                    className="header__mobile-link"
+                    onClick={() => {
+                      logout();
+                      closeMobileMenu();
+                    }}
+                  >
+                    로그아웃
+                  </button>
+                </>
+              ) : (
+                <Link to="/login" className="header__mobile-login" onClick={closeMobileMenu}>
+                  로그인
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
