@@ -336,3 +336,92 @@
     gap: var(--spacing-3);
   }
 }
+
+/* ===== Email Verification Styles ===== */
+
+/* Input with Button Layout */
+.auth-input-with-btn {
+  display: flex;
+  gap: var(--spacing-2);
+}
+
+.auth-input-with-btn .auth-input {
+  flex: 1;
+}
+
+/* Verification Button */
+.auth-verify-btn {
+  padding: var(--spacing-3) var(--spacing-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-white);
+  background: var(--color-primary);
+  border-radius: var(--radius-lg);
+  white-space: nowrap;
+  min-width: 90px;
+  transition: all var(--transition-fast);
+}
+
+.auth-verify-btn:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.auth-verify-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Verified Input State */
+.auth-input--verified {
+  border-color: var(--color-success);
+  background: rgba(34, 197, 94, 0.05);
+}
+
+.auth-input--verified:focus {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+/* Verified Badge */
+.auth-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-success);
+  margin-top: var(--spacing-1);
+}
+
+/* Verification Code Group */
+.auth-verification-group {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Timer Hint */
+.auth-timer-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-500);
+  margin-top: var(--spacing-1);
+}
+
+/* Responsive for Verification */
+@media (max-width: 480px) {
+  .auth-input-with-btn {
+    flex-direction: column;
+  }
+  
+  .auth-verify-btn {
+    width: 100%;
+  }
+}
