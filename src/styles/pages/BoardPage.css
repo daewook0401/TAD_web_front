@@ -57,6 +57,13 @@
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-bold);
   border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.board-nav__icon-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .board-nav__icon--lol {

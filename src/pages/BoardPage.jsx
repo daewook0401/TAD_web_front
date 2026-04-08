@@ -7,9 +7,9 @@ const BoardPage = () => {
   const [postTypeFilter, setPostTypeFilter] = useState('all'); // all, free, info
 
   const categories = {
-    lol: { name: '롤', icon: 'LOL', color: 'lol', summary: '메타, 챔피언, 내전 전략' },
-    maple: { name: '메이플랜드', icon: 'ML', color: 'maple', summary: '사냥터, 보스, 육성 루트' },
-    free: { name: '자유', icon: 'FR', color: 'free', summary: '잡담, 모집, 자유 주제' },
+    lol: { name: '롤', icon: 'https://drive.towardadiamond.com/tad/category-icons/lol.webp', color: 'lol', summary: '메타, 챔피언, 내전 전략', isImage: true },
+    maple: { name: '메이플랜드', icon: 'https://drive.towardadiamond.com/tad/category-icons/maple-land.webp', color: 'maple', summary: '사냥터, 보스, 육성 루트', isImage: true },
+    free: { name: '자유', icon: 'FR', color: 'free', summary: '잡담, 모집, 자유 주제', isImage: false },
   };
 
   const postTypeLabels = {
@@ -134,7 +134,11 @@ const BoardPage = () => {
                 onClick={() => setPostTypeFilter('all')}
               >
                 <span className={`board-nav__icon board-nav__icon--${categoryItem.color}`}>
-                  {categoryItem.icon}
+                  {categoryItem.isImage ? (
+                    <img src={categoryItem.icon} alt={categoryItem.name} className="board-nav__icon-img" />
+                  ) : (
+                    categoryItem.icon
+                  )}
                 </span>
                 <span className="board-nav__label">{categoryItem.name}</span>
               </Link>
