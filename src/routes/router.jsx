@@ -3,6 +3,8 @@ import RootLayout from '../components/layout/RootLayout';
 import MainLayout from '../components/layout/MainLayout';
 import HomePage from '../pages/HomePage';
 import BoardPage from '../pages/BoardPage';
+import BoardDetailPage from '../pages/board/BoardDetailPage';
+import BoardWritePage from '../pages/board/BoardWritePage';
 import MyMatchesPage from '../pages/matches/MyMatchesPage';
 import SearchMatchesPage from '../pages/matches/SearchMatchesPage';
 import TeamRankingPage from '../pages/matches/TeamRankingPage';
@@ -21,6 +23,22 @@ export const router = createBrowserRouter([
       {
         path: '/board',
         element: <BoardPage />,
+      },
+      {
+        path: '/board/write',
+        element: <BoardWritePage />,
+      },
+      {
+        path: '/board/post/:postId',
+        element: <BoardDetailPage />,
+      },
+      {
+        path: '/board/:category/write',
+        element: <BoardWritePage />,
+      },
+      {
+        path: '/board/:category/post/:postId',
+        element: <BoardDetailPage />,
       },
       {
         path: '/board/:category',
