@@ -1,77 +1,132 @@
 import axios from 'axios';
 
-// .env에서 API 기본 URL 가져오기
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
-// Axios 인스턴스 생성
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json;charset=UTF-8',
-    'Accept': 'application/json;charset=UTF-8',
+    Accept: 'application/json;charset=UTF-8',
   },
 });
 
-// 인증이 필요 없는 엔드포인트
-const PUBLIC_ENDPOINTS = ['/auth/login', '/auth/signup', '/auth/mail', '/auth/mail/verify', '/auth/refresh'];
+const PUBLIC_ENDPOINTS = [
+  '/auth/login',
+  '/auth/signup',
+  '/auth/mail',
+  '/auth/mail/verify',
+  '/auth/refresh',
+  '/auth/google-login',
+];
 
-// Request interceptor - 토큰 자동 추가
+let refreshPromise = null;
+
+const getAccessToken = () => sessionStorage.getItem('accessToken');
+const getRefreshToken = () => sessionStorage.getItem('refreshToken');
+
+const saveTokens = ({ accessToken, refreshToken }) => {
+  if (accessToken) {
+    sessionStorage.setItem('accessToken', accessToken);
+  }
+
+  if (refreshToken) {
+    sessionStorage.setItem('refreshToken', refreshToken);
+  }
+};
+
+const clearAuthStorage = () => {
+  sessionStorage.removeItem('accessToken');
+  sessionStorage.removeItem('refreshToken');
+  sessionStorage.removeItem('user');
+};
+
+const redirectToLogin = () => {
+  if (window.location.pathname !== '/login') {
+    window.location.href = '/login';
+  }
+};
+
+const requestTokenRefresh = async () => {
+  const refreshToken = getRefreshToken();
+
+  if (!refreshToken) {
+    throw new Error('NO_REFRESH_TOKEN');
+  }
+
+  const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+    refreshToken,
+  });
+
+  saveTokens(response.data);
+  return response.data.accessToken;
+};
+
+const refreshAccessToken = async () => {
+  if (!refreshPromise) {
+    refreshPromise = requestTokenRefresh().finally(() => {
+      refreshPromise = null;
+    });
+  }
+
+  return refreshPromise;
+};
+
 api.interceptors.request.use(
   (config) => {
     const isPublic = PUBLIC_ENDPOINTS.some((endpoint) => config.url?.includes(endpoint));
+
     if (!isPublic) {
-      const token = sessionStorage.getItem('accessToken');
+      const token = getAccessToken();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor - 에러 처리, 토큰 갱신
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+    const isRefreshRequest = originalRequest?.url?.includes('/auth/refresh');
 
-    // 401 에러이고 재시도하지 않은 경우
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      // 리프레시 토큰으로 액세스 토큰 갱신 시도
-      const refreshToken = sessionStorage.getItem('refreshToken');
-      if (refreshToken) {
-        try {
-          const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-            refreshToken,
-          });
-
-          const { accessToken } = response.data;
-          sessionStorage.setItem('accessToken', accessToken);
-
-          // 원래 요청 재시도
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-          return api(originalRequest);
-        } catch (refreshError) {
-          // 리프레시 실패 시 로그아웃
-          sessionStorage.removeItem('accessToken');
-          sessionStorage.removeItem('refreshToken');
-          window.location.href = '/login';
-          return Promise.reject(refreshError);
-        }
-      }
-
-      // 리프레시 토큰 없으면 로그인 페이지로
-      sessionStorage.removeItem('accessToken');
-      window.location.href = '/login';
+    if (!originalRequest) {
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    if (isRefreshRequest) {
+      clearAuthStorage();
+      redirectToLogin();
+      return Promise.reject(error);
+    }
+
+    const shouldRefresh =
+      status === 401 &&
+      !originalRequest._retry &&
+      (message === 'ACCESS_TOKEN_EXPIRED' || Boolean(getRefreshToken()));
+
+    if (!shouldRefresh) {
+      return Promise.reject(error);
+    }
+
+    originalRequest._retry = true;
+
+    try {
+      const accessToken = await refreshAccessToken();
+      originalRequest.headers = originalRequest.headers ?? {};
+      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+      return api(originalRequest);
+    } catch (refreshError) {
+      clearAuthStorage();
+      redirectToLogin();
+      return Promise.reject(refreshError);
+    }
   }
 );
 
