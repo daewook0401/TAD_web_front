@@ -1,16 +1,62 @@
-# React + Vite
+# TAD Web Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+TAD는 게임 이용자들이 정보를 찾고, 의견을 나누고, 자신의 플레이 경험을 기록할 수 있도록 만든 커뮤니티형 웹서비스입니다.
 
-Currently, two official plugins are available:
+이 사이트는 단순히 글을 읽는 공간이 아니라, 게임별 게시판과 개인화된 사용자 영역을 통해 이용자가 필요한 정보를 빠르게 찾고 직접 참여할 수 있도록 구성되어 있습니다.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 서비스 소개
 
-## React Compiler
+TAD는 게임을 즐기는 사용자들을 위한 통합 커뮤니티입니다.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+사용자는 게임 카테고리별 게시판에서 공략, 정보, 자유 주제의 글을 확인할 수 있고, 직접 게시글을 작성해 다른 사용자와 내용을 공유할 수 있습니다. 게시글에는 텍스트뿐 아니라 이미지와 파일도 함께 첨부할 수 있어 공략 자료, 참고 이미지, 기록용 파일 등을 한 번에 올릴 수 있습니다.
 
-## Expanding the ESLint configuration
+또한 회원가입과 로그인 기능을 통해 개인 계정을 기반으로 서비스를 이용할 수 있으며, 로그인한 사용자는 자신의 프로필을 관리하고 인증이 필요한 기능에 접근할 수 있습니다.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 주요 기능
+
+### 1. 회원가입과 로그인
+
+사용자는 이메일 인증을 거쳐 회원가입을 진행할 수 있습니다.
+
+가입이 완료되면 로그인하여 인증이 필요한 기능을 사용할 수 있으며, 로그인 상태에서는 사용자 정보를 기반으로 개인화된 화면과 기능이 제공됩니다.
+
+### 2. 내 정보 관리
+
+로그인한 사용자는 자신의 프로필 정보를 조회하고 수정할 수 있습니다.
+
+비밀번호 변경 기능도 제공하여 계정 정보를 직접 관리할 수 있습니다.
+
+### 3. 게임별 게시판 탐색
+
+서비스는 여러 게임 카테고리를 기준으로 게시판을 제공합니다.
+
+사용자는 원하는 게임 카테고리로 이동해 해당 게임에 맞는 글을 모아볼 수 있으며, 자유글과 정보글처럼 성격이 다른 게시글도 구분해서 확인할 수 있습니다.
+
+### 4. 게시글 열람
+
+게시판에서는 글 목록을 확인할 수 있고, 각 게시글의 상세 페이지에서 본문 내용을 읽을 수 있습니다.
+
+이 과정을 통해 공략, 팁, 소식, 자유 주제의 커뮤니티 글을 자연스럽게 소비할 수 있습니다.
+
+### 5. 게시글 작성
+
+로그인한 사용자는 직접 게시글을 작성할 수 있습니다.
+
+글 작성 화면에서는 제목, 태그, 본문, 글 유형을 입력할 수 있고, 에디터를 사용해 내용을 정리할 수 있습니다. 이미지와 일반 파일 첨부도 가능해 다양한 형태의 정보를 공유할 수 있습니다.
+
+### 6. 커뮤니티 중심 이용 흐름
+
+이 서비스는 아래와 같은 흐름을 중심으로 사용됩니다.
+
+1. 사용자가 회원가입 또는 로그인을 진행합니다.
+2. 관심 있는 게임 카테고리 게시판으로 이동합니다.
+3. 게시글 목록과 상세 내용을 확인하며 정보를 탐색합니다.
+4. 필요하면 직접 게시글을 작성해 정보나 의견을 공유합니다.
+5. 로그인 사용자는 자신의 계정 정보와 활동 기반 기능을 계속 이용합니다.
+
+## 사용자 관점에서의 핵심 가치
+
+- 게임별로 나뉜 게시판을 통해 원하는 주제의 글을 빠르게 찾을 수 있습니다.
+- 자유글과 정보글을 구분해 커뮤니티성과 정보성을 함께 담을 수 있습니다.
+- 글, 이미지, 파일 첨부를 함께 지원해 단순 텍스트보다 풍부한 정보 공유가 가능합니다.
+- 회원 기능을 통해 개인 계정 기반의 지속적인 커뮤니티 활동이 가능합니다.
