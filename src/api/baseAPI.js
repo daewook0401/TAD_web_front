@@ -107,7 +107,7 @@ api.interceptors.response.use(
     }
 
     const shouldRefresh =
-      status === 401 &&
+      (status === 401 || status === 403) &&
       !originalRequest._retry &&
       (message === 'ACCESS_TOKEN_EXPIRED' || Boolean(getRefreshToken()));
 

@@ -37,6 +37,10 @@ export const router = createBrowserRouter([
         element: <BoardWritePage />,
       },
       {
+        path: '/board/:category/post/:postId/edit',
+        element: <BoardWritePage />,
+      },
+      {
         path: '/board/:category/post/:postId',
         element: <BoardDetailPage />,
       },

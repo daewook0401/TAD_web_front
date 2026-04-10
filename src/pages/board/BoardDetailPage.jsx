@@ -56,9 +56,15 @@ const getStoredUser = () => {
   }
 };
 
+const canManageResource = (user, authorId) => {
+  if (!user) return false;
+  return user.id === authorId || user.roles?.includes('ROLE_ADMIN');
+};
+
 const CommentItem = ({
   comment,
   depth = 0,
+  user,
   replyDrafts,
   replyFiles,
   onReplyToggle,
@@ -66,11 +72,15 @@ const CommentItem = ({
   onReplyFileChange,
   onReplyFileRemove,
   onReplySubmit,
+  onCommentEdit,
+  onCommentDelete,
   isAuthenticated,
   submittingReplyId,
+  workingCommentId,
 }) => {
   const draft = replyDrafts[comment.id] || '';
   const attachedFiles = replyFiles[comment.id] || [];
+  const canManageComment = !comment.deleted && canManageResource(user, comment.authorId);
 
   return (
     <div className={`board-comment ${depth > 0 ? 'board-comment--reply' : ''}`}>
@@ -79,11 +89,34 @@ const CommentItem = ({
           <strong>{comment.deleted ? '삭제된 댓글' : comment.authorNickname || '익명'}</strong>
           <span>{formatDateTime(comment.createdAt)}</span>
         </div>
-        {!comment.deleted && isAuthenticated && (
-          <button type="button" className="board-comment__reply-btn" onClick={() => onReplyToggle(comment.id)}>
-            답글
-          </button>
-        )}
+
+        <div className="board-comment__actions">
+          {!comment.deleted && isAuthenticated && (
+            <button type="button" className="board-comment__reply-btn" onClick={() => onReplyToggle(comment.id)}>
+              답글
+            </button>
+          )}
+          {canManageComment && (
+            <>
+              <button
+                type="button"
+                className="board-comment__reply-btn"
+                onClick={() => onCommentEdit(comment)}
+                disabled={workingCommentId === comment.id}
+              >
+                수정
+              </button>
+              <button
+                type="button"
+                className="board-comment__reply-btn"
+                onClick={() => onCommentDelete(comment.id)}
+                disabled={workingCommentId === comment.id}
+              >
+                삭제
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="board-comment__body">
@@ -135,7 +168,7 @@ const CommentItem = ({
                   className="board-comment__draft-file"
                   onClick={() => onReplyFileRemove(comment.id, file)}
                 >
-                  {file.name} ×
+                  {file.name} x
                 </button>
               ))}
             </div>
@@ -149,6 +182,7 @@ const CommentItem = ({
             key={reply.id}
             comment={reply}
             depth={depth + 1}
+            user={user}
             replyDrafts={replyDrafts}
             replyFiles={replyFiles}
             onReplyToggle={onReplyToggle}
@@ -156,8 +190,11 @@ const CommentItem = ({
             onReplyFileChange={onReplyFileChange}
             onReplyFileRemove={onReplyFileRemove}
             onReplySubmit={onReplySubmit}
+            onCommentEdit={onCommentEdit}
+            onCommentDelete={onCommentDelete}
             isAuthenticated={isAuthenticated}
             submittingReplyId={submittingReplyId}
+            workingCommentId={workingCommentId}
           />
         ))}
     </div>
@@ -181,6 +218,8 @@ const BoardDetailPage = () => {
   const [replyFiles, setReplyFiles] = useState({});
   const [submittingComment, setSubmittingComment] = useState(false);
   const [submittingReplyId, setSubmittingReplyId] = useState(null);
+  const [deletingPost, setDeletingPost] = useState(false);
+  const [workingCommentId, setWorkingCommentId] = useState(null);
 
   const user = useMemo(() => getStoredUser(), []);
   const isAuthenticated = Boolean(sessionStorage.getItem('accessToken'));
@@ -245,6 +284,7 @@ const BoardDetailPage = () => {
 
   const currentCategory = categories.find((item) => item.categoryKey === activeCategory);
   const contentHtml = normalizePostContent(post);
+  const canManagePost = canManageResource(user, post?.authorId);
 
   const imageAttachments = (post?.attachments || []).filter((item) => item.contentType?.startsWith('image/'));
   const fileAttachments = (post?.attachments || []).filter((item) => !item.contentType?.startsWith('image/'));
@@ -393,6 +433,62 @@ const BoardDetailPage = () => {
     }
   };
 
+  const handlePostDelete = async () => {
+    if (!post?.id || deletingPost) return;
+
+    const confirmed = window.confirm('이 게시글을 삭제하시겠습니까?');
+    if (!confirmed) return;
+
+    setDeletingPost(true);
+
+    try {
+      await boardAPI.deletePost(post.id);
+      navigate(`/board/${post.categoryKey || activeCategory}`);
+    } catch (deleteError) {
+      console.error('게시글 삭제 실패:', deleteError);
+      setError(deleteError.response?.data?.message || '게시글 삭제에 실패했습니다.');
+    } finally {
+      setDeletingPost(false);
+    }
+  };
+
+  const handleCommentEdit = async (comment) => {
+    const nextContent = window.prompt('댓글 내용을 수정해주세요.', comment.content === '[deleted]' ? '' : comment.content);
+    if (nextContent === null) return;
+
+    if (!nextContent.trim()) {
+      window.alert('댓글 내용을 입력해주세요.');
+      return;
+    }
+
+    setWorkingCommentId(comment.id);
+    try {
+      await boardAPI.updateComment(comment.id, { content: nextContent.trim() });
+      await fetchComments();
+    } catch (updateError) {
+      console.error('댓글 수정 실패:', updateError);
+      setError(updateError.response?.data?.message || '댓글 수정에 실패했습니다.');
+    } finally {
+      setWorkingCommentId(null);
+    }
+  };
+
+  const handleCommentDelete = async (commentId) => {
+    const confirmed = window.confirm('이 댓글을 삭제하시겠습니까?');
+    if (!confirmed) return;
+
+    setWorkingCommentId(commentId);
+    try {
+      await boardAPI.deleteComment(commentId);
+      await fetchComments();
+    } catch (deleteError) {
+      console.error('댓글 삭제 실패:', deleteError);
+      setError(deleteError.response?.data?.message || '댓글 삭제에 실패했습니다.');
+    } finally {
+      setWorkingCommentId(null);
+    }
+  };
+
   if (categoriesLoading || postLoading) {
     return (
       <div className="board-page">
@@ -432,9 +528,21 @@ const BoardDetailPage = () => {
             <button className="board-detail__back" onClick={() => navigate(`/board/${activeCategory}`)}>
               목록으로
             </button>
-            <Link className="board-detail__write" to={`/board/${activeCategory}/write`}>
-              글쓰기
-            </Link>
+            <div className="board-detail__toolbar-actions">
+              {canManagePost && post?.id && (
+                <>
+                  <Link className="board-detail__back" to={`/board/${activeCategory}/post/${post.id}/edit`}>
+                    수정
+                  </Link>
+                  <button className="board-detail__back" onClick={handlePostDelete} disabled={deletingPost}>
+                    {deletingPost ? '삭제 중...' : '삭제'}
+                  </button>
+                </>
+              )}
+              <Link className="board-detail__write" to={`/board/${activeCategory}/write`}>
+                글쓰기
+              </Link>
+            </div>
           </div>
 
           {error ? (
@@ -500,7 +608,7 @@ const BoardDetailPage = () => {
                             >
                               <div>
                                 <strong>{attachment.fileName}</strong>
-                                <span>{attachment.contentType || 'file'} · {formatFileSize(attachment.fileSize)}</span>
+                                <span>{attachment.contentType || 'file'} / {formatFileSize(attachment.fileSize)}</span>
                               </div>
                               <span>열기</span>
                             </a>
@@ -565,7 +673,7 @@ const BoardDetailPage = () => {
                               )
                             }
                           >
-                            {file.name} ×
+                            {file.name} x
                           </button>
                         ))}
                       </div>
@@ -582,6 +690,7 @@ const BoardDetailPage = () => {
                         <CommentItem
                           key={comment.id}
                           comment={comment}
+                          user={user}
                           replyDrafts={replyDrafts}
                           replyFiles={replyFiles}
                           onReplyToggle={handleReplyToggle}
@@ -589,8 +698,11 @@ const BoardDetailPage = () => {
                           onReplyFileChange={handleReplyFileChange}
                           onReplyFileRemove={handleReplyFileRemove}
                           onReplySubmit={handleReplySubmit}
+                          onCommentEdit={handleCommentEdit}
+                          onCommentDelete={handleCommentDelete}
                           isAuthenticated={isAuthenticated}
                           submittingReplyId={submittingReplyId}
+                          workingCommentId={workingCommentId}
                         />
                       ))}
                     </div>
@@ -603,7 +715,7 @@ const BoardDetailPage = () => {
                   <p className="board-detail__card-label">게시판 안내</p>
                   <h2 className="board-detail__card-title">{currentCategory?.name || '커뮤니티'}</h2>
                   <p className="board-detail__card-text">
-                    {currentCategory?.summary || '게시글과 첨부파일, 댓글을 한곳에서 확인할 수 있습니다.'}
+                    {currentCategory?.summary || '게시글과 첨부파일, 댓글을 한 화면에서 확인할 수 있습니다.'}
                   </p>
                 </div>
 
