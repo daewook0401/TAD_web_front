@@ -41,6 +41,23 @@ export const boardAPI = {
     });
   },
 
+  updatePostFormData: ({ postId, payload, files = [] }) => {
+    const formData = new FormData();
+    appendJsonPart(formData, payload);
+
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+
+    return api.put(`/board/posts/${postId}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+
+  deletePost: (postId) => api.delete(`/board/posts/${postId}`),
+
   getComments: (postId) => api.get(`/board/posts/${postId}/comments`),
 
   createCommentFormData: ({ postId, payload, images = [] }) => {

@@ -43,19 +43,34 @@ const extractTextFromHtml = (html) => {
   return (doc.body.textContent || '').trim();
 };
 
+const getStoredUser = () => {
+  try {
+    const raw = sessionStorage.getItem('user');
+    return raw ? JSON.parse(raw) : null;
+  } catch (error) {
+    console.error('사용자 세션 파싱 실패:', error);
+    return null;
+  }
+};
+
 const BoardWritePage = () => {
-  const { category } = useParams();
+  const { category, postId } = useParams();
   const navigate = useNavigate();
   const editorRef = useRef(null);
   const imageInputRef = useRef(null);
   const fileInputRef = useRef(null);
   const selectionRangeRef = useRef(null);
 
+  const isEditMode = Boolean(postId);
+  const user = useMemo(() => getStoredUser(), []);
+
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [postLoading, setPostLoading] = useState(isEditMode);
   const [form, setForm] = useState(initialForm);
   const [editorHtml, setEditorHtml] = useState('');
   const [files, setFiles] = useState([]);
+  const [existingAttachments, setExistingAttachments] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -76,16 +91,62 @@ const BoardWritePage = () => {
   }, []);
 
   useEffect(() => {
-    if (categories.length === 0) return;
+    const fetchPost = async () => {
+      if (!isEditMode) {
+        setPostLoading(false);
+        return;
+      }
+
+      setPostLoading(true);
+
+      try {
+        const response = await boardAPI.getPost(postId);
+        const post = response.data;
+        const isAdmin = user?.roles?.includes('ROLE_ADMIN');
+        const isAuthor = user?.id === post?.authorId;
+
+        if (!isAdmin && !isAuthor) {
+          window.alert('게시글을 수정할 권한이 없습니다.');
+          navigate(`/board/${post.categoryKey}/post/${post.id}`);
+          return;
+        }
+
+        setForm({
+          categoryKey: post.categoryKey || '',
+          postType: post.postType || 'free',
+          title: post.title || '',
+          tag: post.tag || '',
+        });
+        setEditorHtml(post.content || '');
+        setExistingAttachments(post.attachments || []);
+      } catch (fetchError) {
+        console.error('게시글 조회 실패:', fetchError);
+        setError('게시글 정보를 불러오지 못했습니다.');
+      } finally {
+        setPostLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [isEditMode, navigate, postId, user]);
+
+  useEffect(() => {
+    if (editorRef.current && editorRef.current.innerHTML !== editorHtml) {
+      editorRef.current.innerHTML = editorHtml;
+    }
+  }, [editorHtml]);
+
+  useEffect(() => {
+    if (categories.length === 0 || isEditMode) return;
 
     const matchedCategory = categories.find((item) => item.categoryKey === category);
     const fallbackCategory = matchedCategory?.categoryKey || categories[0]?.categoryKey || '';
 
     setForm((prev) => ({
       ...prev,
-      categoryKey: fallbackCategory,
+      categoryKey: prev.categoryKey || fallbackCategory,
     }));
-  }, [categories, category]);
+  }, [categories, category, isEditMode]);
 
   const currentCategory = useMemo(
     () => categories.find((item) => item.categoryKey === form.categoryKey),
@@ -302,27 +363,35 @@ const BoardWritePage = () => {
         content: contentHtml,
       };
 
-      const response = await boardAPI.createPostFormData({
-        payload,
-        files: files.map((item) => item.file),
-      });
+      const request = isEditMode
+        ? boardAPI.updatePostFormData({
+            postId,
+            payload,
+            files: files.map((item) => item.file),
+          })
+        : boardAPI.createPostFormData({
+            payload,
+            files: files.map((item) => item.file),
+          });
 
-      const createdPost = response.data;
-      if (createdPost?.id) {
-        navigate(`/board/${createdPost.categoryKey || form.categoryKey}/post/${createdPost.id}`);
+      const response = await request;
+      const savedPost = response.data;
+
+      if (savedPost?.id) {
+        navigate(`/board/${savedPost.categoryKey || form.categoryKey}/post/${savedPost.id}`);
         return;
       }
 
       navigate(`/board/${form.categoryKey}`);
     } catch (submitError) {
-      console.error('게시글 작성 실패:', submitError);
-      setError('게시글 등록에 실패했습니다. 잠시 후 다시 시도해주세요.');
+      console.error('게시글 저장 실패:', submitError);
+      setError('게시글 저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (categoriesLoading) {
+  if (categoriesLoading || postLoading) {
     return (
       <div className="board-page">
         <div className="board-loading">로딩 중...</div>
@@ -359,11 +428,14 @@ const BoardWritePage = () => {
         <div className="board-write__container">
           <div className="board-write__header">
             <div>
-              <p className="board-write__eyebrow">게시글 작성</p>
-              <h1 className="board-write__title">{currentCategory?.name || '커뮤니티'} 글쓰기</h1>
-              <p className="board-write__subtitle">자유롭게 글을 작성하고 필요한 파일을 함께 첨부해보세요.</p>
+              <p className="board-write__eyebrow">{isEditMode ? '게시글 수정' : '게시글 작성'}</p>
+              <h1 className="board-write__title">{currentCategory?.name || '커뮤니티'} {isEditMode ? '수정하기' : '글쓰기'}</h1>
+              <p className="board-write__subtitle">내용을 정리하고 필요한 파일이 있으면 함께 첨부해보세요.</p>
             </div>
-            <button className="board-write__cancel" onClick={() => navigate(`/board/${form.categoryKey || category || ''}`)}>
+            <button
+              className="board-write__cancel"
+              onClick={() => navigate(isEditMode ? `/board/${form.categoryKey}/post/${postId}` : `/board/${form.categoryKey || category || ''}`)}
+            >
               취소
             </button>
           </div>
@@ -520,7 +592,7 @@ const BoardWritePage = () => {
                     />
 
                     <div className="board-write__editor-footer">
-                      <span>편집한 내용이 아래 미리보기에 바로 반영됩니다.</span>
+                      <span>입력한 내용은 아래 미리보기에 바로 반영됩니다.</span>
                       <span>{extractTextFromHtml(editorHtml).length}자</span>
                     </div>
                   </div>
@@ -542,11 +614,37 @@ const BoardWritePage = () => {
                   onChange={handleAttachmentPicked}
                 />
 
+                {isEditMode && existingAttachments.length > 0 && (
+                  <div className="board-write__attachments board-write__attachments--embedded">
+                    <div className="board-write__attachments-head">
+                      <p className="board-write__attachments-title">기존 첨부파일</p>
+                      <p className="board-write__attachments-copy">수정 시 기존 첨부파일은 유지되고, 아래 파일은 추가로 업로드됩니다.</p>
+                    </div>
+                    <div className="board-write__file-list">
+                      {existingAttachments.map((attachment) => (
+                        <a
+                          key={attachment.id}
+                          className="board-write__file-item"
+                          href={attachment.fileUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <div>
+                            <strong>{attachment.fileName}</strong>
+                            <span>{attachment.contentType || 'file'}</span>
+                          </div>
+                          <span>보기</span>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {files.length > 0 && (
                   <div className="board-write__attachments board-write__attachments--embedded">
                     <div className="board-write__attachments-head">
-                      <p className="board-write__attachments-title">첨부파일</p>
-                      <p className="board-write__attachments-copy">선택한 파일은 게시글과 함께 업로드됩니다.</p>
+                      <p className="board-write__attachments-title">새로 추가할 파일</p>
+                      <p className="board-write__attachments-copy">선택한 파일은 저장 시 함께 업로드됩니다.</p>
                     </div>
 
                     <div className="board-write__file-list">
@@ -568,11 +666,15 @@ const BoardWritePage = () => {
                 {error ? <p className="board-write__error">{error}</p> : null}
 
                 <div className="board-write__actions">
-                  <button type="button" className="board-write__ghost" onClick={() => navigate(`/board/${form.categoryKey}`)}>
+                  <button
+                    type="button"
+                    className="board-write__ghost"
+                    onClick={() => navigate(isEditMode ? `/board/${form.categoryKey}/post/${postId}` : `/board/${form.categoryKey}`)}
+                  >
                     목록으로
                   </button>
                   <button type="submit" className="board-write__submit" disabled={isSubmitting}>
-                    {isSubmitting ? '등록 중...' : '게시글 등록'}
+                    {isSubmitting ? '저장 중...' : isEditMode ? '게시글 수정' : '게시글 등록'}
                   </button>
                 </div>
               </div>
@@ -583,9 +685,9 @@ const BoardWritePage = () => {
                 <p className="board-write__tip-label">작성 가이드</p>
                 <h2 className="board-write__tip-title">읽기 쉬운 글로 정리해보세요.</h2>
                 <ul className="board-write__tips">
-                  <li>제목은 핵심이 잘 보이도록 간결하게 적어주세요.</li>
-                  <li>목록, 인용, 링크 같은 서식을 활용하면 읽기 편합니다.</li>
-                  <li>첨부한 이미지는 현재 첨부 영역에서 함께 확인할 수 있습니다.</li>
+                  <li>제목은 전달력이 좋도록 간결하게 적어주세요.</li>
+                  <li>목록, 인용, 링크 같은 서식을 사용하면 읽기 편합니다.</li>
+                  <li>첨부 이미지와 파일은 저장 후 상세 화면에서 확인할 수 있습니다.</li>
                 </ul>
               </div>
 
