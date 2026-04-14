@@ -8,7 +8,7 @@ export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   
   // 로그아웃
-  logout: () => api.post('/auth/logout'),
+  logout: (refreshToken) => api.post('/auth/logout', { refreshToken }),
   
   // 이메일 인증 코드 발송
   sendVerificationCode: (email) => api.post('/auth/mail', { email }),

@@ -14,6 +14,7 @@ const api = axios.create({
 const PUBLIC_ENDPOINTS = [
   '/auth/login',
   '/auth/signup',
+  '/auth/logout',
   '/auth/mail',
   '/auth/mail/verify',
   '/auth/refresh',
