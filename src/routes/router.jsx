@@ -11,6 +11,8 @@ import TeamRankingPage from '../pages/matches/TeamRankingPage';
 import LoginPage from '../pages/auth/LoginPage';
 import SignupPage from '../pages/auth/SignupPage';
 import MyPage from '../pages/MyPage';
+import AdminPage from '../pages/AdminPage';
+import RequireAdmin from '../components/auth/RequireAdmin';
 
 export const router = createBrowserRouter([
   {
@@ -75,6 +77,10 @@ export const router = createBrowserRouter([
       {
         path: '/mypage',
         element: <MyPage />,
+      },
+      {
+        path: '/admin',
+        element: <RequireAdmin><AdminPage /></RequireAdmin>,
       },
     ],
   },

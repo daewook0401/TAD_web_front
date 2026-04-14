@@ -1,5 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { useState, useEffect, createContext, useContext } from 'react';
+import { authAPI } from '../api/authAPI';
 
 export const AuthContext = createContext();
 
@@ -39,12 +40,26 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const clearAuthStorage = () => {
     setUser(null);
     setIsAuthenticated(false);
     sessionStorage.removeItem('accessToken');
     sessionStorage.removeItem('refreshToken');
     sessionStorage.removeItem('user');
+  };
+
+  const logout = async () => {
+    const refreshToken = sessionStorage.getItem('refreshToken');
+
+    try {
+      if (refreshToken) {
+        await authAPI.logout(refreshToken);
+      }
+    } catch (error) {
+      console.error('Failed to logout from server session:', error);
+    } finally {
+      clearAuthStorage();
+    }
   };
 
   const isAdmin = () => {

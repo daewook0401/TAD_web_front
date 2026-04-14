@@ -138,6 +138,15 @@ const Header = () => {
                   >
                     마이페이지
                   </Link>
+                  {isAdmin() && (
+                    <Link
+                      to="/admin"
+                      className="header__user-menu-item"
+                      onClick={() => setIsUserDropdownOpen(false)}
+                    >
+                      관리자 페이지
+                    </Link>
+                  )}
                   <button
                     onClick={() => {
                       logout();
@@ -219,6 +228,11 @@ const Header = () => {
                   <Link to="/mypage" className="header__mobile-link" onClick={closeMobileMenu}>
                     마이페이지
                   </Link>
+                  {isAdmin() && (
+                    <Link to="/admin" className="header__mobile-link" onClick={closeMobileMenu}>
+                      관리자 페이지
+                    </Link>
+                  )}
                   <button
                     className="header__mobile-link"
                     onClick={() => {
