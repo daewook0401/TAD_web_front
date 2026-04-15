@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../provider/AuthContext';
 import '../../styles/layout/Header.css';
 
@@ -18,10 +18,11 @@ const Header = () => {
       basePath: '/matches',
       hasDropdown: true,
       subItems: [
+        { label: '내전 기록 등록', path: '/matches/upload', requiresAuth: true },
         { label: '내 전적 확인', path: '/matches/my', requiresAuth: true },
         { label: '전적 검색', path: '/matches/search' },
-        { label: '팀 랭킹', path: '/matches/team' },
-      ]
+        { label: '팀 순위', path: '/matches/team' },
+      ],
     },
     {
       label: '게시판',
@@ -30,22 +31,21 @@ const Header = () => {
       hasDropdown: true,
       subItems: [
         { label: '롤 게시판', path: '/board/lol' },
-        { label: '메이플랜드 게시판', path: '/board/maple' },
+        { label: '메이플 게시판', path: '/board/maple' },
         { label: '자유 게시판', path: '/board/free' },
-      ]
+      ],
     },
   ];
 
-  const isActiveLink = (basePath) => {
-    return location.pathname.startsWith(basePath);
-  };
+  const isActiveLink = (basePath) => location.pathname.startsWith(basePath);
 
-  const handleSubItemClick = (e, subItem) => {
+  const handleProtectedNavigation = (event, subItem) => {
     if (subItem.requiresAuth && !isAuthenticated) {
-      e.preventDefault();
+      event.preventDefault();
       alert('로그인이 필요한 서비스입니다.');
-      navigate('/');
+      navigate('/login');
     }
+
     setIsMobileMenuOpen(false);
   };
 
@@ -54,10 +54,7 @@ const Header = () => {
   };
 
   return (
-    <header
-      className="site-header"
-      onMouseLeave={() => setActiveDropdown(null)}
-    >
+    <header className="site-header" onMouseLeave={() => setActiveDropdown(null)}>
       <nav className="header__nav">
         <Link to="/" className="header__logo" onClick={closeMobileMenu}>
           <span className="header__logo-text">TAD</span>
@@ -76,7 +73,7 @@ const Header = () => {
               >
                 {item.label}
               </Link>
-              
+
               {item.hasDropdown && activeDropdown === item.path && (
                 <div className="header__dropdown">
                   <div className="header__dropdown-section">
@@ -84,11 +81,11 @@ const Header = () => {
                       <Link
                         key={subItem.path}
                         to={subItem.path}
-                        onClick={(e) => {
-                          handleSubItemClick(e, subItem);
+                        className="header__dropdown-link"
+                        onClick={(event) => {
+                          handleProtectedNavigation(event, subItem);
                           setActiveDropdown(null);
                         }}
-                        className="header__dropdown-link"
                       >
                         {subItem.label}
                       </Link>
@@ -104,46 +101,33 @@ const Header = () => {
           {isAuthenticated ? (
             <div className="header__user">
               <button
-                onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                onClick={() => setIsUserDropdownOpen((value) => !value)}
                 className="header__user-btn"
               >
-                <div className="header__user-avatar">
-                  {user?.nickname?.charAt(0) || 'U'}
-                </div>
+                <div className="header__user-avatar">{user?.nickname?.charAt(0) || 'U'}</div>
                 <span className="header__user-name">
                   {user?.nickname || '사용자'}
                   {isAdmin() && <span className="header__admin-badge">관리자</span>}
                 </span>
-                <svg
-                  className="header__user-icon"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
+                <svg className="header__user-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
 
               {isUserDropdownOpen && (
                 <div className="header__user-dropdown">
+                  <Link to="/mypage" className="header__user-menu-item" onClick={() => setIsUserDropdownOpen(false)}>
+                    마이페이지
+                  </Link>
                   <Link
-                    to="/mypage"
+                    to="/matches/upload"
                     className="header__user-menu-item"
                     onClick={() => setIsUserDropdownOpen(false)}
                   >
-                    마이페이지
+                    내전 기록 등록
                   </Link>
                   {isAdmin() && (
-                    <Link
-                      to="/admin"
-                      className="header__user-menu-item"
-                      onClick={() => setIsUserDropdownOpen(false)}
-                    >
+                    <Link to="/admin" className="header__user-menu-item" onClick={() => setIsUserDropdownOpen(false)}>
                       관리자 페이지
                     </Link>
                   )}
@@ -168,31 +152,20 @@ const Header = () => {
 
         <button
           className="header__mobile-btn"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label={isMobileMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
+          onClick={() => setIsMobileMenuOpen((value) => !value)}
+          aria-label={isMobileMenuOpen ? '메뉴 닫기' : '메뉴 열기'}
           aria-expanded={isMobileMenuOpen}
         >
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             {isMobileMenuOpen ? (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             ) : (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             )}
           </svg>
         </button>
       </nav>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="header__mobile-menu">
           <div className="header__mobile-menu-inner">
@@ -205,28 +178,29 @@ const Header = () => {
                 >
                   {item.label}
                 </Link>
-                {item.subItems && (
-                  <div className="header__mobile-subitems">
-                    {item.subItems.map((subItem) => (
-                      <Link
-                        key={subItem.path}
-                        to={subItem.path}
-                        className="header__mobile-link"
-                        onClick={(e) => handleSubItemClick(e, subItem)}
-                      >
-                        {subItem.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                <div className="header__mobile-subitems">
+                  {item.subItems.map((subItem) => (
+                    <Link
+                      key={subItem.path}
+                      to={subItem.path}
+                      className="header__mobile-link"
+                      onClick={(event) => handleProtectedNavigation(event, subItem)}
+                    >
+                      {subItem.label}
+                    </Link>
+                  ))}
+                </div>
               </div>
             ))}
-            
+
             <div className="header__mobile-actions">
               {isAuthenticated ? (
                 <>
                   <Link to="/mypage" className="header__mobile-link" onClick={closeMobileMenu}>
                     마이페이지
+                  </Link>
+                  <Link to="/matches/upload" className="header__mobile-link" onClick={closeMobileMenu}>
+                    내전 기록 등록
                   </Link>
                   {isAdmin() && (
                     <Link to="/admin" className="header__mobile-link" onClick={closeMobileMenu}>
