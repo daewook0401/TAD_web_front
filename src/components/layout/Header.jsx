@@ -21,7 +21,6 @@ const Header = () => {
         { label: '내전 기록 등록', path: '/matches/upload', requiresAuth: true },
         { label: '내 전적 확인', path: '/matches/my', requiresAuth: true },
         { label: '전적 검색', path: '/matches/search' },
-        { label: '팀 순위', path: '/matches/team' },
       ],
     },
     {

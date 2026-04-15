@@ -15,6 +15,10 @@ export const analysisAPI = {
 
   getMyRecords: () => api.get('/analyze/my-records'),
 
+  getRankings: (keyword) => api.get('/analyze/rankings', {
+    params: keyword ? { keyword } : {},
+  }),
+
   getRecordDetail: (gameId) => api.get(`/analyze/${gameId}`),
 
   updateDraft: (gameId, payload) => api.put(`/analyze/${gameId}/draft`, payload),
