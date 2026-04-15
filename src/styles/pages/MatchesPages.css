@@ -552,6 +552,11 @@
   color: var(--color-error);
 }
 
+.matches-table__result--neutral {
+  background: var(--color-gray-100);
+  color: var(--color-gray-600);
+}
+
 .matches-table__tier {
   display: inline-block;
   padding: var(--spacing-1) var(--spacing-3);
@@ -1123,6 +1128,11 @@
 
 .match-review__confirm {
   width: auto;
+}
+
+.match-review__hint {
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
 }
 
 @media (max-width: 1024px) {

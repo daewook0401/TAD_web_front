@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { analysisAPI } from '../../api/analysisAPI';
 import { useAuth } from '../../provider/AuthContext';
@@ -11,6 +11,31 @@ const MyMatchesPage = () => {
   const [records, setRecords] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const isFetchingRef = useRef(false);
+
+  const fetchRecords = useCallback(async (showLoading = false) => {
+    if (isFetchingRef.current) {
+      return;
+    }
+
+    isFetchingRef.current = true;
+    if (showLoading) {
+      setIsLoading(true);
+    }
+
+    try {
+      const response = await analysisAPI.getMyRecords();
+      setRecords(response.data);
+      setErrorMessage('');
+    } catch (error) {
+      setErrorMessage(error.response?.data?.message || '내 전적 목록을 불러오지 못했습니다.');
+    } finally {
+      isFetchingRef.current = false;
+      if (showLoading) {
+        setIsLoading(false);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -18,35 +43,73 @@ const MyMatchesPage = () => {
       return;
     }
 
-    const fetchRecords = async () => {
-      setIsLoading(true);
-      setErrorMessage('');
+    fetchRecords(true);
+  }, [fetchRecords, isAuthenticated, navigate]);
 
-      try {
-        const response = await analysisAPI.getMyRecords();
-        setRecords(response.data);
-      } catch (error) {
-        setErrorMessage(error.response?.data?.message || '내 전적 목록을 불러오지 못했습니다.');
-      } finally {
-        setIsLoading(false);
+  useEffect(() => {
+    const hasProcessing = records.some((record) => record.status === 'PROCESSING');
+    if (!hasProcessing) {
+      return undefined;
+    }
+
+    let timeoutId;
+    let cancelled = false;
+
+    const poll = async () => {
+      await fetchRecords(false);
+      if (!cancelled) {
+        timeoutId = window.setTimeout(poll, 5000);
       }
     };
 
-    fetchRecords();
-  }, [isAuthenticated, navigate]);
+    timeoutId = window.setTimeout(poll, 5000);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [fetchRecords, records]);
 
   const stats = useMemo(() => {
     const confirmed = records.filter((record) => record.status === 'CONFIRMED');
-    const wins = confirmed.filter((record) => record.winner === 'team1' || record.winner === 'team2').length;
-    const drafts = records.filter((record) => record.reviewRequired).length;
+    const drafts = records.filter((record) => record.status === 'DRAFT').length;
+    const processing = records.filter((record) => record.status === 'PROCESSING').length;
 
     return {
       totalMatches: records.length,
       confirmedMatches: confirmed.length,
       drafts,
-      wins,
+      processing,
     };
   }, [records]);
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'PROCESSING':
+        return '준비중';
+      case 'DRAFT':
+        return '검수 필요';
+      case 'CONFIRMED':
+        return '확정 완료';
+      case 'FAILED':
+        return '분석 실패';
+      default:
+        return status;
+    }
+  };
+
+  const getStatusClassName = (status) => {
+    switch (status) {
+      case 'CONFIRMED':
+        return 'matches-table__result--win';
+      case 'DRAFT':
+        return 'matches-table__result--loss';
+      case 'PROCESSING':
+      case 'FAILED':
+      default:
+        return 'matches-table__result--neutral';
+    }
+  };
 
   if (!isAuthenticated) {
     return null;
@@ -60,7 +123,7 @@ const MyMatchesPage = () => {
             <span className="matches-hero__eyebrow">My Match Log</span>
             <h1 className="matches-hero__title">내 전적 확인</h1>
             <p className="matches-hero__description">
-              업로드가 끝난 내전 기록을 확인하고, 검수 필요 상태라면 이름 수정 후 최종 확정할 수 있습니다.
+              업로드한 내전 기록이 준비중인지, 검수 가능한지, 최종 확정됐는지 한눈에 확인할 수 있습니다.
             </p>
             <Link to="/matches/upload" className="match-upload__cta">
               새 내전 기록 업로드
@@ -96,20 +159,20 @@ const MyMatchesPage = () => {
             <p className="my-stats__value">{stats.totalMatches}</p>
           </div>
           <div className="my-stats__card">
-            <p className="my-stats__label">확정 완료</p>
-            <p className="my-stats__value my-stats__value--win">{stats.confirmedMatches}</p>
+            <p className="my-stats__label">준비중</p>
+            <p className="my-stats__value">{stats.processing}</p>
           </div>
           <div className="my-stats__card">
             <p className="my-stats__label">검수 필요</p>
             <p className="my-stats__value my-stats__value--loss">{stats.drafts}</p>
           </div>
           <div className="my-stats__card">
-            <p className="my-stats__label">인식된 기록</p>
-            <p className="my-stats__value">{records.reduce((sum, record) => sum + (record.recognizedPlayers ?? 0), 0)}</p>
+            <p className="my-stats__label">확정 완료</p>
+            <p className="my-stats__value my-stats__value--win">{stats.confirmedMatches}</p>
           </div>
           <div className="my-stats__card">
-            <p className="my-stats__label">업로드 이미지</p>
-            <p className="my-stats__value">{records.length}</p>
+            <p className="my-stats__label">인식 플레이어</p>
+            <p className="my-stats__value">{records.reduce((sum, record) => sum + (record.recognizedPlayers ?? 0), 0)}</p>
           </div>
         </div>
       </section>
@@ -135,16 +198,24 @@ const MyMatchesPage = () => {
                       <td className="matches-table__td matches-table__td--name">{record.gameNumber}</td>
                       <td className="matches-table__td">{record.createdAt ?? '-'}</td>
                       <td className="matches-table__td">
-                        <span className={`matches-table__result ${record.reviewRequired ? 'matches-table__result--loss' : 'matches-table__result--win'}`}>
-                          {record.reviewRequired ? '검수 필요' : '확정 완료'}
+                        <span className={`matches-table__result ${getStatusClassName(record.status)}`}>
+                          {getStatusLabel(record.status)}
                         </span>
                       </td>
-                      <td className="matches-table__td">{record.winner === 'team1' ? '1팀' : '2팀'}</td>
+                      <td className="matches-table__td">
+                        {record.winner === 'team1' ? '1팀' : record.winner === 'team2' ? '2팀' : '-'}
+                      </td>
                       <td className="matches-table__td">{record.recognizedPlayers ?? 0}</td>
                       <td className="matches-table__td">
-                        <Link to={`/matches/review/${record.gameNumber}`} className="match-upload__link">
-                          {record.reviewRequired ? '검수하기' : '상세 보기'}
-                        </Link>
+                        {record.status === 'DRAFT' || record.status === 'CONFIRMED' ? (
+                          <Link to={`/matches/review/${record.gameNumber}`} className="match-upload__link">
+                            {record.status === 'DRAFT' ? '검수하기' : '상세 보기'}
+                          </Link>
+                        ) : (
+                          <span className="match-review__hint">
+                            {record.status === 'PROCESSING' ? '분석 중' : '확인 불가'}
+                          </span>
+                        )}
                       </td>
                     </tr>
                   ))
