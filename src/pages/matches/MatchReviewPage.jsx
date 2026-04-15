@@ -8,6 +8,8 @@ const createEmptyRecord = () => ({
   gameNumber: null,
   winner: 'team1',
   status: 'DRAFT',
+  screenshotUrl: '',
+  createdAt: null,
   team1: { players: [] },
   team2: { players: [] },
 });
@@ -301,6 +303,24 @@ const MatchReviewPage = () => {
               </>
             )}
           </div>
+
+          {record.screenshotUrl && (
+            <div className="match-review__image-section">
+              <div className="match-review__image-header">
+                <h3 className="match-review__image-title">업로드한 결과 이미지</h3>
+                <a href={record.screenshotUrl} target="_blank" rel="noreferrer" className="match-upload__link">
+                  원본 보기
+                </a>
+              </div>
+              <div className="match-review__image-card">
+                <img
+                  src={record.screenshotUrl}
+                  alt={`내전 기록 ${record.gameNumber} 결과 이미지`}
+                  className="match-review__image-preview"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </div>
