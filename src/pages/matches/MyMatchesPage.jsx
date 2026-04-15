@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { analysisAPI } from '../../api/analysisAPI';
 import { useAuth } from '../../provider/AuthContext';
@@ -11,8 +11,14 @@ const MyMatchesPage = () => {
   const [records, setRecords] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const isFetchingRef = useRef(false);
 
   const fetchRecords = useCallback(async (showLoading = false) => {
+    if (isFetchingRef.current) {
+      return;
+    }
+
+    isFetchingRef.current = true;
     if (showLoading) {
       setIsLoading(true);
     }
@@ -24,6 +30,7 @@ const MyMatchesPage = () => {
     } catch (error) {
       setErrorMessage(error.response?.data?.message || '내 전적 목록을 불러오지 못했습니다.');
     } finally {
+      isFetchingRef.current = false;
       if (showLoading) {
         setIsLoading(false);
       }
@@ -45,11 +52,22 @@ const MyMatchesPage = () => {
       return undefined;
     }
 
-    const intervalId = window.setInterval(() => {
-      fetchRecords(false);
-    }, 5000);
+    let timeoutId;
+    let cancelled = false;
 
-    return () => window.clearInterval(intervalId);
+    const poll = async () => {
+      await fetchRecords(false);
+      if (!cancelled) {
+        timeoutId = window.setTimeout(poll, 5000);
+      }
+    };
+
+    timeoutId = window.setTimeout(poll, 5000);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
   }, [fetchRecords, records]);
 
   const stats = useMemo(() => {
@@ -81,10 +99,16 @@ const MyMatchesPage = () => {
   };
 
   const getStatusClassName = (status) => {
-    if (status === 'CONFIRMED') {
-      return 'matches-table__result--win';
+    switch (status) {
+      case 'CONFIRMED':
+        return 'matches-table__result--win';
+      case 'DRAFT':
+        return 'matches-table__result--loss';
+      case 'PROCESSING':
+      case 'FAILED':
+      default:
+        return 'matches-table__result--neutral';
     }
-    return 'matches-table__result--loss';
   };
 
   if (!isAuthenticated) {

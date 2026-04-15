@@ -6,6 +6,7 @@ export const analysisAPI = {
     formData.append('image', file);
 
     return api.post('/analyze/upload', formData, {
+      timeout: 300000,
       headers: {
         'Content-Type': 'multipart/form-data',
       },
