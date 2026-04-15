@@ -109,7 +109,7 @@
 }
 
 .board-detail__meta span::after {
-  content: '?';
+  content: '·';
   margin-left: var(--spacing-2);
   color: var(--color-gray-300);
 }

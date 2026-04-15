@@ -1107,43 +1107,38 @@
 }
 
 .match-review__team-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 72px;
-  padding: var(--spacing-2) var(--spacing-3);
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
+  display: inline;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.01em;
 }
 
 .match-review__team-badge--winner {
-  background: rgba(34, 197, 94, 0.12);
   color: var(--color-success);
 }
 
 .match-review__team-badge--loser {
-  background: rgba(239, 68, 68, 0.12);
   color: var(--color-error);
 }
 
 .match-review__winner-button {
-  padding: var(--spacing-3) var(--spacing-4);
-  border-radius: var(--radius-lg);
-  background: var(--color-gray-100);
-  color: var(--color-gray-700);
+  padding: 0;
+  background: transparent;
+  color: var(--color-gray-500);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  transition: all var(--transition-fast);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--transition-fast);
 }
 
 .match-review__winner-button:hover {
-  background: var(--color-gray-200);
+  color: var(--color-primary);
 }
 
 .match-review__winner-button--active {
-  background: rgba(34, 197, 94, 0.12);
   color: var(--color-success);
+  text-decoration: none;
 }
 
 .match-review__input {
