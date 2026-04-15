@@ -1125,6 +1125,11 @@
   width: auto;
 }
 
+.match-review__hint {
+  color: var(--color-gray-500);
+  font-size: var(--font-size-sm);
+}
+
 @media (max-width: 1024px) {
   .match-upload__container,
   .match-upload__teams {

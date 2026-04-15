@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { analysisAPI } from '../../api/analysisAPI';
 import { useAuth } from '../../provider/AuthContext';
@@ -9,10 +9,8 @@ const MatchUploadPage = () => {
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
-  const [result, setResult] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  const [statusMessage, setStatusMessage] = useState('');
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -28,19 +26,6 @@ const MatchUploadPage = () => {
     };
   }, [previewUrl]);
 
-  const summary = useMemo(() => {
-    if (!result) {
-      return null;
-    }
-
-    const allPlayers = [...(result.team1?.players ?? []), ...(result.team2?.players ?? [])];
-
-    return {
-      recognizedPlayers: allPlayers.filter((player) => Boolean(player?.name)).length,
-      winnerLabel: result.winner === 'team1' ? '1팀' : '2팀',
-    };
-  }, [result]);
-
   if (!isAuthenticated) {
     return null;
   }
@@ -49,9 +34,7 @@ const MatchUploadPage = () => {
     const file = event.target.files?.[0] ?? null;
 
     setSelectedFile(file);
-    setResult(null);
     setErrorMessage('');
-    setStatusMessage('');
 
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
@@ -75,52 +58,23 @@ const MatchUploadPage = () => {
 
     setIsSubmitting(true);
     setErrorMessage('');
-    setStatusMessage('이미지를 업로드했고 서버에서 전적을 분석 중입니다. 잠시만 기다려주세요.');
 
     try {
       const response = await analysisAPI.uploadMatchRecord(selectedFile);
-      setResult(response.data);
-      setStatusMessage('업로드가 완료되었습니다. 내 전적 확인에서 이름과 수치를 검수한 뒤 최종 확정해주세요.');
       navigate('/matches/my', {
         replace: true,
         state: {
-          message: `게임 #${response.data.gameNumber} 업로드가 완료되었습니다. 검수 후 최종 확정해주세요.`,
+          message: `게임 #${response.data.gameNumber} 업로드가 완료되었습니다. 준비중 상태에서 분석이 끝나면 검수할 수 있습니다.`,
         },
       });
     } catch (error) {
       setErrorMessage(
-        error.code === 'ECONNABORTED'
-          ? '분석 시간이 길어져 요청이 중단되었습니다. 잠시 후 다시 시도해주세요.'
-          : error.response?.data?.message || '전적 업로드 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.'
+        error.response?.data?.message || '전적 업로드 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.'
       );
-      setStatusMessage('');
     } finally {
       setIsSubmitting(false);
     }
   };
-
-  const renderPlayerRows = (players = []) =>
-    players.map((player, index) => {
-      const kda =
-        [player?.kills, player?.deaths, player?.assists].every((value) => value !== null && value !== undefined)
-          ? `${player.kills} / ${player.deaths} / ${player.assists}`
-          : '-';
-
-      return (
-        <tr key={`${player?.slotNumber ?? index + 1}-${player?.name ?? 'empty'}`} className="matches-table__row">
-          <td className="matches-table__td">{player?.slotNumber ?? index + 1}</td>
-          <td className="matches-table__td matches-table__td--name">{player?.name || '미인식'}</td>
-          <td className="matches-table__td matches-table__td--kda">{kda}</td>
-          <td className="matches-table__td">{player?.cs ?? '-'}</td>
-          <td className="matches-table__td">{player?.gold ?? '-'}</td>
-          <td className="matches-table__td">
-            <span className={`matches-table__result ${player?.winner ? 'matches-table__result--win' : 'matches-table__result--loss'}`}>
-              {player?.winner ? '승리' : '패배'}
-            </span>
-          </td>
-        </tr>
-      );
-    });
 
   return (
     <div className="matches-page">
@@ -130,7 +84,7 @@ const MatchUploadPage = () => {
             <span className="matches-hero__eyebrow">Scrim Upload</span>
             <h1 className="matches-hero__title">내전 기록 등록</h1>
             <p className="matches-hero__description">
-              경기 결과 스크린샷을 올리면 분석 서버 호출과 DB 저장까지 한 번에 처리됩니다.
+              경기 결과 이미지를 올리면 바로 내 전적 확인으로 이동하고, 분석이 끝나면 검수 후 최종 확정할 수 있습니다.
             </p>
           </div>
           <div className="matches-hero__user">
@@ -144,10 +98,10 @@ const MatchUploadPage = () => {
         <div className="match-upload__container">
           <div className="match-upload__panel">
             <div className="match-upload__intro">
-              <span className="match-upload__badge">자동 저장</span>
+              <span className="match-upload__badge">빠른 등록</span>
               <h2 className="match-upload__title">스크린샷 업로드</h2>
               <p className="match-upload__description">
-                로그인한 사용자만 등록할 수 있으며, 업로드한 이미지는 MinIO에 저장된 뒤 분석 결과와 함께 게임 기록으로 남습니다.
+                업로드 직후에는 준비중 상태로 보이고, 분석이 완료되면 내 전적 확인에서 이름과 수치를 검수할 수 있습니다.
               </p>
             </div>
 
@@ -173,108 +127,15 @@ const MatchUploadPage = () => {
                 </div>
               )}
 
-              {statusMessage && !errorMessage && <p className="match-upload__status">{statusMessage}</p>}
               {errorMessage && <p className="match-upload__error">{errorMessage}</p>}
 
               <button type="submit" className="match-upload__submit" disabled={isSubmitting}>
-                {isSubmitting ? '업로드 완료, 분석 중...' : '내전 기록 등록'}
+                {isSubmitting ? '등록 중...' : '내전 기록 등록'}
               </button>
             </form>
           </div>
-
         </div>
       </section>
-
-      {result && (
-        <>
-          <section className="my-stats">
-            <div className="my-stats__grid">
-              <div className="my-stats__card">
-                <p className="my-stats__label">게임 번호</p>
-                <p className="my-stats__value">{result.gameNumber}</p>
-              </div>
-              <div className="my-stats__card">
-                <p className="my-stats__label">승리 팀</p>
-                <p className="my-stats__value my-stats__value--win">{summary?.winnerLabel}</p>
-              </div>
-              <div className="my-stats__card">
-                <p className="my-stats__label">인식 플레이어</p>
-                <p className="my-stats__value">{summary?.recognizedPlayers ?? 0}</p>
-              </div>
-              <div className="my-stats__card">
-                <p className="my-stats__label">버킷</p>
-                <p className="my-stats__value match-upload__stat-text">{result.bucket}</p>
-              </div>
-              <div className="my-stats__card">
-                <p className="my-stats__label">오브젝트 키</p>
-                <p className="my-stats__value match-upload__stat-text">{result.objectKey}</p>
-              </div>
-            </div>
-          </section>
-
-          <section className="matches-table">
-            <div className="matches-table__container">
-              <div className="match-upload__result-header">
-                <div>
-                  <span className="matches-hero__eyebrow">Upload Result</span>
-                  <h2 className="match-upload__result-title">분석 결과</h2>
-                </div>
-                {result.screenshotUrl && (
-                  <a href={result.screenshotUrl} target="_blank" rel="noreferrer" className="match-upload__link">
-                    저장된 이미지 보기
-                  </a>
-                )}
-              </div>
-
-              <div className="match-upload__teams">
-                <div className="matches-table__wrapper">
-                  <div className="match-upload__team-head">
-                    <h3>1팀</h3>
-                    <span className={`matches-table__result ${result.winner === 'team1' ? 'matches-table__result--win' : 'matches-table__result--loss'}`}>
-                      {result.winner === 'team1' ? '승리' : '패배'}
-                    </span>
-                  </div>
-                  <table className="matches-table__table">
-                    <thead>
-                      <tr className="matches-table__header-row">
-                        <th className="matches-table__th">슬롯</th>
-                        <th className="matches-table__th">플레이어</th>
-                        <th className="matches-table__th">K / D / A</th>
-                        <th className="matches-table__th">CS</th>
-                        <th className="matches-table__th">Gold</th>
-                        <th className="matches-table__th">결과</th>
-                      </tr>
-                    </thead>
-                    <tbody>{renderPlayerRows(result.team1?.players)}</tbody>
-                  </table>
-                </div>
-
-                <div className="matches-table__wrapper">
-                  <div className="match-upload__team-head">
-                    <h3>2팀</h3>
-                    <span className={`matches-table__result ${result.winner === 'team2' ? 'matches-table__result--win' : 'matches-table__result--loss'}`}>
-                      {result.winner === 'team2' ? '승리' : '패배'}
-                    </span>
-                  </div>
-                  <table className="matches-table__table">
-                    <thead>
-                      <tr className="matches-table__header-row">
-                        <th className="matches-table__th">슬롯</th>
-                        <th className="matches-table__th">플레이어</th>
-                        <th className="matches-table__th">K / D / A</th>
-                        <th className="matches-table__th">CS</th>
-                        <th className="matches-table__th">Gold</th>
-                        <th className="matches-table__th">결과</th>
-                      </tr>
-                    </thead>
-                    <tbody>{renderPlayerRows(result.team2?.players)}</tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </section>
-        </>
-      )}
     </div>
   );
 };

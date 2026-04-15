@@ -47,6 +47,8 @@ const MatchReviewPage = () => {
   }, [gameId, isAuthenticated, navigate]);
 
   const isDraft = record.status === 'DRAFT';
+  const isProcessing = record.status === 'PROCESSING';
+  const isFailed = record.status === 'FAILED';
 
   const summary = useMemo(() => {
     const allPlayers = [...(record.team1?.players ?? []), ...(record.team2?.players ?? [])];
@@ -257,6 +259,8 @@ const MatchReviewPage = () => {
 
       <section className="matches-table">
         <div className="matches-table__container">
+          {isProcessing && <p className="match-upload__status">아직 분석 중입니다. 내 전적 확인 화면에서 잠시 후 다시 확인해주세요.</p>}
+          {isFailed && <p className="match-upload__error">분석 처리에 실패했습니다. 이미지를 다시 업로드해주세요.</p>}
           {statusMessage && <p className="match-upload__status">{statusMessage}</p>}
           {errorMessage && <p className="match-upload__error">{errorMessage}</p>}
 
