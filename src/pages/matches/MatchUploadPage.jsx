@@ -5,7 +5,7 @@ import { useAuth } from '../../provider/AuthContext';
 import '../../styles/pages/MatchesPages.css';
 
 const MatchUploadPage = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth();
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
@@ -13,20 +13,22 @@ const MatchUploadPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
+    if (isAuthLoading) {
+      return;
+    }
+
     if (!isAuthenticated) {
       navigate('/login', { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthLoading, isAuthenticated, navigate]);
 
-  useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl);
-      }
-    };
+  useEffect(() => () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
   }, [previewUrl]);
 
-  if (!isAuthenticated) {
+  if (isAuthLoading || !isAuthenticated) {
     return null;
   }
 
@@ -52,7 +54,7 @@ const MatchUploadPage = () => {
     event.preventDefault();
 
     if (!selectedFile) {
-      setErrorMessage('업로드할 스크린샷을 선택해주세요.');
+      setErrorMessage('업로드할 스크린샷을 선택해 주세요.');
       return;
     }
 
@@ -68,9 +70,7 @@ const MatchUploadPage = () => {
         },
       });
     } catch (error) {
-      setErrorMessage(
-        error.response?.data?.message || '전적 업로드 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.'
-      );
+      setErrorMessage(error.response?.data?.message || '전적 업로드 중 문제가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setIsSubmitting(false);
     }
@@ -101,7 +101,7 @@ const MatchUploadPage = () => {
               <span className="match-upload__badge">빠른 등록</span>
               <h2 className="match-upload__title">스크린샷 업로드</h2>
               <p className="match-upload__description">
-                업로드 직후에는 준비중 상태로 보이고, 분석이 완료되면 내 전적 확인에서 이름과 수치를 검수할 수 있습니다.
+                업로드 직후에는 준비중 상태로 보이고 분석이 완료되면 내 전적 확인에서 이름과 수치를 검수할 수 있습니다.
               </p>
             </div>
 
@@ -114,11 +114,9 @@ const MatchUploadPage = () => {
                   onChange={handleFileChange}
                 />
                 <span className="match-upload__drop-title">
-                  {selectedFile ? selectedFile.name : '업로드할 내전 결과 이미지를 선택하세요'}
+                  {selectedFile ? selectedFile.name : '업로드할 내전 결과 이미지를 선택해 주세요'}
                 </span>
-                <span className="match-upload__drop-help">
-                  PNG, JPG, WEBP 이미지를 지원합니다.
-                </span>
+                <span className="match-upload__drop-help">PNG, JPG, WEBP 이미지를 지원합니다.</span>
               </label>
 
               {previewUrl && (

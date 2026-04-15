@@ -5,7 +5,7 @@ import { useAuth } from '../../provider/AuthContext';
 import '../../styles/pages/MatchesPages.css';
 
 const MyMatchesPage = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [records, setRecords] = useState([]);
@@ -50,15 +50,23 @@ const MyMatchesPage = () => {
   }, []);
 
   useEffect(() => {
+    if (isAuthLoading) {
+      return;
+    }
+
     if (!isAuthenticated) {
       navigate('/login', { replace: true });
       return;
     }
 
     fetchRecords(true);
-  }, [fetchRecords, isAuthenticated, navigate]);
+  }, [fetchRecords, isAuthLoading, isAuthenticated, navigate]);
 
   useEffect(() => {
+    if (isAuthLoading || !isAuthenticated) {
+      return undefined;
+    }
+
     const hasProcessing = records.some((record) => getNormalizedStatus(record) === 'PROCESSING');
     if (!hasProcessing) {
       return undefined;
@@ -80,7 +88,7 @@ const MyMatchesPage = () => {
       cancelled = true;
       window.clearTimeout(timeoutId);
     };
-  }, [fetchRecords, getNormalizedStatus, records]);
+  }, [fetchRecords, getNormalizedStatus, isAuthLoading, isAuthenticated, records]);
 
   const stats = useMemo(() => {
     const confirmedMatches = records.filter((record) => getNormalizedStatus(record) === 'CONFIRMED').length;
@@ -140,7 +148,27 @@ const MyMatchesPage = () => {
     );
   };
 
-  if (!isAuthenticated) {
+  const formatDateTime = (value) => {
+    if (!value) {
+      return '-';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  };
+
+  if (isAuthLoading || !isAuthenticated) {
     return null;
   }
 
@@ -228,7 +256,7 @@ const MyMatchesPage = () => {
                     return (
                       <tr key={record.gameNumber} className="matches-table__row">
                         <td className="matches-table__td matches-table__td--name">{record.gameNumber}</td>
-                        <td className="matches-table__td">{record.createdAt ?? '-'}</td>
+                        <td className="matches-table__td">{formatDateTime(record.createdAt)}</td>
                         <td className="matches-table__td">
                           <span className={`matches-table__result ${getStatusClassName(status)}`}>
                             {getStatusLabel(status)}
