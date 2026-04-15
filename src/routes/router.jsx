@@ -9,6 +9,7 @@ import MyMatchesPage from '../pages/matches/MyMatchesPage';
 import SearchMatchesPage from '../pages/matches/SearchMatchesPage';
 import TeamRankingPage from '../pages/matches/TeamRankingPage';
 import MatchUploadPage from '../pages/matches/MatchUploadPage';
+import MatchReviewPage from '../pages/matches/MatchReviewPage';
 import LoginPage from '../pages/auth/LoginPage';
 import SignupPage from '../pages/auth/SignupPage';
 import MyPage from '../pages/MyPage';
@@ -36,6 +37,7 @@ export const router = createBrowserRouter([
       { path: '/matches/search', element: <SearchMatchesPage /> },
       { path: '/matches/team', element: <TeamRankingPage /> },
       { path: '/matches/upload', element: <MatchUploadPage /> },
+      { path: '/matches/review/:gameId', element: <MatchReviewPage /> },
       { path: '/login', element: <LoginPage /> },
       { path: '/signup', element: <SignupPage /> },
       { path: '/mypage', element: <MyPage /> },
