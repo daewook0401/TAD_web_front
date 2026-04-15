@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../provider/AuthContext';
 import '../../styles/pages/MatchesPages.css';
 
@@ -19,70 +19,61 @@ const MyMatchesPage = () => {
   }
 
   const matches = [
-    { id: 1, date: '2025-12-06 14:30', game: 'League of Legends', result: '승리', kda: '12/2/8', duration: '35분', champion: 'Ahri', tier: 'Gold' },
-    { id: 2, date: '2025-12-06 13:45', game: 'League of Legends', result: '패배', kda: '8/5/6', duration: '28분', champion: 'Lux', tier: 'Silver' },
-    { id: 3, date: '2025-12-05 20:15', game: 'Mapleland', result: '승리', kda: '15/1/10', duration: '42분', champion: 'Warrior', tier: 'Platinum' },
-    { id: 4, date: '2025-12-05 19:20', game: 'League of Legends', result: '승리', kda: '10/3/9', duration: '31분', champion: 'Evelynn', tier: 'Gold' },
-    { id: 5, date: '2025-12-04 18:45', game: 'Mapleland', result: '패배', kda: '7/8/5', duration: '25분', champion: 'Archer', tier: 'Silver' },
-    { id: 6, date: '2025-12-04 17:30', game: 'League of Legends', result: '승리', kda: '14/4/7', duration: '36분', champion: 'Syndra', tier: 'Gold' },
+    { id: 1, date: '2026-04-10 20:30', game: 'League of Legends', result: '승리', kda: '12/2/8', gold: '16.6K', player: 'Ahri' },
+    { id: 2, date: '2026-04-08 21:10', game: 'League of Legends', result: '패배', kda: '5/4/9', gold: '13.2K', player: 'Lissandra' },
+    { id: 3, date: '2026-04-07 19:40', game: 'League of Legends', result: '승리', kda: '7/1/13', gold: '14.1K', player: 'Orianna' },
   ];
 
-  const filteredMatches = filterGame === 'all' ? matches : matches.filter(m => m.game === filterGame);
-
-  const stats = {
-    totalMatches: matches.length,
-    wins: matches.filter(m => m.result === '승리').length,
-    losses: matches.filter(m => m.result === '패배').length,
-    winRate: Math.round((matches.filter(m => m.result === '승리').length / matches.length) * 100),
-    avgKda: '10.3',
-  };
+  const filteredMatches = filterGame === 'all' ? matches : matches.filter((match) => match.game === filterGame);
+  const wins = matches.filter((match) => match.result === '승리').length;
+  const losses = matches.filter((match) => match.result === '패배').length;
 
   return (
     <div className="matches-page">
-      {/* Hero Section */}
       <section className="matches-hero">
         <div className="matches-hero__container matches-hero__container--split">
           <div>
             <span className="matches-hero__eyebrow">My Match Log</span>
             <h1 className="matches-hero__title">내 전적 확인</h1>
-            <p className="matches-hero__description">최근 경기 흐름과 핵심 지표를 한 번에 확인하세요.</p>
+            <p className="matches-hero__description">
+              최근 내전 기록과 결과를 한 번에 확인하고, 새 경기 결과도 바로 등록할 수 있습니다.
+            </p>
+            <Link to="/matches/upload" className="match-upload__cta">
+              내전 기록 등록
+            </Link>
           </div>
-          {isAuthenticated && (
-            <div className="matches-hero__user">
-              <p className="matches-hero__user-label">사용자</p>
-              <p className="matches-hero__user-name">{user?.name || '사용자'}</p>
-            </div>
-          )}
+          <div className="matches-hero__user">
+            <p className="matches-hero__user-label">소환사</p>
+            <p className="matches-hero__user-name">{user?.nickname || '사용자'}</p>
+          </div>
         </div>
       </section>
 
-      {/* Stats Cards */}
       <section className="my-stats">
         <div className="my-stats__grid">
           <div className="my-stats__card">
             <p className="my-stats__label">총 경기</p>
-            <p className="my-stats__value">{stats.totalMatches}</p>
+            <p className="my-stats__value">{matches.length}</p>
           </div>
           <div className="my-stats__card">
             <p className="my-stats__label">승리</p>
-            <p className="my-stats__value my-stats__value--win">{stats.wins}</p>
+            <p className="my-stats__value my-stats__value--win">{wins}</p>
           </div>
           <div className="my-stats__card">
             <p className="my-stats__label">패배</p>
-            <p className="my-stats__value my-stats__value--loss">{stats.losses}</p>
+            <p className="my-stats__value my-stats__value--loss">{losses}</p>
           </div>
           <div className="my-stats__card">
             <p className="my-stats__label">승률</p>
-            <p className="my-stats__value">{stats.winRate}%</p>
+            <p className="my-stats__value">{Math.round((wins / matches.length) * 100)}%</p>
           </div>
           <div className="my-stats__card">
-            <p className="my-stats__label">평균 K/D/A</p>
-            <p className="my-stats__value">{stats.avgKda}</p>
+            <p className="my-stats__label">평균 KDA</p>
+            <p className="my-stats__value">8.0</p>
           </div>
         </div>
       </section>
 
-      {/* Filter Section */}
       <section className="matches-filter">
         <div className="matches-filter__container">
           <span className="matches-filter__label">게임 필터:</span>
@@ -98,16 +89,9 @@ const MyMatchesPage = () => {
           >
             League of Legends
           </button>
-          <button
-            onClick={() => setFilterGame('Mapleland')}
-            className={`matches-filter__btn ${filterGame === 'Mapleland' ? 'matches-filter__btn--active' : ''}`}
-          >
-            Mapleland
-          </button>
         </div>
       </section>
 
-      {/* Matches Table */}
       <section className="matches-table">
         <div className="matches-table__container">
           <div className="matches-table__wrapper">
@@ -117,10 +101,9 @@ const MyMatchesPage = () => {
                   <th className="matches-table__th">날짜</th>
                   <th className="matches-table__th">게임</th>
                   <th className="matches-table__th">결과</th>
-                  <th className="matches-table__th">챔피언/직업</th>
-                  <th className="matches-table__th">K/D/A</th>
-                  <th className="matches-table__th">게임시간</th>
-                  <th className="matches-table__th">티어</th>
+                  <th className="matches-table__th">플레이어</th>
+                  <th className="matches-table__th">K / D / A</th>
+                  <th className="matches-table__th">Gold</th>
                 </tr>
               </thead>
               <tbody>
@@ -134,18 +117,15 @@ const MyMatchesPage = () => {
                           {match.result}
                         </span>
                       </td>
-                      <td className="matches-table__td">{match.champion}</td>
+                      <td className="matches-table__td matches-table__td--name">{match.player}</td>
                       <td className="matches-table__td matches-table__td--kda">{match.kda}</td>
-                      <td className="matches-table__td">{match.duration}</td>
-                      <td className="matches-table__td">
-                        <span className="matches-table__tier">{match.tier}</span>
-                      </td>
+                      <td className="matches-table__td">{match.gold}</td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="matches-table__empty">
-                      경기 기록이 없습니다
+                    <td colSpan="6" className="matches-table__empty">
+                      표시할 경기 기록이 없습니다.
                     </td>
                   </tr>
                 )}

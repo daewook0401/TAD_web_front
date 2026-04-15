@@ -8,6 +8,7 @@ import BoardWritePage from '../pages/board/BoardWritePage';
 import MyMatchesPage from '../pages/matches/MyMatchesPage';
 import SearchMatchesPage from '../pages/matches/SearchMatchesPage';
 import TeamRankingPage from '../pages/matches/TeamRankingPage';
+import MatchUploadPage from '../pages/matches/MatchUploadPage';
 import LoginPage from '../pages/auth/LoginPage';
 import SignupPage from '../pages/auth/SignupPage';
 import MyPage from '../pages/MyPage';
@@ -16,71 +17,35 @@ import RequireAdmin from '../components/auth/RequireAdmin';
 
 export const router = createBrowserRouter([
   {
-    element: <RootLayout><MainLayout /></RootLayout>,
+    element: (
+      <RootLayout>
+        <MainLayout />
+      </RootLayout>
+    ),
     children: [
-      {
-        path: '/',
-        element: <HomePage />,
-      },
-      {
-        path: '/board',
-        element: <BoardPage />,
-      },
-      {
-        path: '/board/write',
-        element: <BoardWritePage />,
-      },
-      {
-        path: '/board/post/:postId',
-        element: <BoardDetailPage />,
-      },
-      {
-        path: '/board/:category/write',
-        element: <BoardWritePage />,
-      },
-      {
-        path: '/board/:category/post/:postId/edit',
-        element: <BoardWritePage />,
-      },
-      {
-        path: '/board/:category/post/:postId',
-        element: <BoardDetailPage />,
-      },
-      {
-        path: '/board/:category',
-        element: <BoardPage />,
-      },
-      {
-        path: '/matches',
-        element: <MyMatchesPage />,
-      },
-      {
-        path: '/matches/my',
-        element: <MyMatchesPage />,
-      },
-      {
-        path: '/matches/search',
-        element: <SearchMatchesPage />,
-      },
-      {
-        path: '/matches/team',
-        element: <TeamRankingPage />,
-      },
-      {
-        path: '/login',
-        element: <LoginPage />,
-      },
-      {
-        path: '/signup',
-        element: <SignupPage />,
-      },
-      {
-        path: '/mypage',
-        element: <MyPage />,
-      },
+      { path: '/', element: <HomePage /> },
+      { path: '/board', element: <BoardPage /> },
+      { path: '/board/write', element: <BoardWritePage /> },
+      { path: '/board/post/:postId', element: <BoardDetailPage /> },
+      { path: '/board/:category/write', element: <BoardWritePage /> },
+      { path: '/board/:category/post/:postId/edit', element: <BoardWritePage /> },
+      { path: '/board/:category/post/:postId', element: <BoardDetailPage /> },
+      { path: '/board/:category', element: <BoardPage /> },
+      { path: '/matches', element: <MyMatchesPage /> },
+      { path: '/matches/my', element: <MyMatchesPage /> },
+      { path: '/matches/search', element: <SearchMatchesPage /> },
+      { path: '/matches/team', element: <TeamRankingPage /> },
+      { path: '/matches/upload', element: <MatchUploadPage /> },
+      { path: '/login', element: <LoginPage /> },
+      { path: '/signup', element: <SignupPage /> },
+      { path: '/mypage', element: <MyPage /> },
       {
         path: '/admin',
-        element: <RequireAdmin><AdminPage /></RequireAdmin>,
+        element: (
+          <RequireAdmin>
+            <AdminPage />
+          </RequireAdmin>
+        ),
       },
     ],
   },
