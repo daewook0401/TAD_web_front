@@ -1065,6 +1065,12 @@
   gap: var(--spacing-6);
 }
 
+.match-review__teams {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-6);
+}
+
 .match-upload__team-head {
   display: flex;
   justify-content: space-between;
@@ -1135,6 +1141,54 @@
   font-size: var(--font-size-sm);
 }
 
+.match-review__team-panel .matches-table__table {
+  min-width: 100%;
+  table-layout: fixed;
+}
+
+.match-review__team-panel .matches-table__wrapper,
+.match-review__team-panel {
+  overflow-x: auto;
+}
+
+.match-review__team-panel .matches-table__th,
+.match-review__team-panel .matches-table__td {
+  white-space: nowrap;
+}
+
+.match-review__image-section {
+  margin-top: var(--spacing-8);
+}
+
+.match-review__image-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-4);
+}
+
+.match-review__image-title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gray-900);
+}
+
+.match-review__image-card {
+  overflow: hidden;
+  background: var(--color-white);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-gray-200);
+}
+
+.match-review__image-preview {
+  width: 100%;
+  display: block;
+  object-fit: contain;
+  background: var(--color-gray-900);
+}
+
 @media (max-width: 1024px) {
   .match-upload__container,
   .match-upload__teams {
@@ -1144,6 +1198,11 @@
 
 @media (max-width: 768px) {
   .match-upload__result-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .match-review__image-header {
     flex-direction: column;
     align-items: flex-start;
   }

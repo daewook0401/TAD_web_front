@@ -13,6 +13,18 @@ const MyMatchesPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const isFetchingRef = useRef(false);
 
+  const getNormalizedStatus = useCallback((record) => {
+    if (!record) {
+      return 'PROCESSING';
+    }
+
+    if (record.status === 'CONFIRMED' && !record.confirmedAt) {
+      return (record.recognizedPlayers ?? 0) > 0 ? 'DRAFT' : 'PROCESSING';
+    }
+
+    return record.status ?? 'PROCESSING';
+  }, []);
+
   const fetchRecords = useCallback(async (showLoading = false) => {
     if (isFetchingRef.current) {
       return;
@@ -47,7 +59,7 @@ const MyMatchesPage = () => {
   }, [fetchRecords, isAuthenticated, navigate]);
 
   useEffect(() => {
-    const hasProcessing = records.some((record) => record.status === 'PROCESSING');
+    const hasProcessing = records.some((record) => getNormalizedStatus(record) === 'PROCESSING');
     if (!hasProcessing) {
       return undefined;
     }
@@ -68,20 +80,21 @@ const MyMatchesPage = () => {
       cancelled = true;
       window.clearTimeout(timeoutId);
     };
-  }, [fetchRecords, records]);
+  }, [fetchRecords, getNormalizedStatus, records]);
 
   const stats = useMemo(() => {
-    const confirmed = records.filter((record) => record.status === 'CONFIRMED');
-    const drafts = records.filter((record) => record.status === 'DRAFT').length;
-    const processing = records.filter((record) => record.status === 'PROCESSING').length;
+    const confirmedMatches = records.filter((record) => getNormalizedStatus(record) === 'CONFIRMED').length;
+    const drafts = records.filter((record) => getNormalizedStatus(record) === 'DRAFT').length;
+    const processing = records.filter((record) => getNormalizedStatus(record) === 'PROCESSING').length;
 
     return {
       totalMatches: records.length,
-      confirmedMatches: confirmed.length,
+      confirmedMatches,
       drafts,
       processing,
+      recognizedPlayers: records.reduce((sum, record) => sum + (record.recognizedPlayers ?? 0), 0),
     };
-  }, [records]);
+  }, [getNormalizedStatus, records]);
 
   const getStatusLabel = (status) => {
     switch (status) {
@@ -111,6 +124,22 @@ const MyMatchesPage = () => {
     }
   };
 
+  const getActionContent = (record, status) => {
+    if (status === 'DRAFT' || status === 'CONFIRMED') {
+      return (
+        <Link to={`/matches/review/${record.gameNumber}`} className="match-upload__link">
+          {status === 'DRAFT' ? '검수하기' : '상세 보기'}
+        </Link>
+      );
+    }
+
+    return (
+      <span className="match-review__hint">
+        {status === 'PROCESSING' ? '분석 중' : '확인 불가'}
+      </span>
+    );
+  };
+
   if (!isAuthenticated) {
     return null;
   }
@@ -123,14 +152,14 @@ const MyMatchesPage = () => {
             <span className="matches-hero__eyebrow">My Match Log</span>
             <h1 className="matches-hero__title">내 전적 확인</h1>
             <p className="matches-hero__description">
-              업로드한 내전 기록이 준비중인지, 검수 가능한지, 최종 확정됐는지 한눈에 확인할 수 있습니다.
+              업로드한 내전 기록의 분석 진행 상태와 검수 여부를 한눈에 확인할 수 있습니다.
             </p>
             <Link to="/matches/upload" className="match-upload__cta">
               새 내전 기록 업로드
             </Link>
           </div>
           <div className="matches-hero__user">
-            <p className="matches-hero__user-label">소환사</p>
+            <p className="matches-hero__user-label">환영합니다</p>
             <p className="matches-hero__user-name">{user?.nickname || '사용자'}</p>
           </div>
         </div>
@@ -172,7 +201,7 @@ const MyMatchesPage = () => {
           </div>
           <div className="my-stats__card">
             <p className="my-stats__label">인식 플레이어</p>
-            <p className="my-stats__value">{records.reduce((sum, record) => sum + (record.recognizedPlayers ?? 0), 0)}</p>
+            <p className="my-stats__value">{stats.recognizedPlayers}</p>
           </div>
         </div>
       </section>
@@ -184,7 +213,7 @@ const MyMatchesPage = () => {
               <thead>
                 <tr className="matches-table__header-row">
                   <th className="matches-table__th">게임 번호</th>
-                  <th className="matches-table__th">업로드 시각</th>
+                  <th className="matches-table__th">업로드 시간</th>
                   <th className="matches-table__th">상태</th>
                   <th className="matches-table__th">승리 팀</th>
                   <th className="matches-table__th">인식 플레이어</th>
@@ -193,36 +222,36 @@ const MyMatchesPage = () => {
               </thead>
               <tbody>
                 {!isLoading && records.length > 0 ? (
-                  records.map((record) => (
-                    <tr key={record.gameNumber} className="matches-table__row">
-                      <td className="matches-table__td matches-table__td--name">{record.gameNumber}</td>
-                      <td className="matches-table__td">{record.createdAt ?? '-'}</td>
-                      <td className="matches-table__td">
-                        <span className={`matches-table__result ${getStatusClassName(record.status)}`}>
-                          {getStatusLabel(record.status)}
-                        </span>
-                      </td>
-                      <td className="matches-table__td">
-                        {record.winner === 'team1' ? '1팀' : record.winner === 'team2' ? '2팀' : '-'}
-                      </td>
-                      <td className="matches-table__td">{record.recognizedPlayers ?? 0}</td>
-                      <td className="matches-table__td">
-                        {record.status === 'DRAFT' || record.status === 'CONFIRMED' ? (
-                          <Link to={`/matches/review/${record.gameNumber}`} className="match-upload__link">
-                            {record.status === 'DRAFT' ? '검수하기' : '상세 보기'}
-                          </Link>
-                        ) : (
-                          <span className="match-review__hint">
-                            {record.status === 'PROCESSING' ? '분석 중' : '확인 불가'}
+                  records.map((record) => {
+                    const status = getNormalizedStatus(record);
+
+                    return (
+                      <tr key={record.gameNumber} className="matches-table__row">
+                        <td className="matches-table__td matches-table__td--name">{record.gameNumber}</td>
+                        <td className="matches-table__td">{record.createdAt ?? '-'}</td>
+                        <td className="matches-table__td">
+                          <span className={`matches-table__result ${getStatusClassName(status)}`}>
+                            {getStatusLabel(status)}
                           </span>
-                        )}
-                      </td>
-                    </tr>
-                  ))
+                        </td>
+                        <td className="matches-table__td">
+                          {status === 'PROCESSING'
+                            ? '-'
+                            : record.winner === 'team1'
+                              ? '1팀'
+                              : record.winner === 'team2'
+                                ? '2팀'
+                                : '-'}
+                        </td>
+                        <td className="matches-table__td">{record.recognizedPlayers ?? 0}</td>
+                        <td className="matches-table__td">{getActionContent(record, status)}</td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan="6" className="matches-table__empty">
-                      {isLoading ? '업로드한 내전 기록을 불러오는 중입니다.' : '아직 업로드된 내전 기록이 없습니다.'}
+                      {isLoading ? '업로드한 내전 기록을 불러오는 중입니다.' : '아직 업로드한 내전 기록이 없습니다.'}
                     </td>
                   </tr>
                 )}

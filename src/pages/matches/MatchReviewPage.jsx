@@ -8,6 +8,8 @@ const createEmptyRecord = () => ({
   gameNumber: null,
   winner: 'team1',
   status: 'DRAFT',
+  screenshotUrl: '',
+  createdAt: null,
   team1: { players: [] },
   team2: { players: [] },
 });
@@ -50,10 +52,25 @@ const MatchReviewPage = () => {
   const isProcessing = record.status === 'PROCESSING';
   const isFailed = record.status === 'FAILED';
 
-  const summary = useMemo(() => {
+  const recognizedPlayers = useMemo(() => {
     const allPlayers = [...(record.team1?.players ?? []), ...(record.team2?.players ?? [])];
     return allPlayers.filter((player) => player?.name?.trim()).length;
   }, [record]);
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'PROCESSING':
+        return '준비중';
+      case 'DRAFT':
+        return '검수 필요';
+      case 'CONFIRMED':
+        return '확정 완료';
+      case 'FAILED':
+        return '분석 실패';
+      default:
+        return status;
+    }
+  };
 
   const updatePlayer = (teamKey, playerIndex, field, value) => {
     setRecord((current) => {
@@ -112,7 +129,7 @@ const MatchReviewPage = () => {
     try {
       const response = await analysisAPI.updateDraft(gameId, buildDraftPayload());
       setRecord(response.data);
-      setStatusMessage('수정사항이 저장되었습니다. 이상 없으면 최종 확정해주세요.');
+      setStatusMessage('수정 내용이 저장되었습니다. 문제가 없으면 최종 확정을 진행해 주세요.');
     } catch (error) {
       setErrorMessage(error.response?.data?.message || '검수 내용 저장에 실패했습니다.');
     } finally {
@@ -138,7 +155,7 @@ const MatchReviewPage = () => {
   };
 
   const renderEditableTeam = (teamKey, teamLabel) => (
-    <div className="matches-table__wrapper">
+    <div className="matches-table__wrapper match-review__team-panel">
       <div className="match-upload__team-head">
         <h3>{teamLabel}</h3>
         <label className="match-review__winner-toggle">
@@ -220,7 +237,7 @@ const MatchReviewPage = () => {
             <span className="matches-hero__eyebrow">Review Draft</span>
             <h1 className="matches-hero__title">내전 기록 검수</h1>
             <p className="matches-hero__description">
-              업로드된 전적의 이름과 수치를 확인하고, 수정이 끝나면 최종 확정해주세요.
+              인식된 닉네임과 전적 수치를 확인하고 수정한 뒤, 문제가 없으면 최종 확정해 주세요.
             </p>
           </div>
           <div className="matches-hero__user">
@@ -234,15 +251,17 @@ const MatchReviewPage = () => {
         <div className="my-stats__grid">
           <div className="my-stats__card">
             <p className="my-stats__label">상태</p>
-            <p className="my-stats__value">{record.status}</p>
+            <p className="my-stats__value">{getStatusLabel(record.status)}</p>
           </div>
           <div className="my-stats__card">
             <p className="my-stats__label">현재 승리 팀</p>
-            <p className="my-stats__value my-stats__value--win">{record.winner === 'team1' ? '1팀' : '2팀'}</p>
+            <p className="my-stats__value my-stats__value--win">
+              {record.winner === 'team1' ? '1팀' : record.winner === 'team2' ? '2팀' : '-'}
+            </p>
           </div>
           <div className="my-stats__card">
             <p className="my-stats__label">인식 플레이어</p>
-            <p className="my-stats__value">{summary}</p>
+            <p className="my-stats__value">{recognizedPlayers}</p>
           </div>
           <div className="my-stats__card">
             <p className="my-stats__label">업로드 일시</p>
@@ -259,12 +278,12 @@ const MatchReviewPage = () => {
 
       <section className="matches-table">
         <div className="matches-table__container">
-          {isProcessing && <p className="match-upload__status">아직 분석 중입니다. 내 전적 확인 화면에서 잠시 후 다시 확인해주세요.</p>}
-          {isFailed && <p className="match-upload__error">분석 처리에 실패했습니다. 이미지를 다시 업로드해주세요.</p>}
+          {isProcessing && <p className="match-upload__status">아직 분석 중입니다. 잠시 후 다시 확인해 주세요.</p>}
+          {isFailed && <p className="match-upload__error">분석 처리에 실패했습니다. 이미지를 다시 업로드해 주세요.</p>}
           {statusMessage && <p className="match-upload__status">{statusMessage}</p>}
           {errorMessage && <p className="match-upload__error">{errorMessage}</p>}
 
-          <div className="match-upload__teams">
+          <div className="match-review__teams">
             {renderEditableTeam('team1', '1팀')}
             {renderEditableTeam('team2', '2팀')}
           </div>
@@ -284,6 +303,24 @@ const MatchReviewPage = () => {
               </>
             )}
           </div>
+
+          {record.screenshotUrl && (
+            <div className="match-review__image-section">
+              <div className="match-review__image-header">
+                <h3 className="match-review__image-title">업로드한 결과 이미지</h3>
+                <a href={record.screenshotUrl} target="_blank" rel="noreferrer" className="match-upload__link">
+                  원본 보기
+                </a>
+              </div>
+              <div className="match-review__image-card">
+                <img
+                  src={record.screenshotUrl}
+                  alt={`내전 기록 ${record.gameNumber} 결과 이미지`}
+                  className="match-review__image-preview"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </section>
     </div>
