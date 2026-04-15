@@ -1,151 +1,157 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { analysisAPI } from '../../api/analysisAPI';
 import { useAuth } from '../../provider/AuthContext';
 import '../../styles/pages/MatchesPages.css';
 
 const MyMatchesPage = () => {
   const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
-  const [filterGame, setFilterGame] = useState('all');
+  const location = useLocation();
+  const [records, setRecords] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login', { replace: true });
+      return;
     }
+
+    const fetchRecords = async () => {
+      setIsLoading(true);
+      setErrorMessage('');
+
+      try {
+        const response = await analysisAPI.getMyRecords();
+        setRecords(response.data);
+      } catch (error) {
+        setErrorMessage(error.response?.data?.message || '내 전적 목록을 불러오지 못했습니다.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchRecords();
   }, [isAuthenticated, navigate]);
+
+  const stats = useMemo(() => {
+    const confirmed = records.filter((record) => record.status === 'CONFIRMED');
+    const wins = confirmed.filter((record) => record.winner === 'team1' || record.winner === 'team2').length;
+    const drafts = records.filter((record) => record.reviewRequired).length;
+
+    return {
+      totalMatches: records.length,
+      confirmedMatches: confirmed.length,
+      drafts,
+      wins,
+    };
+  }, [records]);
 
   if (!isAuthenticated) {
     return null;
   }
 
-  const matches = [
-    { id: 1, date: '2025-12-06 14:30', game: 'League of Legends', result: '승리', kda: '12/2/8', duration: '35분', champion: 'Ahri', tier: 'Gold' },
-    { id: 2, date: '2025-12-06 13:45', game: 'League of Legends', result: '패배', kda: '8/5/6', duration: '28분', champion: 'Lux', tier: 'Silver' },
-    { id: 3, date: '2025-12-05 20:15', game: 'Mapleland', result: '승리', kda: '15/1/10', duration: '42분', champion: 'Warrior', tier: 'Platinum' },
-    { id: 4, date: '2025-12-05 19:20', game: 'League of Legends', result: '승리', kda: '10/3/9', duration: '31분', champion: 'Evelynn', tier: 'Gold' },
-    { id: 5, date: '2025-12-04 18:45', game: 'Mapleland', result: '패배', kda: '7/8/5', duration: '25분', champion: 'Archer', tier: 'Silver' },
-    { id: 6, date: '2025-12-04 17:30', game: 'League of Legends', result: '승리', kda: '14/4/7', duration: '36분', champion: 'Syndra', tier: 'Gold' },
-  ];
-
-  const filteredMatches = filterGame === 'all' ? matches : matches.filter(m => m.game === filterGame);
-
-  const stats = {
-    totalMatches: matches.length,
-    wins: matches.filter(m => m.result === '승리').length,
-    losses: matches.filter(m => m.result === '패배').length,
-    winRate: Math.round((matches.filter(m => m.result === '승리').length / matches.length) * 100),
-    avgKda: '10.3',
-  };
-
   return (
     <div className="matches-page">
-      {/* Hero Section */}
       <section className="matches-hero">
         <div className="matches-hero__container matches-hero__container--split">
           <div>
             <span className="matches-hero__eyebrow">My Match Log</span>
             <h1 className="matches-hero__title">내 전적 확인</h1>
-            <p className="matches-hero__description">최근 경기 흐름과 핵심 지표를 한 번에 확인하세요.</p>
+            <p className="matches-hero__description">
+              업로드가 끝난 내전 기록을 확인하고, 검수 필요 상태라면 이름 수정 후 최종 확정할 수 있습니다.
+            </p>
+            <Link to="/matches/upload" className="match-upload__cta">
+              새 내전 기록 업로드
+            </Link>
           </div>
-          {isAuthenticated && (
-            <div className="matches-hero__user">
-              <p className="matches-hero__user-label">사용자</p>
-              <p className="matches-hero__user-name">{user?.name || '사용자'}</p>
-            </div>
-          )}
+          <div className="matches-hero__user">
+            <p className="matches-hero__user-label">소환사</p>
+            <p className="matches-hero__user-name">{user?.nickname || '사용자'}</p>
+          </div>
         </div>
       </section>
 
-      {/* Stats Cards */}
+      {location.state?.message && (
+        <section className="matches-search">
+          <div className="matches-search__container">
+            <p className="match-upload__status">{location.state.message}</p>
+          </div>
+        </section>
+      )}
+
+      {errorMessage && (
+        <section className="matches-search">
+          <div className="matches-search__container">
+            <p className="match-upload__error">{errorMessage}</p>
+          </div>
+        </section>
+      )}
+
       <section className="my-stats">
         <div className="my-stats__grid">
           <div className="my-stats__card">
-            <p className="my-stats__label">총 경기</p>
+            <p className="my-stats__label">총 업로드</p>
             <p className="my-stats__value">{stats.totalMatches}</p>
           </div>
           <div className="my-stats__card">
-            <p className="my-stats__label">승리</p>
-            <p className="my-stats__value my-stats__value--win">{stats.wins}</p>
+            <p className="my-stats__label">확정 완료</p>
+            <p className="my-stats__value my-stats__value--win">{stats.confirmedMatches}</p>
           </div>
           <div className="my-stats__card">
-            <p className="my-stats__label">패배</p>
-            <p className="my-stats__value my-stats__value--loss">{stats.losses}</p>
+            <p className="my-stats__label">검수 필요</p>
+            <p className="my-stats__value my-stats__value--loss">{stats.drafts}</p>
           </div>
           <div className="my-stats__card">
-            <p className="my-stats__label">승률</p>
-            <p className="my-stats__value">{stats.winRate}%</p>
+            <p className="my-stats__label">인식된 기록</p>
+            <p className="my-stats__value">{records.reduce((sum, record) => sum + (record.recognizedPlayers ?? 0), 0)}</p>
           </div>
           <div className="my-stats__card">
-            <p className="my-stats__label">평균 K/D/A</p>
-            <p className="my-stats__value">{stats.avgKda}</p>
+            <p className="my-stats__label">업로드 이미지</p>
+            <p className="my-stats__value">{records.length}</p>
           </div>
         </div>
       </section>
 
-      {/* Filter Section */}
-      <section className="matches-filter">
-        <div className="matches-filter__container">
-          <span className="matches-filter__label">게임 필터:</span>
-          <button
-            onClick={() => setFilterGame('all')}
-            className={`matches-filter__btn ${filterGame === 'all' ? 'matches-filter__btn--active' : ''}`}
-          >
-            전체
-          </button>
-          <button
-            onClick={() => setFilterGame('League of Legends')}
-            className={`matches-filter__btn ${filterGame === 'League of Legends' ? 'matches-filter__btn--active' : ''}`}
-          >
-            League of Legends
-          </button>
-          <button
-            onClick={() => setFilterGame('Mapleland')}
-            className={`matches-filter__btn ${filterGame === 'Mapleland' ? 'matches-filter__btn--active' : ''}`}
-          >
-            Mapleland
-          </button>
-        </div>
-      </section>
-
-      {/* Matches Table */}
       <section className="matches-table">
         <div className="matches-table__container">
           <div className="matches-table__wrapper">
             <table className="matches-table__table">
               <thead>
                 <tr className="matches-table__header-row">
-                  <th className="matches-table__th">날짜</th>
-                  <th className="matches-table__th">게임</th>
-                  <th className="matches-table__th">결과</th>
-                  <th className="matches-table__th">챔피언/직업</th>
-                  <th className="matches-table__th">K/D/A</th>
-                  <th className="matches-table__th">게임시간</th>
-                  <th className="matches-table__th">티어</th>
+                  <th className="matches-table__th">게임 번호</th>
+                  <th className="matches-table__th">업로드 시각</th>
+                  <th className="matches-table__th">상태</th>
+                  <th className="matches-table__th">승리 팀</th>
+                  <th className="matches-table__th">인식 플레이어</th>
+                  <th className="matches-table__th">확인</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredMatches.length > 0 ? (
-                  filteredMatches.map((match) => (
-                    <tr key={match.id} className="matches-table__row">
-                      <td className="matches-table__td">{match.date}</td>
-                      <td className="matches-table__td">{match.game}</td>
+                {!isLoading && records.length > 0 ? (
+                  records.map((record) => (
+                    <tr key={record.gameNumber} className="matches-table__row">
+                      <td className="matches-table__td matches-table__td--name">{record.gameNumber}</td>
+                      <td className="matches-table__td">{record.createdAt ?? '-'}</td>
                       <td className="matches-table__td">
-                        <span className={`matches-table__result ${match.result === '승리' ? 'matches-table__result--win' : 'matches-table__result--loss'}`}>
-                          {match.result}
+                        <span className={`matches-table__result ${record.reviewRequired ? 'matches-table__result--loss' : 'matches-table__result--win'}`}>
+                          {record.reviewRequired ? '검수 필요' : '확정 완료'}
                         </span>
                       </td>
-                      <td className="matches-table__td">{match.champion}</td>
-                      <td className="matches-table__td matches-table__td--kda">{match.kda}</td>
-                      <td className="matches-table__td">{match.duration}</td>
+                      <td className="matches-table__td">{record.winner === 'team1' ? '1팀' : '2팀'}</td>
+                      <td className="matches-table__td">{record.recognizedPlayers ?? 0}</td>
                       <td className="matches-table__td">
-                        <span className="matches-table__tier">{match.tier}</span>
+                        <Link to={`/matches/review/${record.gameNumber}`} className="match-upload__link">
+                          {record.reviewRequired ? '검수하기' : '상세 보기'}
+                        </Link>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="matches-table__empty">
-                      경기 기록이 없습니다
+                    <td colSpan="6" className="matches-table__empty">
+                      {isLoading ? '업로드한 내전 기록을 불러오는 중입니다.' : '아직 업로드된 내전 기록이 없습니다.'}
                     </td>
                   </tr>
                 )}
