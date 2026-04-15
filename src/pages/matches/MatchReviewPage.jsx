@@ -15,7 +15,7 @@ const createEmptyRecord = () => ({
 });
 
 const MatchReviewPage = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { gameId } = useParams();
   const navigate = useNavigate();
   const [record, setRecord] = useState(createEmptyRecord);
@@ -26,6 +26,10 @@ const MatchReviewPage = () => {
   const [statusMessage, setStatusMessage] = useState('');
 
   useEffect(() => {
+    if (isAuthLoading) {
+      return;
+    }
+
     if (!isAuthenticated) {
       navigate('/login', { replace: true });
       return;
@@ -46,7 +50,7 @@ const MatchReviewPage = () => {
     };
 
     fetchRecord();
-  }, [gameId, isAuthenticated, navigate]);
+  }, [gameId, isAuthLoading, isAuthenticated, navigate]);
 
   const isDraft = record.status === 'DRAFT';
   const isProcessing = record.status === 'PROCESSING';
@@ -70,6 +74,40 @@ const MatchReviewPage = () => {
       default:
         return status;
     }
+  };
+
+  const getTeamResultLabel = (teamKey) => {
+    if (!record.winner) {
+      return '미정';
+    }
+
+    return record.winner === teamKey ? '승리팀' : '패배팀';
+  };
+
+  const getTeamResultClassName = (teamKey) => (
+    record.winner === teamKey
+      ? 'match-review__team-badge match-review__team-badge--winner'
+      : 'match-review__team-badge match-review__team-badge--loser'
+  );
+
+  const formatDateTime = (value) => {
+    if (!value) {
+      return '-';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   };
 
   const updatePlayer = (teamKey, playerIndex, field, value) => {
@@ -157,17 +195,19 @@ const MatchReviewPage = () => {
   const renderEditableTeam = (teamKey, teamLabel) => (
     <div className="matches-table__wrapper match-review__team-panel">
       <div className="match-upload__team-head">
-        <h3>{teamLabel}</h3>
-        <label className="match-review__winner-toggle">
-          <input
-            type="radio"
-            name="winner"
-            checked={record.winner === teamKey}
-            onChange={() => setRecord((current) => ({ ...current, winner: teamKey }))}
-            disabled={!isDraft}
-          />
-          승리 팀
-        </label>
+        <div className="match-review__team-heading">
+          <h3>{teamLabel}</h3>
+          <span className={getTeamResultClassName(teamKey)}>{getTeamResultLabel(teamKey)}</span>
+        </div>
+        {isDraft && (
+          <button
+            type="button"
+            className={`match-review__winner-button ${record.winner === teamKey ? 'match-review__winner-button--active' : ''}`}
+            onClick={() => setRecord((current) => ({ ...current, winner: teamKey }))}
+          >
+            {record.winner === teamKey ? '승리팀으로 선택됨' : `${teamLabel}을 승리팀으로 선택`}
+          </button>
+        )}
       </div>
       <table className="matches-table__table">
         <thead>
@@ -211,7 +251,7 @@ const MatchReviewPage = () => {
     </div>
   );
 
-  if (!isAuthenticated) {
+  if (isAuthLoading || !isAuthenticated) {
     return null;
   }
 
@@ -265,13 +305,7 @@ const MatchReviewPage = () => {
           </div>
           <div className="my-stats__card">
             <p className="my-stats__label">업로드 일시</p>
-            <p className="my-stats__value match-upload__stat-text">{record.createdAt ?? '-'}</p>
-          </div>
-          <div className="my-stats__card">
-            <p className="my-stats__label">이미지</p>
-            <a href={record.screenshotUrl} target="_blank" rel="noreferrer" className="match-upload__link">
-              보기
-            </a>
+            <p className="my-stats__value match-upload__stat-text">{formatDateTime(record.createdAt)}</p>
           </div>
         </div>
       </section>
