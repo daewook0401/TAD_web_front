@@ -1065,6 +1065,12 @@
   gap: var(--spacing-6);
 }
 
+.match-review__teams {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-6);
+}
+
 .match-upload__team-head {
   display: flex;
   justify-content: space-between;
@@ -1133,6 +1139,21 @@
 .match-review__hint {
   color: var(--color-gray-500);
   font-size: var(--font-size-sm);
+}
+
+.match-review__team-panel .matches-table__table {
+  min-width: 100%;
+  table-layout: fixed;
+}
+
+.match-review__team-panel .matches-table__wrapper,
+.match-review__team-panel {
+  overflow-x: auto;
+}
+
+.match-review__team-panel .matches-table__th,
+.match-review__team-panel .matches-table__td {
+  white-space: nowrap;
 }
 
 @media (max-width: 1024px) {
