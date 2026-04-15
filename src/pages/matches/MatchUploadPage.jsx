@@ -12,6 +12,7 @@ const MatchUploadPage = () => {
   const [result, setResult] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [statusMessage, setStatusMessage] = useState('');
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -50,6 +51,7 @@ const MatchUploadPage = () => {
     setSelectedFile(file);
     setResult(null);
     setErrorMessage('');
+    setStatusMessage('');
 
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
@@ -73,14 +75,25 @@ const MatchUploadPage = () => {
 
     setIsSubmitting(true);
     setErrorMessage('');
+    setStatusMessage('이미지를 업로드했고 서버에서 전적을 분석 중입니다. 잠시만 기다려주세요.');
 
     try {
       const response = await analysisAPI.uploadMatchRecord(selectedFile);
       setResult(response.data);
+      setStatusMessage('업로드가 완료되었습니다. 내 전적 확인에서 이름과 수치를 검수한 뒤 최종 확정해주세요.');
+      navigate('/matches/my', {
+        replace: true,
+        state: {
+          message: `게임 #${response.data.gameNumber} 업로드가 완료되었습니다. 검수 후 최종 확정해주세요.`,
+        },
+      });
     } catch (error) {
       setErrorMessage(
-        error.response?.data?.message || '전적 업로드 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.'
+        error.code === 'ECONNABORTED'
+          ? '분석 시간이 길어져 요청이 중단되었습니다. 잠시 후 다시 시도해주세요.'
+          : error.response?.data?.message || '전적 업로드 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.'
       );
+      setStatusMessage('');
     } finally {
       setIsSubmitting(false);
     }
@@ -160,23 +173,15 @@ const MatchUploadPage = () => {
                 </div>
               )}
 
+              {statusMessage && !errorMessage && <p className="match-upload__status">{statusMessage}</p>}
               {errorMessage && <p className="match-upload__error">{errorMessage}</p>}
 
               <button type="submit" className="match-upload__submit" disabled={isSubmitting}>
-                {isSubmitting ? '업로드 중...' : '내전 기록 등록'}
+                {isSubmitting ? '업로드 완료, 분석 중...' : '내전 기록 등록'}
               </button>
             </form>
           </div>
 
-          <aside className="match-upload__sidecard">
-            <h3 className="match-upload__side-title">처리 순서</h3>
-            <ol className="match-upload__steps">
-              <li>프론트에서 스크린샷 업로드</li>
-              <li>백엔드에서 MinIO 저장</li>
-              <li>분석 서버에 bucket/object_key 전달</li>
-              <li>게임, 플레이어, 전적 통계 저장</li>
-            </ol>
-          </aside>
         </div>
       </section>
 
