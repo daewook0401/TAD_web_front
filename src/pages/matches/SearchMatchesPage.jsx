@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { analysisAPI } from '../../api/analysisAPI';
 import '../../styles/pages/MatchesPages.css';
 
+const MIN_GAMES = 3;
+const RANKING_LIMIT = 100;
+
 const SearchMatchesPage = () => {
   const [searchPlayer, setSearchPlayer] = useState('');
   const [rankings, setRankings] = useState([]);
@@ -14,7 +17,10 @@ const SearchMatchesPage = () => {
       setErrorMessage('');
 
       try {
-        const response = await analysisAPI.getRankings();
+        const response = await analysisAPI.getRankings({
+          minGames: MIN_GAMES,
+          limit: RANKING_LIMIT,
+        });
         setRankings(response.data ?? []);
       } catch (error) {
         setErrorMessage(error.response?.data?.message || '전적 순위를 불러오지 못했습니다.');
@@ -37,9 +43,8 @@ const SearchMatchesPage = () => {
 
   const suggestions = useMemo(() => rankings.slice(0, 8), [rankings]);
 
-  const formatAverageKda = (player) => (
-    `${player.averageKills ?? 0} / ${player.averageDeaths ?? 0} / ${player.averageAssists ?? 0}`
-  );
+  const formatAverageKda = (player) =>
+    `${player.averageKills ?? 0} / ${player.averageDeaths ?? 0} / ${player.averageAssists ?? 0}`;
 
   const formatAverageNumber = (value) => (value ?? 0).toLocaleString();
 
@@ -68,20 +73,21 @@ const SearchMatchesPage = () => {
             />
           </div>
 
+          <p className="matches-search__suggestions-label">
+            3경기 이상 확정 전적 기준, 상위 {Math.min(rankings.length, RANKING_LIMIT)}명
+          </p>
+
           {suggestions.length > 0 && (
-            <div>
-              <p className="matches-search__suggestions-label">상위 플레이어</p>
-              <div className="matches-search__suggestions">
-                {suggestions.map((player) => (
-                  <button
-                    key={`${player.rank}-${player.playerName}`}
-                    onClick={() => setSearchPlayer(player.playerName)}
-                    className="matches-search__suggestion"
-                  >
-                    {player.playerName}
-                  </button>
-                ))}
-              </div>
+            <div className="matches-search__suggestions">
+              {suggestions.map((player) => (
+                <button
+                  key={`${player.rank}-${player.playerName}`}
+                  onClick={() => setSearchPlayer(player.playerName)}
+                  className="matches-search__suggestion"
+                >
+                  {player.playerName}
+                </button>
+              ))}
             </div>
           )}
         </div>

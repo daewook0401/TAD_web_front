@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useEffect, useState, createContext, useContext } from 'react';
 import { authAPI } from '../api/authAPI';
 
 export const AuthContext = createContext();
@@ -9,23 +9,59 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 초기 로드 시 sessionStorage에서 사용자 정보와 토큰 복원
+  const clearAuthStorage = () => {
+    setUser(null);
+    setIsAuthenticated(false);
+    sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('refreshToken');
+    sessionStorage.removeItem('user');
+  };
+
   useEffect(() => {
-    try {
+    let cancelled = false;
+
+    const restoreSession = async () => {
       const token = sessionStorage.getItem('accessToken');
-      const userData = sessionStorage.getItem('user');
-      
-      if (token && userData) {
-        setUser(JSON.parse(userData));
-        setIsAuthenticated(true);
+      const rawUser = sessionStorage.getItem('user');
+
+      if (!token) {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+        return;
       }
-    } catch (error) {
-      console.error('Failed to restore user session:', error);
-      sessionStorage.removeItem('accessToken');
-      sessionStorage.removeItem('refreshToken');
-      sessionStorage.removeItem('user');
-    }
-    setIsLoading(false);
+
+      try {
+        if (rawUser && !cancelled) {
+          setUser(JSON.parse(rawUser));
+          setIsAuthenticated(true);
+        }
+
+        const response = await authAPI.getMyProfile();
+        if (cancelled) {
+          return;
+        }
+
+        setUser(response.data);
+        setIsAuthenticated(true);
+        sessionStorage.setItem('user', JSON.stringify(response.data));
+      } catch (error) {
+        if (!cancelled) {
+          console.error('Failed to restore user session:', error);
+          clearAuthStorage();
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    restoreSession();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const login = (userData, tokens) => {
@@ -38,14 +74,6 @@ export const AuthProvider = ({ children }) => {
     if (tokens?.refreshToken) {
       sessionStorage.setItem('refreshToken', tokens.refreshToken);
     }
-  };
-
-  const clearAuthStorage = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-    sessionStorage.removeItem('accessToken');
-    sessionStorage.removeItem('refreshToken');
-    sessionStorage.removeItem('user');
   };
 
   const logout = async () => {
@@ -62,27 +90,24 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const isAdmin = () => {
-    return user?.roles?.includes('ROLE_ADMIN') || false;
-  };
-
-  const value = {
-    user,
-    isAuthenticated,
-    isLoading,
-    login,
-    logout,
-    isAdmin,
-  };
+  const isAdmin = () => user?.roles?.includes('ROLE_ADMIN') || false;
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated,
+        isLoading,
+        login,
+        logout,
+        isAdmin,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
-// useAuth 훅
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
