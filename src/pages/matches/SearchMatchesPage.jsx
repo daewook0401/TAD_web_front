@@ -3,6 +3,7 @@ import { analysisAPI } from '../../api/analysisAPI';
 import '../../styles/pages/MatchesPages.css';
 
 const MIN_GAMES = 3;
+const SEARCH_MIN_GAMES = 1;
 const RANKING_LIMIT = 100;
 
 const SearchMatchesPage = () => {
@@ -103,7 +104,7 @@ const SearchMatchesPage = () => {
     try {
       const response = await analysisAPI.getRankings({
         keyword: keyword || undefined,
-        minGames: MIN_GAMES,
+        minGames: keyword ? SEARCH_MIN_GAMES : MIN_GAMES,
         limit: RANKING_LIMIT,
       });
       setRankings(response.data ?? []);
@@ -226,7 +227,7 @@ const SearchMatchesPage = () => {
               </h2>
             </div>
             <p className="matches-section-heading__meta">
-              {MIN_GAMES}경기 이상 확정 전적 기준, 최대 {RANKING_LIMIT}명
+              {submittedKeyword ? '1경기 이상 확정 전적 기준' : `${MIN_GAMES}경기 이상 확정 전적 기준`}, 최대 {RANKING_LIMIT}명
             </p>
           </div>
 
