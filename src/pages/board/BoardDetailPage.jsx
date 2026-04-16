@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { boardAPI } from '../../api/boardAPI';
 import '../../styles/pages/BoardPage.css';
@@ -224,7 +224,7 @@ const BoardDetailPage = () => {
   const user = useMemo(() => getStoredUser(), []);
   const isAuthenticated = Boolean(sessionStorage.getItem('accessToken'));
 
-  const fetchComments = async () => {
+  const fetchComments = useCallback(async () => {
     if (!postId) return;
 
     setCommentsLoading(true);
@@ -237,7 +237,7 @@ const BoardDetailPage = () => {
     } finally {
       setCommentsLoading(false);
     }
-  };
+  }, [postId]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -274,7 +274,7 @@ const BoardDetailPage = () => {
       fetchPost();
       fetchComments();
     }
-  }, [postId]);
+  }, [fetchComments, postId]);
 
   const activeCategory = useMemo(() => {
     if (category) return category;
@@ -575,7 +575,7 @@ const BoardDetailPage = () => {
                   {(imageAttachments.length > 0 || fileAttachments.length > 0) && (
                     <div className="board-detail__attachments">
                       <div className="board-detail__attachments-head">
-                        <h2>첨부파일</h2>
+                        <h2>첨부 파일</h2>
                         <span>{post?.attachments?.length || 0}개</span>
                       </div>
 
@@ -610,7 +610,7 @@ const BoardDetailPage = () => {
                                 <strong>{attachment.fileName}</strong>
                                 <span>{attachment.contentType || 'file'} / {formatFileSize(attachment.fileSize)}</span>
                               </div>
-                              <span>열기</span>
+                              <span>보기</span>
                             </a>
                           ))}
                         </div>
@@ -715,7 +715,7 @@ const BoardDetailPage = () => {
                   <p className="board-detail__card-label">게시판 안내</p>
                   <h2 className="board-detail__card-title">{currentCategory?.name || '커뮤니티'}</h2>
                   <p className="board-detail__card-text">
-                    {currentCategory?.summary || '게시글과 첨부파일, 댓글을 한 화면에서 확인할 수 있습니다.'}
+                    {currentCategory?.summary || '게시글과 첨부 파일, 댓글을 이 화면에서 확인할 수 있습니다.'}
                   </p>
                 </div>
 

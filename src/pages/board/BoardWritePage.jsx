@@ -617,8 +617,8 @@ const BoardWritePage = () => {
                 {isEditMode && existingAttachments.length > 0 && (
                   <div className="board-write__attachments board-write__attachments--embedded">
                     <div className="board-write__attachments-head">
-                      <p className="board-write__attachments-title">기존 첨부파일</p>
-                      <p className="board-write__attachments-copy">수정 시 기존 첨부파일은 유지되고, 아래 파일은 추가로 업로드됩니다.</p>
+                      <p className="board-write__attachments-title">기존 첨부 파일</p>
+                      <p className="board-write__attachments-copy">수정 시 기존 첨부 파일은 유지되고, 아래 파일은 추가로 업로드됩니다.</p>
                     </div>
                     <div className="board-write__file-list">
                       {existingAttachments.map((attachment) => (
@@ -644,7 +644,7 @@ const BoardWritePage = () => {
                   <div className="board-write__attachments board-write__attachments--embedded">
                     <div className="board-write__attachments-head">
                       <p className="board-write__attachments-title">새로 추가할 파일</p>
-                      <p className="board-write__attachments-copy">선택한 파일은 저장 시 함께 업로드됩니다.</p>
+                      <p className="board-write__attachments-copy">선택한 파일은 저장할 때 함께 업로드됩니다.</p>
                     </div>
 
                     <div className="board-write__file-list">
