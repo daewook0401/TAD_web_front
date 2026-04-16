@@ -74,7 +74,7 @@ const SearchMatchesPage = () => {
           </div>
 
           <p className="matches-search__suggestions-label">
-            3경기 이상 확정 전적 기준, 상위 {Math.min(rankings.length, RANKING_LIMIT)}명
+            {`${MIN_GAMES}경기 이상 확정 전적 기준, 상위 ${Math.min(rankings.length, RANKING_LIMIT)}명`}
           </p>
 
           {suggestions.length > 0 && (
