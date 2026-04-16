@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { analysisAPI } from '../../api/analysisAPI';
 import '../../styles/pages/MatchesPages.css';
 
@@ -18,6 +18,8 @@ const SearchMatchesPage = () => {
   const [errorMessage, setErrorMessage] = useState('');
   const [recordsErrorMessage, setRecordsErrorMessage] = useState('');
   const [detailErrorMessage, setDetailErrorMessage] = useState('');
+  const playerRecordsRequestId = useRef(0);
+  const gameDetailRequestId = useRef(0);
 
   useEffect(() => {
     const fetchInitialRankings = async () => {
@@ -114,6 +116,9 @@ const SearchMatchesPage = () => {
   };
 
   const handleSelectPlayer = async (playerName) => {
+    const requestId = playerRecordsRequestId.current + 1;
+    playerRecordsRequestId.current = requestId;
+
     setSelectedPlayer(playerName);
     setSelectedGameDetail(null);
     setRecordsLoading(true);
@@ -122,27 +127,38 @@ const SearchMatchesPage = () => {
 
     try {
       const response = await analysisAPI.getPlayerRecords(playerName);
+      if (playerRecordsRequestId.current !== requestId) return;
       setPlayerRecords(response.data ?? []);
     } catch (error) {
+      if (playerRecordsRequestId.current !== requestId) return;
       setPlayerRecords([]);
       setRecordsErrorMessage(error.response?.data?.message || '선수별 경기 기록을 불러오지 못했습니다.');
     } finally {
-      setRecordsLoading(false);
+      if (playerRecordsRequestId.current === requestId) {
+        setRecordsLoading(false);
+      }
     }
   };
 
   const handleSelectGame = async (gameNumber) => {
+    const requestId = gameDetailRequestId.current + 1;
+    gameDetailRequestId.current = requestId;
+
     setDetailLoading(true);
     setDetailErrorMessage('');
 
     try {
       const response = await analysisAPI.getPublicRecordDetail(gameNumber);
+      if (gameDetailRequestId.current !== requestId) return;
       setSelectedGameDetail(response.data);
     } catch (error) {
+      if (gameDetailRequestId.current !== requestId) return;
       setSelectedGameDetail(null);
       setDetailErrorMessage(error.response?.data?.message || '경기 상세 기록을 불러오지 못했습니다.');
     } finally {
-      setDetailLoading(false);
+      if (gameDetailRequestId.current === requestId) {
+        setDetailLoading(false);
+      }
     }
   };
 
@@ -234,7 +250,9 @@ const SearchMatchesPage = () => {
                   searchedRankings.map((player) => (
                     <tr key={`${player.rank}-${player.playerName}`} className="matches-table__row">
                       <td className="matches-table__td">
-                        <span className={`ranking-badge ranking-badge--${player.rank}`}>{player.rank}</span>
+                        <span className={`ranking-badge ${player.rank <= 3 ? `ranking-badge--${player.rank}` : ''}`}>
+                          {player.rank}
+                        </span>
                       </td>
                       <td className="matches-table__td matches-table__td--name">
                         <button
