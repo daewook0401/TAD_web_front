@@ -19,6 +19,20 @@ export const analysisAPI = {
     params: params ?? {},
   }),
 
+  getPlayerRecords: (playerName) => {
+    const normalizedPlayerName = playerName?.trim();
+
+    if (!normalizedPlayerName) {
+      return Promise.reject(new Error('플레이어 이름이 필요합니다.'));
+    }
+
+    return api.get('/analyze/player-records', {
+      params: { playerName: normalizedPlayerName },
+    });
+  },
+
+  getPublicRecordDetail: (gameId) => api.get(`/analyze/records/${gameId}`),
+
   getRecordDetail: (gameId) => api.get(`/analyze/${gameId}`),
 
   updateDraft: (gameId, payload) => api.put(`/analyze/${gameId}/draft`, payload),
