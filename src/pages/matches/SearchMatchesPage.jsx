@@ -11,10 +11,13 @@ const SearchMatchesPage = () => {
   const [rankings, setRankings] = useState([]);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [playerRecords, setPlayerRecords] = useState([]);
+  const [selectedGameDetail, setSelectedGameDetail] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [recordsLoading, setRecordsLoading] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [recordsErrorMessage, setRecordsErrorMessage] = useState('');
+  const [detailErrorMessage, setDetailErrorMessage] = useState('');
 
   useEffect(() => {
     const fetchInitialRankings = async () => {
@@ -42,7 +45,7 @@ const SearchMatchesPage = () => {
   const formatAverageKda = (player) =>
     `${player.averageKills ?? 0} / ${player.averageDeaths ?? 0} / ${player.averageAssists ?? 0}`;
 
-  const formatAverageNumber = (value) => (value ?? 0).toLocaleString();
+  const formatNumber = (value) => (value ?? 0).toLocaleString();
 
   const formatDate = (value) => {
     if (!value) return '-';
@@ -71,6 +74,17 @@ const SearchMatchesPage = () => {
     return rankings.find((player) => player.playerName === selectedPlayer) ?? null;
   }, [rankings, selectedPlayer]);
 
+  const detailPlayers = useMemo(() => {
+    if (!selectedGameDetail) {
+      return [];
+    }
+
+    return [
+      ...(selectedGameDetail.team1?.players ?? []),
+      ...(selectedGameDetail.team2?.players ?? []),
+    ];
+  }, [selectedGameDetail]);
+
   const handleSearch = async (event) => {
     event.preventDefault();
 
@@ -78,7 +92,9 @@ const SearchMatchesPage = () => {
     setSubmittedKeyword(keyword);
     setSelectedPlayer(null);
     setPlayerRecords([]);
+    setSelectedGameDetail(null);
     setRecordsErrorMessage('');
+    setDetailErrorMessage('');
     setErrorMessage('');
     setIsLoading(true);
 
@@ -99,8 +115,10 @@ const SearchMatchesPage = () => {
 
   const handleSelectPlayer = async (playerName) => {
     setSelectedPlayer(playerName);
+    setSelectedGameDetail(null);
     setRecordsLoading(true);
     setRecordsErrorMessage('');
+    setDetailErrorMessage('');
 
     try {
       const response = await analysisAPI.getPlayerRecords(playerName);
@@ -113,6 +131,21 @@ const SearchMatchesPage = () => {
     }
   };
 
+  const handleSelectGame = async (gameNumber) => {
+    setDetailLoading(true);
+    setDetailErrorMessage('');
+
+    try {
+      const response = await analysisAPI.getPublicRecordDetail(gameNumber);
+      setSelectedGameDetail(response.data);
+    } catch (error) {
+      setSelectedGameDetail(null);
+      setDetailErrorMessage(error.response?.data?.message || '경기 상세 기록을 불러오지 못했습니다.');
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
   return (
     <div className="matches-page">
       <section className="matches-hero">
@@ -120,7 +153,7 @@ const SearchMatchesPage = () => {
           <span className="matches-hero__eyebrow">Player Search</span>
           <h1 className="matches-hero__title">전적 검색</h1>
           <p className="matches-hero__description">
-            닉네임을 입력하고 검색 버튼을 누르면 플레이어를 찾고, 이름을 클릭하면 판 단위 기록을 볼 수 있습니다.
+            닉네임을 입력하고 검색 버튼을 누른 뒤, 플레이어와 판을 차례로 눌러 상세 기록을 확인하세요.
           </p>
         </div>
       </section>
@@ -217,8 +250,8 @@ const SearchMatchesPage = () => {
                       <td className="matches-table__td">{player.totalGames}</td>
                       <td className="matches-table__td">{player.winRate}%</td>
                       <td className="matches-table__td matches-table__td--kda">{formatAverageKda(player)}</td>
-                      <td className="matches-table__td">{formatAverageNumber(player.averageCs)}</td>
-                      <td className="matches-table__td">{formatAverageNumber(player.averageGold)}</td>
+                      <td className="matches-table__td">{formatNumber(player.averageCs)}</td>
+                      <td className="matches-table__td">{formatNumber(player.averageGold)}</td>
                     </tr>
                   ))
                 ) : (
@@ -239,7 +272,7 @@ const SearchMatchesPage = () => {
                   <p className="matches-section-heading__eyebrow">경기별 기록</p>
                   <h2 className="player-records__title">{selectedPlayer}</h2>
                   <p className="player-records__description">
-                    확정된 전적에서 해당 플레이어가 참여한 경기만 최신순으로 보여줍니다.
+                    경기 번호 또는 자세히 버튼을 누르면 양 팀 전체 스탯을 볼 수 있습니다.
                   </p>
                 </div>
 
@@ -265,14 +298,22 @@ const SearchMatchesPage = () => {
                       <th className="matches-table__th">CS</th>
                       <th className="matches-table__th">Gold</th>
                       <th className="matches-table__th">확정일</th>
-                      <th className="matches-table__th">스크린샷</th>
+                      <th className="matches-table__th">상세</th>
                     </tr>
                   </thead>
                   <tbody>
                     {!recordsLoading && playerRecords.length > 0 ? (
                       playerRecords.map((record) => (
                         <tr key={`${record.gameNumber}-${record.slotNumber}`} className="matches-table__row">
-                          <td className="matches-table__td">#{record.gameNumber}</td>
+                          <td className="matches-table__td">
+                            <button
+                              type="button"
+                              className="matches-player-link"
+                              onClick={() => handleSelectGame(record.gameNumber)}
+                            >
+                              #{record.gameNumber}
+                            </button>
+                          </td>
                           <td className="matches-table__td">
                             <span
                               className={`matches-table__result ${
@@ -288,17 +329,17 @@ const SearchMatchesPage = () => {
                           <td className="matches-table__td matches-table__td--kda">
                             {record.kills ?? 0} / {record.deaths ?? 0} / {record.assists ?? 0}
                           </td>
-                          <td className="matches-table__td">{formatAverageNumber(record.cs)}</td>
-                          <td className="matches-table__td">{formatAverageNumber(record.gold)}</td>
+                          <td className="matches-table__td">{formatNumber(record.cs)}</td>
+                          <td className="matches-table__td">{formatNumber(record.gold)}</td>
                           <td className="matches-table__td">{formatDate(record.confirmedAt || record.createdAt)}</td>
                           <td className="matches-table__td">
-                            {record.screenshotUrl ? (
-                              <a href={record.screenshotUrl} target="_blank" rel="noreferrer" className="matches-record-link">
-                                보기
-                              </a>
-                            ) : (
-                              '-'
-                            )}
+                            <button
+                              type="button"
+                              className="matches-record-link"
+                              onClick={() => handleSelectGame(record.gameNumber)}
+                            >
+                              자세히
+                            </button>
                           </td>
                         </tr>
                       ))
@@ -312,6 +353,80 @@ const SearchMatchesPage = () => {
                   </tbody>
                 </table>
               </div>
+
+              {detailErrorMessage && <p className="match-upload__error">{detailErrorMessage}</p>}
+
+              {(detailLoading || selectedGameDetail) && (
+                <div className="match-detail-panel">
+                  {detailLoading ? (
+                    <p className="matches-table__empty">경기 상세를 불러오는 중입니다.</p>
+                  ) : (
+                    <>
+                      <div className="match-detail-panel__header">
+                        <div>
+                          <p className="matches-section-heading__eyebrow">판 상세</p>
+                          <h3 className="match-detail-panel__title">경기 #{selectedGameDetail.gameNumber}</h3>
+                          <p className="player-records__description">
+                            승리 팀: {selectedGameDetail.winner || '-'} / 상태: {selectedGameDetail.status}
+                          </p>
+                        </div>
+
+                        {selectedGameDetail.screenshotUrl && (
+                          <a
+                            href={selectedGameDetail.screenshotUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="matches-record-link"
+                          >
+                            스크린샷 보기
+                          </a>
+                        )}
+                      </div>
+
+                      <div className="matches-table__wrapper">
+                        <table className="matches-table__table">
+                          <thead>
+                            <tr className="matches-table__header-row">
+                              <th className="matches-table__th">팀</th>
+                              <th className="matches-table__th">슬롯</th>
+                              <th className="matches-table__th">플레이어</th>
+                              <th className="matches-table__th">결과</th>
+                              <th className="matches-table__th">K/D/A</th>
+                              <th className="matches-table__th">CS</th>
+                              <th className="matches-table__th">Gold</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {detailPlayers.map((player) => (
+                              <tr key={player.statId} className="matches-table__row">
+                                <td className="matches-table__td">{player.teamKey}</td>
+                                <td className="matches-table__td">{player.slotNumber}</td>
+                                <td className="matches-table__td matches-table__td--name">{player.name || '-'}</td>
+                                <td className="matches-table__td">
+                                  <span
+                                    className={`matches-table__result ${
+                                      player.winner
+                                        ? 'matches-table__result--win'
+                                        : 'matches-table__result--loss'
+                                    }`}
+                                  >
+                                    {player.winner ? '승리' : '패배'}
+                                  </span>
+                                </td>
+                                <td className="matches-table__td matches-table__td--kda">
+                                  {player.kills ?? 0} / {player.deaths ?? 0} / {player.assists ?? 0}
+                                </td>
+                                <td className="matches-table__td">{formatNumber(player.cs)}</td>
+                                <td className="matches-table__td">{formatNumber(player.gold)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

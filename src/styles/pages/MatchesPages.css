@@ -681,10 +681,39 @@
 }
 
 .matches-record-link {
+  display: inline-flex;
+  padding: 0;
+  background: transparent;
   color: var(--color-primary);
+  font: inherit;
   font-weight: var(--font-weight-semibold);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.match-detail-panel {
+  margin-top: var(--spacing-6);
+  padding: var(--spacing-6);
+  background:
+    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 32%),
+    var(--color-gray-50);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-2xl);
+}
+
+.match-detail-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-5);
+}
+
+.match-detail-panel__title {
+  color: var(--color-gray-900);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--spacing-2);
 }
 
 /* Ranking Badge */
@@ -970,7 +999,8 @@
   }
 
   .matches-section-heading,
-  .player-records__header {
+  .player-records__header,
+  .match-detail-panel__header {
     flex-direction: column;
     align-items: flex-start;
   }
