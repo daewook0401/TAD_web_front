@@ -34,7 +34,6 @@ export const AuthProvider = ({ children }) => {
       try {
         if (rawUser && !cancelled) {
           setUser(JSON.parse(rawUser));
-          setIsAuthenticated(true);
         }
 
         const response = await authAPI.getMyProfile();
