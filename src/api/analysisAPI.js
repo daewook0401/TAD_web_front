@@ -19,6 +19,10 @@ export const analysisAPI = {
     params: params ?? {},
   }),
 
+  getPlayerRecords: (playerName) => api.get('/analyze/player-records', {
+    params: { playerName },
+  }),
+
   getRecordDetail: (gameId) => api.get(`/analyze/${gameId}`),
 
   updateDraft: (gameId, payload) => api.put(`/analyze/${gameId}/draft`, payload),
