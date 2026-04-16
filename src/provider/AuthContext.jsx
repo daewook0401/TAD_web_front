@@ -47,8 +47,12 @@ export const AuthProvider = ({ children }) => {
         sessionStorage.setItem('user', JSON.stringify(response.data));
       } catch (error) {
         if (!cancelled) {
+          const status = error?.response?.status;
           console.error('Failed to restore user session:', error);
-          clearAuthStorage();
+
+          if (status === 401 || status === 403) {
+            clearAuthStorage();
+          }
         }
       } finally {
         if (!cancelled) {
