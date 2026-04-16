@@ -30,12 +30,18 @@ export const AuthProvider = ({ children }) => {
         }
         return;
       }
+      if (rawUser && !cancelled) {
+        try {
+          setUser(JSON.parse(rawUser));
+          setIsAuthenticated(true);
+        } catch (error) {
+          console.error('Failed to parse stored user data. Revalidating session:', error);
+          setUser(null);
+          sessionStorage.removeItem('user');
+        }
+      }
 
       try {
-        if (rawUser && !cancelled) {
-          setUser(JSON.parse(rawUser));
-        }
-
         const response = await authAPI.getMyProfile();
         if (cancelled) {
           return;
