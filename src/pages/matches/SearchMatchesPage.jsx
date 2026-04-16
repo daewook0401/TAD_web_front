@@ -7,6 +7,8 @@ const MIN_GAMES = 3;
 const SEARCH_MIN_GAMES = 1;
 const RANKING_LIMIT = 100;
 
+const compactSearchText = (value) => value.trim().replace(/\s+/g, '').toLowerCase();
+
 const SearchMatchesPage = () => {
   const navigate = useNavigate();
   const [searchPlayer, setSearchPlayer] = useState('');
@@ -44,12 +46,12 @@ const SearchMatchesPage = () => {
   const formatNumber = (value) => (value ?? 0).toLocaleString();
 
   const searchedRankings = useMemo(() => {
-    const keyword = submittedKeyword.trim().toLowerCase();
+    const keyword = compactSearchText(submittedKeyword);
     if (!keyword) {
       return rankings;
     }
 
-    return rankings.filter((player) => player.playerName?.toLowerCase().includes(keyword));
+    return rankings.filter((player) => compactSearchText(player.playerName ?? '').includes(keyword));
   }, [rankings, submittedKeyword]);
 
   const handleSearch = async (event) => {
