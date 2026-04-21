@@ -172,7 +172,6 @@ const PlayerMatchesPage = () => {
             <table className="matches-table__table">
               <thead>
                 <tr className="matches-table__header-row">
-                  <th className="matches-table__th">경기</th>
                   <th className="matches-table__th">결과</th>
                   <th className="matches-table__th">팀</th>
                   <th className="matches-table__th">K/D/A</th>
@@ -186,7 +185,6 @@ const PlayerMatchesPage = () => {
                 {records.length > 0 ? (
                   records.map((record) => (
                     <tr key={`${record.gameNumber}-${record.slotNumber}`} className="matches-table__row">
-                      <td className="matches-table__td">#{record.gameNumber}</td>
                       <td className="matches-table__td">
                         <span
                           className={`matches-table__result ${
@@ -218,7 +216,7 @@ const PlayerMatchesPage = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="8" className="matches-table__empty">
+                    <td colSpan="7" className="matches-table__empty">
                       표시할 경기 기록이 없습니다.
                     </td>
                   </tr>
@@ -238,7 +236,7 @@ const PlayerMatchesPage = () => {
                   <div className="match-detail-panel__header">
                     <div>
                       <p className="matches-section-heading__eyebrow">Review Detail</p>
-                      <h3 className="match-detail-panel__title">경기 #{selectedGameDetail.gameNumber}</h3>
+                      <h3 className="match-detail-panel__title">경기 상세</h3>
                       <p className="player-records__description">
                         승리 팀: {selectedGameDetail.winner || '-'} / 상태: {selectedGameDetail.status}
                       </p>
