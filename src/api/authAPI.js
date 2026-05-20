@@ -22,6 +22,9 @@ export const authAPI = {
   // 내 프로필 조회
   getMyProfile: () => api.get('/auth/me'),
 
+  // 마이페이지 활동 요약 조회
+  getMySummary: () => api.get('/auth/me/summary'),
+
   // 프로필 수정
   updateMyProfile: (data) => api.put('/auth/me', data),
 

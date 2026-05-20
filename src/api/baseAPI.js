@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { authStorage } from '../utils/authStorage';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 
@@ -23,25 +24,6 @@ const PUBLIC_ENDPOINTS = [
 
 let refreshPromise = null;
 
-const getAccessToken = () => sessionStorage.getItem('accessToken');
-const getRefreshToken = () => sessionStorage.getItem('refreshToken');
-
-const saveTokens = ({ accessToken, refreshToken }) => {
-  if (accessToken) {
-    sessionStorage.setItem('accessToken', accessToken);
-  }
-
-  if (refreshToken) {
-    sessionStorage.setItem('refreshToken', refreshToken);
-  }
-};
-
-const clearAuthStorage = () => {
-  sessionStorage.removeItem('accessToken');
-  sessionStorage.removeItem('refreshToken');
-  sessionStorage.removeItem('user');
-};
-
 const redirectToLogin = () => {
   if (window.location.pathname !== '/login') {
     window.location.href = '/login';
@@ -49,7 +31,7 @@ const redirectToLogin = () => {
 };
 
 const requestTokenRefresh = async () => {
-  const refreshToken = getRefreshToken();
+  const refreshToken = authStorage.getRefreshToken();
 
   if (!refreshToken) {
     throw new Error('NO_REFRESH_TOKEN');
@@ -59,7 +41,7 @@ const requestTokenRefresh = async () => {
     refreshToken,
   });
 
-  saveTokens(response.data);
+  authStorage.saveTokens(response.data);
   return response.data.accessToken;
 };
 
@@ -78,7 +60,7 @@ api.interceptors.request.use(
     const isPublic = PUBLIC_ENDPOINTS.some((endpoint) => config.url?.includes(endpoint));
 
     if (!isPublic) {
-      const token = getAccessToken();
+      const token = authStorage.getAccessToken();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -102,7 +84,7 @@ api.interceptors.response.use(
     }
 
     if (isRefreshRequest) {
-      clearAuthStorage();
+      authStorage.clear();
       redirectToLogin();
       return Promise.reject(error);
     }
@@ -110,7 +92,7 @@ api.interceptors.response.use(
     const shouldRefresh =
       (status === 401 || status === 403) &&
       !originalRequest._retry &&
-      (message === 'ACCESS_TOKEN_EXPIRED' || Boolean(getRefreshToken()));
+      (message === 'ACCESS_TOKEN_EXPIRED' || Boolean(authStorage.getRefreshToken()));
 
     if (!shouldRefresh) {
       return Promise.reject(error);
@@ -124,7 +106,7 @@ api.interceptors.response.use(
       originalRequest.headers.Authorization = `Bearer ${accessToken}`;
       return api(originalRequest);
     } catch (refreshError) {
-      clearAuthStorage();
+      authStorage.clear();
       redirectToLogin();
       return Promise.reject(refreshError);
     }

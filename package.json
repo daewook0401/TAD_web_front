@@ -7,17 +7,21 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:local:e2e": "playwright test e2e/local-smoke.spec.js",
+    "test:local:e2e:headed": "playwright test e2e/local-smoke.spec.js --headed"
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.2",
     "axios": "^1.13.2",
+    "dompurify": "^3.4.5",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-router-dom": "^7.9.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@playwright/test": "^1.60.0",
     "@types/react": "^19.2.1",
     "@types/react-dom": "^19.2.1",
     "@vitejs/plugin-react": "^5.0.4",
@@ -25,6 +29,8 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
+    "pg": "^8.21.0",
+    "redis": "^5.12.1",
     "vite": "^7.1.7"
   }
 }
