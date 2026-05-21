@@ -6,6 +6,9 @@ export const authAPI = {
   
   // 로그인
   login: (data) => authApi.post('/auth/login', data),
+
+  // Google 로그인
+  googleLogin: (token) => authApi.post('/auth/google-login', { token }),
   
   // 로그아웃
   logout: () => authApi.post('/auth/logout'),

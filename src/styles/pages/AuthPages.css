@@ -234,6 +234,21 @@
   justify-content: center;
 }
 
+.google-login-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 44px;
+}
+
+.google-login-wrapper > div {
+  width: 100%;
+}
+
+.google-login-wrapper iframe {
+  width: 100% !important;
+}
+
 .google-btn {
   display: flex;
   align-items: center;
