@@ -50,7 +50,6 @@ const LoginPage = () => {
           },
           {
             accessToken: response.data.accessToken,
-            refreshToken: response.data.refreshToken,
           }
         );
         navigate('/matches/my');

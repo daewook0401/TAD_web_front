@@ -1,15 +1,20 @@
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const GATEWAY_API_BASE_URL = import.meta.env.VITE_GATEWAY_API_BASE_URL || API_BASE_URL;
 
-const api = axios.create({
-  baseURL: API_BASE_URL,
+const createApiClient = (baseURL, options = {}) => axios.create({
+  baseURL,
   timeout: 10000,
+  withCredentials: options.withCredentials ?? false,
   headers: {
     'Content-Type': 'application/json;charset=UTF-8',
     Accept: 'application/json;charset=UTF-8',
   },
 });
+
+const api = createApiClient(API_BASE_URL);
+export const authApi = createApiClient(GATEWAY_API_BASE_URL, { withCredentials: true });
 
 const PUBLIC_ENDPOINTS = [
   '/auth/login',
@@ -24,21 +29,15 @@ const PUBLIC_ENDPOINTS = [
 let refreshPromise = null;
 
 const getAccessToken = () => sessionStorage.getItem('accessToken');
-const getRefreshToken = () => sessionStorage.getItem('refreshToken');
 
-const saveTokens = ({ accessToken, refreshToken }) => {
+const saveTokens = ({ accessToken } = {}) => {
   if (accessToken) {
     sessionStorage.setItem('accessToken', accessToken);
-  }
-
-  if (refreshToken) {
-    sessionStorage.setItem('refreshToken', refreshToken);
   }
 };
 
 const clearAuthStorage = () => {
   sessionStorage.removeItem('accessToken');
-  sessionStorage.removeItem('refreshToken');
   sessionStorage.removeItem('user');
 };
 
@@ -49,14 +48,8 @@ const redirectToLogin = () => {
 };
 
 const requestTokenRefresh = async () => {
-  const refreshToken = getRefreshToken();
-
-  if (!refreshToken) {
-    throw new Error('NO_REFRESH_TOKEN');
-  }
-
-  const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
-    refreshToken,
+  const response = await axios.post(`${GATEWAY_API_BASE_URL}/auth/refresh`, null, {
+    withCredentials: true,
   });
 
   saveTokens(response.data);
@@ -73,62 +66,69 @@ const refreshAccessToken = async () => {
   return refreshPromise;
 };
 
-api.interceptors.request.use(
-  (config) => {
-    const isPublic = PUBLIC_ENDPOINTS.some((endpoint) => config.url?.includes(endpoint));
+const installAuthInterceptors = (client) => {
+  client.interceptors.request.use(
+    (config) => {
+      const isPublic = PUBLIC_ENDPOINTS.some((endpoint) => config.url?.includes(endpoint));
 
-    if (!isPublic) {
-      const token = getAccessToken();
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      if (!isPublic) {
+        const token = getAccessToken();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      }
+
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+
+  client.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const originalRequest = error.config;
+      const status = error.response?.status;
+      const message = error.response?.data?.message;
+      const isRefreshRequest = originalRequest?.url?.includes('/auth/refresh');
+      const isPublicRequest = PUBLIC_ENDPOINTS.some((endpoint) => originalRequest?.url?.includes(endpoint));
+
+      if (!originalRequest) {
+        return Promise.reject(error);
+      }
+
+      if (isRefreshRequest) {
+        clearAuthStorage();
+        redirectToLogin();
+        return Promise.reject(error);
+      }
+
+      const shouldRefresh =
+        (status === 401 || status === 403) &&
+        !originalRequest._retry &&
+        !isPublicRequest &&
+        (message === 'ACCESS_TOKEN_EXPIRED' || message === 'INVALID_TOKEN' || status === 401 || status === 403);
+
+      if (!shouldRefresh) {
+        return Promise.reject(error);
+      }
+
+      originalRequest._retry = true;
+
+      try {
+        const accessToken = await refreshAccessToken();
+        originalRequest.headers = originalRequest.headers ?? {};
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        return client(originalRequest);
+      } catch (refreshError) {
+        clearAuthStorage();
+        redirectToLogin();
+        return Promise.reject(refreshError);
       }
     }
+  );
+};
 
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    const status = error.response?.status;
-    const message = error.response?.data?.message;
-    const isRefreshRequest = originalRequest?.url?.includes('/auth/refresh');
-
-    if (!originalRequest) {
-      return Promise.reject(error);
-    }
-
-    if (isRefreshRequest) {
-      clearAuthStorage();
-      redirectToLogin();
-      return Promise.reject(error);
-    }
-
-    const shouldRefresh =
-      (status === 401 || status === 403) &&
-      !originalRequest._retry &&
-      (message === 'ACCESS_TOKEN_EXPIRED' || Boolean(getRefreshToken()));
-
-    if (!shouldRefresh) {
-      return Promise.reject(error);
-    }
-
-    originalRequest._retry = true;
-
-    try {
-      const accessToken = await refreshAccessToken();
-      originalRequest.headers = originalRequest.headers ?? {};
-      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-      return api(originalRequest);
-    } catch (refreshError) {
-      clearAuthStorage();
-      redirectToLogin();
-      return Promise.reject(refreshError);
-    }
-  }
-);
+installAuthInterceptors(api);
+installAuthInterceptors(authApi);
 
 export default api;

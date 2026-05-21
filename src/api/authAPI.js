@@ -1,32 +1,32 @@
-import api from './baseAPI';
+import { authApi } from './baseAPI';
 
 export const authAPI = {
   // 회원가입
-  signup: (data) => api.post('/auth/signup', data),
+  signup: (data) => authApi.post('/auth/signup', data),
   
   // 로그인
-  login: (data) => api.post('/auth/login', data),
+  login: (data) => authApi.post('/auth/login', data),
   
   // 로그아웃
-  logout: (refreshToken) => api.post('/auth/logout', { refreshToken }),
+  logout: () => authApi.post('/auth/logout'),
   
   // 이메일 인증 코드 발송
-  sendVerificationCode: (email) => api.post('/auth/mail', { email }),
+  sendVerificationCode: (email) => authApi.post('/auth/mail', { email }),
   
   // 이메일 인증 코드 확인
-  verifyEmailCode: (email, code) => api.post('/auth/mail/verify', { email, code }),
+  verifyEmailCode: (email, code) => authApi.post('/auth/mail/verify', { email, code }),
   
   // 토큰 갱신
-  refreshToken: (refreshToken) => api.post('/auth/refresh', { refreshToken }),
+  refreshToken: () => authApi.post('/auth/refresh'),
 
   // 내 프로필 조회
-  getMyProfile: () => api.get('/auth/me'),
+  getMyProfile: () => authApi.get('/auth/me'),
 
   // 프로필 수정
-  updateMyProfile: (data) => api.put('/auth/me', data),
+  updateMyProfile: (data) => authApi.put('/auth/me', data),
 
   // 비밀번호 변경
-  changePassword: (data) => api.put('/auth/me/password', data),
+  changePassword: (data) => authApi.put('/auth/me/password', data),
 };
 
 export default authAPI;

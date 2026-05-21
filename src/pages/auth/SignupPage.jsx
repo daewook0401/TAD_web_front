@@ -190,7 +190,6 @@ const SignupPage = () => {
             roles: loginResponse.data.user.roles,
           }, {
             accessToken: loginResponse.data.accessToken,
-            refreshToken: loginResponse.data.refreshToken,
           });
           setSuccess('회원가입이 완료되었습니다!');
           setTimeout(() => {

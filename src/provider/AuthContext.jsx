@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     sessionStorage.removeItem('accessToken');
-    sessionStorage.removeItem('refreshToken');
     sessionStorage.removeItem('user');
   };
 
@@ -80,18 +79,11 @@ export const AuthProvider = ({ children }) => {
     if (tokens?.accessToken) {
       sessionStorage.setItem('accessToken', tokens.accessToken);
     }
-    if (tokens?.refreshToken) {
-      sessionStorage.setItem('refreshToken', tokens.refreshToken);
-    }
   };
 
   const logout = async () => {
-    const refreshToken = sessionStorage.getItem('refreshToken');
-
     try {
-      if (refreshToken) {
-        await authAPI.logout(refreshToken);
-      }
+      await authAPI.logout();
     } catch (error) {
       console.error('Failed to logout from server session:', error);
     } finally {
