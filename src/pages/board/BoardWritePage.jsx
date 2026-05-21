@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { boardAPI } from '../../api/boardAPI';
+import { authStorage } from '../../utils/authStorage';
+import { sanitizeHtml } from '../../utils/htmlSanitizer';
 import '../../styles/pages/BoardPage.css';
 import '../../styles/pages/BoardWritePage.css';
 
@@ -43,16 +45,6 @@ const extractTextFromHtml = (html) => {
   return (doc.body.textContent || '').trim();
 };
 
-const getStoredUser = () => {
-  try {
-    const raw = sessionStorage.getItem('user');
-    return raw ? JSON.parse(raw) : null;
-  } catch (error) {
-    console.error('사용자 세션 파싱 실패:', error);
-    return null;
-  }
-};
-
 const BoardWritePage = () => {
   const { category, postId } = useParams();
   const navigate = useNavigate();
@@ -62,7 +54,7 @@ const BoardWritePage = () => {
   const selectionRangeRef = useRef(null);
 
   const isEditMode = Boolean(postId);
-  const user = useMemo(() => getStoredUser(), []);
+  const user = useMemo(() => authStorage.getUser(), []);
 
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
@@ -154,8 +146,8 @@ const BoardWritePage = () => {
   );
 
   const previewHtml = useMemo(() => {
-    if (editorHtml) return editorHtml;
-    return '<p class="board-write__preview-empty">본문 미리보기가 여기에 표시됩니다.</p>';
+    if (editorHtml) return sanitizeHtml(editorHtml);
+    return sanitizeHtml('<p class="board-write__preview-empty">본문 미리보기가 여기에 표시됩니다.</p>');
   }, [editorHtml]);
 
   const handleFieldChange = (field) => (event) => {
@@ -343,7 +335,7 @@ const BoardWritePage = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const contentHtml = normalizeEditorHtml(editorRef.current?.innerHTML || editorHtml);
+    const contentHtml = sanitizeHtml(normalizeEditorHtml(editorRef.current?.innerHTML || editorHtml));
     const contentText = extractTextFromHtml(contentHtml);
 
     if (!form.title.trim() || !contentText || !currentCategory?.id) {

@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { boardAPI } from '../../api/boardAPI';
+import { authStorage } from '../../utils/authStorage';
+import { sanitizeHtml } from '../../utils/htmlSanitizer';
 import '../../styles/pages/BoardPage.css';
 import '../../styles/pages/BoardDetailPage.css';
 
@@ -44,16 +46,6 @@ const formatFileSize = (size) => {
   if (size < 1024) return `${size} B`;
   if (size < 1024 * 1024) return `${Math.ceil(size / 1024)} KB`;
   return `${(size / (1024 * 1024)).toFixed(1)} MB`;
-};
-
-const getStoredUser = () => {
-  try {
-    const raw = sessionStorage.getItem('user');
-    return raw ? JSON.parse(raw) : null;
-  } catch (error) {
-    console.error('사용자 세션 파싱 실패:', error);
-    return null;
-  }
 };
 
 const canManageResource = (user, authorId) => {
@@ -221,8 +213,8 @@ const BoardDetailPage = () => {
   const [deletingPost, setDeletingPost] = useState(false);
   const [workingCommentId, setWorkingCommentId] = useState(null);
 
-  const user = useMemo(() => getStoredUser(), []);
-  const isAuthenticated = Boolean(sessionStorage.getItem('accessToken'));
+  const user = useMemo(() => authStorage.getUser(), []);
+  const isAuthenticated = authStorage.hasAccessToken();
 
   const fetchComments = useCallback(async () => {
     if (!postId) return;
@@ -283,7 +275,7 @@ const BoardDetailPage = () => {
   }, [categories, category, post]);
 
   const currentCategory = categories.find((item) => item.categoryKey === activeCategory);
-  const contentHtml = normalizePostContent(post);
+  const contentHtml = useMemo(() => sanitizeHtml(normalizePostContent(post)), [post]);
   const canManagePost = canManageResource(user, post?.authorId);
 
   const imageAttachments = (post?.attachments || []).filter((item) => item.contentType?.startsWith('image/'));

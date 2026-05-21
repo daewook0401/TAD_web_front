@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { authStorage } from '../utils/authStorage';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
 const AUTH_API_BASE_URL =
@@ -29,19 +30,6 @@ const PUBLIC_ENDPOINTS = [
 
 let refreshPromise = null;
 
-const getAccessToken = () => sessionStorage.getItem('accessToken');
-
-const saveTokens = ({ accessToken } = {}) => {
-  if (accessToken) {
-    sessionStorage.setItem('accessToken', accessToken);
-  }
-};
-
-const clearAuthStorage = () => {
-  sessionStorage.removeItem('accessToken');
-  sessionStorage.removeItem('user');
-};
-
 const redirectToLogin = () => {
   if (window.location.pathname !== '/login') {
     window.location.href = '/login';
@@ -53,7 +41,7 @@ const requestTokenRefresh = async () => {
     withCredentials: true,
   });
 
-  saveTokens(response.data);
+  authStorage.saveTokens(response.data);
   return response.data.accessToken;
 };
 
@@ -73,7 +61,7 @@ const installAuthInterceptors = (client) => {
       const isPublic = PUBLIC_ENDPOINTS.some((endpoint) => config.url?.includes(endpoint));
 
       if (!isPublic) {
-        const token = getAccessToken();
+        const token = authStorage.getAccessToken();
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -98,7 +86,7 @@ const installAuthInterceptors = (client) => {
       }
 
       if (isRefreshRequest) {
-        clearAuthStorage();
+        authStorage.clear();
         redirectToLogin();
         return Promise.reject(error);
       }
@@ -121,7 +109,7 @@ const installAuthInterceptors = (client) => {
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return client(originalRequest);
       } catch (refreshError) {
-        clearAuthStorage();
+        authStorage.clear();
         redirectToLogin();
         return Promise.reject(refreshError);
       }

@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
-import { useEffect, useState, createContext, useContext } from 'react';
+import { useCallback, useEffect, useState, createContext, useContext } from 'react';
 import { authAPI } from '../api/authAPI';
+import { authStorage } from '../utils/authStorage';
 
 export const AuthContext = createContext();
 
@@ -9,19 +10,17 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const clearAuthStorage = () => {
+  const clearAuthState = useCallback(() => {
     setUser(null);
     setIsAuthenticated(false);
-    sessionStorage.removeItem('accessToken');
-    sessionStorage.removeItem('user');
-  };
+    authStorage.clear();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
 
     const restoreSession = async () => {
-      const token = sessionStorage.getItem('accessToken');
-      const rawUser = sessionStorage.getItem('user');
+      const token = authStorage.getAccessToken();
 
       if (!token) {
         if (!cancelled) {
@@ -29,15 +28,11 @@ export const AuthProvider = ({ children }) => {
         }
         return;
       }
-      if (rawUser && !cancelled) {
-        try {
-          setUser(JSON.parse(rawUser));
-          setIsAuthenticated(true);
-        } catch (error) {
-          console.error('Failed to parse stored user data. Revalidating session:', error);
-          setUser(null);
-          sessionStorage.removeItem('user');
-        }
+
+      const storedUser = authStorage.getUser();
+      if (storedUser && !cancelled) {
+        setUser(storedUser);
+        setIsAuthenticated(true);
       }
 
       try {
@@ -48,14 +43,14 @@ export const AuthProvider = ({ children }) => {
 
         setUser(response.data);
         setIsAuthenticated(true);
-        sessionStorage.setItem('user', JSON.stringify(response.data));
+        authStorage.setUser(response.data);
       } catch (error) {
         if (!cancelled) {
           const status = error?.response?.status;
           console.error('Failed to restore user session:', error);
 
           if (status === 401 || status === 403) {
-            clearAuthStorage();
+            clearAuthState();
           }
         }
       } finally {
@@ -70,16 +65,25 @@ export const AuthProvider = ({ children }) => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [clearAuthState]);
 
   const login = (userData, tokens) => {
     setUser(userData);
     setIsAuthenticated(true);
-    sessionStorage.setItem('user', JSON.stringify(userData));
-    if (tokens?.accessToken) {
-      sessionStorage.setItem('accessToken', tokens.accessToken);
-    }
+    authStorage.setUser(userData);
+    authStorage.saveTokens(tokens);
   };
+
+  const updateUser = useCallback((userData) => {
+    setUser((currentUser) => {
+      const nextUser = typeof userData === 'function'
+        ? userData(currentUser)
+        : { ...(currentUser ?? {}), ...userData };
+
+      authStorage.setUser(nextUser);
+      return nextUser;
+    });
+  }, []);
 
   const logout = async () => {
     try {
@@ -87,7 +91,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Failed to logout from server session:', error);
     } finally {
-      clearAuthStorage();
+      clearAuthState();
     }
   };
 
@@ -100,6 +104,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         isLoading,
         login,
+        updateUser,
         logout,
         isAdmin,
       }}

@@ -54,6 +54,20 @@ TAD는 게임을 즐기는 사용자들을 위한 통합 커뮤니티입니다.
 4. 필요하면 직접 게시글을 작성해 정보나 의견을 공유합니다.
 5. 로그인 사용자는 자신의 계정 정보와 활동 기반 기능을 계속 이용합니다.
 
+## 로컬 자동 E2E 테스트
+
+백엔드 `local` 프로필, 프론트 Vite 서버, Playwright 테스트를 한 번에 실행할 수 있습니다.
+PostgreSQL/Redis 연결값과 MinIO endpoint는 백엔드 로컬 yml 값을 사용하고, 분석 API 호출과 MinIO 업로드 흐름은 제외합니다.
+
+```powershell
+npx playwright install chromium
+.\scripts\run-local-e2e.ps1
+```
+
+테스트는 고유한 테스트 계정을 API로 가입시키고, 실제 프론트 화면에서 로그인, 게시글 작성, 댓글 작성을 검증합니다.
+API 주소는 기본적으로 `http://127.0.0.1:8080/api`, 프론트 주소는 `http://127.0.0.1:5173`을 사용합니다.
+DB/Redis 연결값은 백엔드 `src/main/resources/application-local.yml`에서 읽으며, 분석 API와 MinIO 업로드 흐름은 이 테스트에서 제외합니다.
+
 ## 사용자 관점에서의 핵심 가치
 
 - 게임별로 나뉜 게시판을 통해 원하는 주제의 글을 빠르게 찾을 수 있습니다.
