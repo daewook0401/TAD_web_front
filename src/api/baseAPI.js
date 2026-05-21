@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
-const GATEWAY_API_BASE_URL = import.meta.env.VITE_GATEWAY_API_BASE_URL || API_BASE_URL;
+const AUTH_API_BASE_URL =
+  import.meta.env.VITE_AUTH_API_BASE_URL || import.meta.env.VITE_GATEWAY_API_BASE_URL || API_BASE_URL;
 
 const createApiClient = (baseURL, options = {}) => axios.create({
   baseURL,
@@ -14,7 +15,7 @@ const createApiClient = (baseURL, options = {}) => axios.create({
 });
 
 const api = createApiClient(API_BASE_URL);
-export const authApi = createApiClient(GATEWAY_API_BASE_URL, { withCredentials: true });
+export const authApi = createApiClient(AUTH_API_BASE_URL, { withCredentials: true });
 
 const PUBLIC_ENDPOINTS = [
   '/auth/login',
@@ -48,7 +49,7 @@ const redirectToLogin = () => {
 };
 
 const requestTokenRefresh = async () => {
-  const response = await axios.post(`${GATEWAY_API_BASE_URL}/auth/refresh`, null, {
+  const response = await axios.post(`${AUTH_API_BASE_URL}/auth/refresh`, null, {
     withCredentials: true,
   });
 
