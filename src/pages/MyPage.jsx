@@ -129,7 +129,7 @@ const MyPage = () => {
     { label: '게시글', value: stats.postCount, to: '/board' },
     { label: '댓글', value: stats.commentCount, to: '/board' },
     { label: '전적 기록', value: stats.analysisRecordCount, to: '/matches/my' },
-    { label: '로그인', value: stats.loginCount, to: null },
+    { label: '오늘 로그인', value: stats.loginCount, to: null },
   ], [stats]);
 
   const fetchMyPage = useCallback(async () => {
