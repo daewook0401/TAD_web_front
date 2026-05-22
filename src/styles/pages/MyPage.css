@@ -333,6 +333,25 @@ a.mypage__stat-card:hover,
   word-break: break-word;
 }
 
+.mypage__social-login-note {
+  display: grid;
+  gap: 4px;
+  padding: var(--spacing-3);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  background: var(--color-gray-50);
+}
+
+.mypage__social-login-note strong {
+  color: var(--color-gray-900);
+  font-size: var(--font-size-sm);
+}
+
+.mypage__social-login-note span {
+  color: var(--color-gray-600);
+  font-size: var(--font-size-xs);
+}
+
 .mypage__quick-links a,
 .mypage__primary-link,
 .mypage__text-link {

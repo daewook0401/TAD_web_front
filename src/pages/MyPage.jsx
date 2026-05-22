@@ -123,6 +123,7 @@ const MyPage = () => {
   const stats = summary.stats;
   const security = summary.security;
   const avatarText = (displayProfile.nickname || displayProfile.email || 'U').charAt(0).toUpperCase();
+  const canChangePassword = displayProfile.passwordLoginEnabled !== false;
 
   const statItems = useMemo(() => [
     { label: '게시글', value: stats.postCount, to: '/board' },
@@ -201,6 +202,12 @@ const MyPage = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
+
+    if (!canChangePassword) {
+      setError('소셜 로그인 계정은 비밀번호를 변경할 수 없습니다.');
+      setShowPasswordForm(false);
+      return;
+    }
 
     if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
       setError('모든 비밀번호 필드를 입력해주세요.');
@@ -335,6 +342,12 @@ const MyPage = () => {
                         </span>
                       </div>
                       <div className="mypage__info-row">
+                        <span className="mypage__info-label">로그인 방식</span>
+                        <span className="mypage__info-value">
+                          {canChangePassword ? '이메일 로그인' : 'Google 로그인'}
+                        </span>
+                      </div>
+                      <div className="mypage__info-row">
                         <span className="mypage__info-label">가입일</span>
                         <span className="mypage__info-value">{formatDate(displayProfile.createdAt)}</span>
                       </div>
@@ -440,7 +453,12 @@ const MyPage = () => {
                 </div>
               </div>
 
-              {showPasswordForm ? (
+              {!canChangePassword ? (
+                <div className="mypage__social-login-note">
+                  <strong>Google 로그인 계정</strong>
+                  <span>비밀번호는 Google 계정에서 관리됩니다.</span>
+                </div>
+              ) : showPasswordForm ? (
                 <form onSubmit={handlePasswordSubmit} className="mypage__password-form">
                   <div className="mypage__form-group">
                     <label className="mypage__label" htmlFor="current-password">현재 비밀번호</label>
