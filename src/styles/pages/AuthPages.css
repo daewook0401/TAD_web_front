@@ -127,6 +127,25 @@
   color: var(--color-gray-400);
 }
 
+.auth-input--readonly {
+  background: var(--color-gray-100);
+  color: var(--color-gray-500);
+}
+
+.auth-profile-preview {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-6);
+}
+
+.auth-profile-preview__image {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-gray-200);
+}
+
 /* Checkbox */
 .auth-checkbox-group {
   display: flex;

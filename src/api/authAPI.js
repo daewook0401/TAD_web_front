@@ -9,6 +9,9 @@ export const authAPI = {
 
   // Google 로그인
   googleLogin: (token) => authApi.post('/auth/google-login', { token }),
+
+  // Google 가입 완료
+  completeGoogleSignup: (data) => authApi.post('/auth/google-signup', data),
   
   // 로그아웃
   logout: () => authApi.post('/auth/logout'),

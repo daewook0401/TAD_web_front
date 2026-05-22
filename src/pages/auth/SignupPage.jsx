@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../provider/AuthContext';
 import { authAPI } from '../../api/authAPI';
 import GoogleAuthButton from '../../components/auth/GoogleAuthButton';
+import { googleSignupDraft } from '../../utils/googleSignupDraft';
 import '../../styles/pages/AuthPages.css';
 
 const SignupPage = () => {
@@ -38,6 +39,18 @@ const SignupPage = () => {
       accessToken: data.accessToken,
     });
     navigate('/matches/my');
+  };
+
+  const redirectToGoogleSignup = (data) => {
+    const draft = {
+      registrationToken: data.registrationToken,
+      email: data.email,
+      nickname: data.nickname,
+      profileImageUrl: data.profileImageUrl,
+    };
+
+    googleSignupDraft.save(draft);
+    navigate('/signup/google', { state: draft });
   };
 
   // 인증 타이머
@@ -216,6 +229,11 @@ const SignupPage = () => {
 
     try {
       const response = await authAPI.googleLogin(credential);
+      if (response.data.registrationRequired) {
+        redirectToGoogleSignup(response.data);
+        return;
+      }
+
       if (response.data.success) {
         completeLogin(response.data);
         return;

@@ -26,6 +26,7 @@ const PUBLIC_ENDPOINTS = [
   '/auth/mail/verify',
   '/auth/refresh',
   '/auth/google-login',
+  '/auth/google-signup',
 ];
 
 let refreshPromise = null;

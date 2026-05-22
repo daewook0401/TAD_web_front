@@ -12,6 +12,7 @@ import MatchUploadPage from '../pages/matches/MatchUploadPage';
 import MatchReviewPage from '../pages/matches/MatchReviewPage';
 import LoginPage from '../pages/auth/LoginPage';
 import SignupPage from '../pages/auth/SignupPage';
+import GoogleSignupPage from '../pages/auth/GoogleSignupPage';
 import MyPage from '../pages/MyPage';
 import AdminPage from '../pages/AdminPage';
 import RequireAdmin from '../components/auth/RequireAdmin';
@@ -40,6 +41,7 @@ export const router = createBrowserRouter([
       { path: '/matches/review/:gameId', element: <MatchReviewPage /> },
       { path: '/login', element: <LoginPage /> },
       { path: '/signup', element: <SignupPage /> },
+      { path: '/signup/google', element: <GoogleSignupPage /> },
       { path: '/mypage', element: <MyPage /> },
       {
         path: '/admin',
