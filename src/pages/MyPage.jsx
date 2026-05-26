@@ -100,7 +100,7 @@ const formatLoginSummary = (login) => {
 };
 
 const MyPage = () => {
-  const { user, isAuthenticated, isAdmin, isLoading: isAuthLoading, updateUser } = useAuth();
+  const { user, isAuthenticated, isAdmin, isLoading: isAuthLoading, updateUser, logout } = useAuth();
   const navigate = useNavigate();
 
   const [profile, setProfile] = useState(null);
@@ -118,6 +118,8 @@ const MyPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [withdrawConfirm, setWithdrawConfirm] = useState('');
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
 
   const displayProfile = profile || user || {};
   const stats = summary.stats;
@@ -251,6 +253,32 @@ const MyPage = () => {
     setShowPasswordForm(false);
     setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
     setError('');
+  };
+
+  const handleWithdrawSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (withdrawConfirm.trim() !== '탈퇴') {
+      setError('회원 탈퇴를 진행하려면 확인 문구를 입력해주세요.');
+      return;
+    }
+
+    if (!window.confirm('계정을 탈퇴하면 현재 로그인 세션이 종료됩니다. 계속 진행할까요?')) {
+      return;
+    }
+
+    try {
+      setIsWithdrawing(true);
+      await authAPI.withdrawAccount();
+      await logout();
+      navigate('/', { replace: true });
+    } catch (err) {
+      setError(err.response?.data?.message || '회원 탈퇴에 실패했습니다.');
+    } finally {
+      setIsWithdrawing(false);
+    }
   };
 
   if (isAuthLoading || isLoading) {
@@ -508,6 +536,39 @@ const MyPage = () => {
                   비밀번호 변경
                 </button>
               )}
+            </section>
+
+            <section className="mypage__card mypage__danger-card">
+              <div className="mypage__card-header">
+                <h2 className="mypage__card-title">회원 탈퇴</h2>
+              </div>
+              <p className="mypage__danger-text">
+                탈퇴 시 계정이 비활성화되고 현재 로그인 세션이 종료됩니다.
+              </p>
+              <form onSubmit={handleWithdrawSubmit} className="mypage__withdraw-form">
+                <div className="mypage__form-group">
+                  <label className="mypage__label" htmlFor="withdraw-confirm">확인 문구</label>
+                  <input
+                    id="withdraw-confirm"
+                    type="text"
+                    value={withdrawConfirm}
+                    onChange={(e) => {
+                      setWithdrawConfirm(e.target.value);
+                      setError('');
+                    }}
+                    className="mypage__input"
+                    placeholder="탈퇴"
+                    autoComplete="off"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="mypage__danger-btn"
+                  disabled={isWithdrawing || withdrawConfirm.trim() !== '탈퇴'}
+                >
+                  {isWithdrawing ? '처리 중' : '탈퇴하기'}
+                </button>
+              </form>
             </section>
 
             <section className="mypage__card">

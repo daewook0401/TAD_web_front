@@ -167,6 +167,16 @@
   line-height: 1.5;
 }
 
+.auth-checkbox-label a {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.auth-checkbox-label a:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
 /* Remember & Forgot Row */
 .auth-options-row {
   display: flex;

@@ -4,6 +4,32 @@ import { analysisAPI } from '../../api/analysisAPI';
 import { useAuth } from '../../provider/AuthContext';
 import '../../styles/pages/MatchesPages.css';
 
+const formatDateTime = (value) => {
+  if (!value) {
+    return '-';
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+};
+
+const formatWinnerLabel = (winner) => {
+  if (winner === 'team1') return '1팀';
+  if (winner === 'team2') return '2팀';
+  return '-';
+};
+
 const MyMatchesPage = () => {
   const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth();
   const navigate = useNavigate();
@@ -90,19 +116,48 @@ const MyMatchesPage = () => {
     };
   }, [fetchRecords, getNormalizedStatus, isAuthLoading, isAuthenticated, records]);
 
+  const enrichedRecords = useMemo(() => records.map((record) => ({
+    ...record,
+    normalizedStatus: getNormalizedStatus(record),
+  })), [getNormalizedStatus, records]);
+
   const stats = useMemo(() => {
-    const confirmedMatches = records.filter((record) => getNormalizedStatus(record) === 'CONFIRMED').length;
-    const drafts = records.filter((record) => getNormalizedStatus(record) === 'DRAFT').length;
-    const processing = records.filter((record) => getNormalizedStatus(record) === 'PROCESSING').length;
+    const confirmedMatches = enrichedRecords.filter((record) => record.normalizedStatus === 'CONFIRMED').length;
+    const drafts = enrichedRecords.filter((record) => record.normalizedStatus === 'DRAFT').length;
+    const processing = enrichedRecords.filter((record) => record.normalizedStatus === 'PROCESSING').length;
 
     return {
-      totalMatches: records.length,
+      totalMatches: enrichedRecords.length,
       confirmedMatches,
       drafts,
       processing,
-      recognizedPlayers: records.reduce((sum, record) => sum + (record.recognizedPlayers ?? 0), 0),
+      recognizedPlayers: enrichedRecords.reduce((sum, record) => sum + (record.recognizedPlayers ?? 0), 0),
     };
-  }, [getNormalizedStatus, records]);
+  }, [enrichedRecords]);
+
+  const dashboard = useMemo(() => {
+    const confirmedRecords = enrichedRecords.filter((record) => record.normalizedStatus === 'CONFIRMED');
+    const reviewQueue = enrichedRecords.filter((record) => record.normalizedStatus === 'DRAFT').slice(0, 4);
+    const winnerCounts = confirmedRecords.reduce((acc, record) => {
+      if (record.winner === 'team1' || record.winner === 'team2') {
+        acc[record.winner] += 1;
+      }
+      return acc;
+    }, { team1: 0, team2: 0 });
+    const winnerTotal = winnerCounts.team1 + winnerCounts.team2;
+    const totalMatches = enrichedRecords.length;
+
+    return {
+      confirmedRate: totalMatches > 0 ? Math.round((confirmedRecords.length / totalMatches) * 100) : 0,
+      averageRecognizedPlayers: totalMatches > 0 ? (stats.recognizedPlayers / totalMatches).toFixed(1) : '0.0',
+      latestUpload: enrichedRecords[0] ?? null,
+      latestConfirmed: confirmedRecords[0] ?? null,
+      reviewQueue,
+      recentConfirmed: confirmedRecords.slice(0, 4),
+      winnerCounts,
+      winnerTotal,
+    };
+  }, [enrichedRecords, stats.recognizedPlayers]);
 
   const getStatusLabel = (status) => {
     switch (status) {
@@ -146,26 +201,6 @@ const MyMatchesPage = () => {
         {status === 'PROCESSING' ? '분석 중' : '확인 불가'}
       </span>
     );
-  };
-
-  const formatDateTime = (value) => {
-    if (!value) {
-      return '-';
-    }
-
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return value;
-    }
-
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   };
 
   if (isAuthLoading || !isAuthenticated) {
@@ -234,6 +269,103 @@ const MyMatchesPage = () => {
         </div>
       </section>
 
+      <section className="matches-dashboard">
+        <div className="matches-dashboard__container">
+          <div className="matches-section-heading">
+            <div>
+              <p className="matches-section-heading__eyebrow">Dashboard</p>
+              <h2 className="matches-section-heading__title">전적 요약</h2>
+            </div>
+            <p className="matches-section-heading__meta">최근 업로드 기준</p>
+          </div>
+
+          <div className="matches-dashboard__grid">
+            <article className="matches-dashboard__panel matches-dashboard__panel--wide">
+              <div className="matches-dashboard__panel-header">
+                <h3>진행 현황</h3>
+                <strong>{dashboard.confirmedRate}%</strong>
+              </div>
+              <div className="matches-dashboard__progress" aria-hidden="true">
+                <span style={{ width: `${dashboard.confirmedRate}%` }} />
+              </div>
+              <div className="matches-dashboard__metrics">
+                <div>
+                  <span>평균 인식 플레이어</span>
+                  <strong>{dashboard.averageRecognizedPlayers}</strong>
+                </div>
+                <div>
+                  <span>최근 업로드</span>
+                  <strong>{formatDateTime(dashboard.latestUpload?.createdAt)}</strong>
+                </div>
+                <div>
+                  <span>최근 확정</span>
+                  <strong>{formatDateTime(dashboard.latestConfirmed?.confirmedAt || dashboard.latestConfirmed?.createdAt)}</strong>
+                </div>
+              </div>
+            </article>
+
+            <article className="matches-dashboard__panel">
+              <div className="matches-dashboard__panel-header">
+                <h3>승리팀 분포</h3>
+                <strong>{dashboard.winnerTotal}</strong>
+              </div>
+              <div className="matches-dashboard__bars">
+                {['team1', 'team2'].map((teamKey) => {
+                  const count = dashboard.winnerCounts[teamKey];
+                  const percent = dashboard.winnerTotal > 0
+                    ? Math.round((count / dashboard.winnerTotal) * 100)
+                    : 0;
+
+                  return (
+                    <div key={teamKey} className="matches-dashboard__bar-row">
+                      <span>{formatWinnerLabel(teamKey)}</span>
+                      <div className="matches-dashboard__bar">
+                        <span style={{ width: `${percent}%` }} />
+                      </div>
+                      <strong>{count}</strong>
+                    </div>
+                  );
+                })}
+              </div>
+            </article>
+
+            <article className="matches-dashboard__panel">
+              <div className="matches-dashboard__panel-header">
+                <h3>검수 대기</h3>
+                <strong>{stats.drafts}</strong>
+              </div>
+              <div className="matches-dashboard__list">
+                {dashboard.reviewQueue.length > 0 ? dashboard.reviewQueue.map((record) => (
+                  <Link key={record.gameNumber} to={`/matches/review/${record.gameNumber}`}>
+                    <span>#{record.gameNumber}</span>
+                    <strong>{formatDateTime(record.createdAt)}</strong>
+                  </Link>
+                )) : (
+                  <p>검수 필요한 기록이 없습니다.</p>
+                )}
+              </div>
+            </article>
+
+            <article className="matches-dashboard__panel">
+              <div className="matches-dashboard__panel-header">
+                <h3>최근 확정</h3>
+                <strong>{stats.confirmedMatches}</strong>
+              </div>
+              <div className="matches-dashboard__list">
+                {dashboard.recentConfirmed.length > 0 ? dashboard.recentConfirmed.map((record) => (
+                  <Link key={record.gameNumber} to={`/matches/review/${record.gameNumber}`}>
+                    <span>#{record.gameNumber}</span>
+                    <strong>{formatWinnerLabel(record.winner)} 승리</strong>
+                  </Link>
+                )) : (
+                  <p>확정된 기록이 없습니다.</p>
+                )}
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
       <section className="matches-table">
         <div className="matches-table__container">
           <div className="matches-table__wrapper">
@@ -249,9 +381,9 @@ const MyMatchesPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {!isLoading && records.length > 0 ? (
-                  records.map((record) => {
-                    const status = getNormalizedStatus(record);
+                {!isLoading && enrichedRecords.length > 0 ? (
+                  enrichedRecords.map((record) => {
+                    const status = record.normalizedStatus;
 
                     return (
                       <tr key={record.gameNumber} className="matches-table__row">
@@ -263,13 +395,7 @@ const MyMatchesPage = () => {
                           </span>
                         </td>
                         <td className="matches-table__td">
-                          {status === 'PROCESSING'
-                            ? '-'
-                            : record.winner === 'team1'
-                              ? '1팀'
-                              : record.winner === 'team2'
-                                ? '2팀'
-                                : '-'}
+                          {status === 'PROCESSING' ? '-' : formatWinnerLabel(record.winner)}
                         </td>
                         <td className="matches-table__td">{record.recognizedPlayers ?? 0}</td>
                         <td className="matches-table__td">{getActionContent(record, status)}</td>

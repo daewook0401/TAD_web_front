@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import '../../styles/layout/Footer.css';
 
 const Footer = () => {
@@ -20,8 +21,8 @@ const Footer = () => {
           <div>
             <h3 className="footer__section-title">서비스</h3>
             <ul className="footer__links">
-              <li><a href="/matches" className="footer__link">전적</a></li>
-              <li><a href="/board" className="footer__link">게시판</a></li>
+              <li><Link to="/matches" className="footer__link">전적</Link></li>
+              <li><Link to="/board" className="footer__link">게시판</Link></li>
             </ul>
           </div>
 
@@ -41,8 +42,8 @@ const Footer = () => {
             © 2025 TAD. All rights reserved.
           </p>
           <div className="footer__legal">
-            <a href="#" className="footer__legal-link">개인정보처리방침</a>
-            <a href="#" className="footer__legal-link">이용약관</a>
+            <Link to="/privacy" className="footer__legal-link">개인정보처리방침</Link>
+            <Link to="/terms" className="footer__legal-link">이용약관</Link>
           </div>
         </div>
       </div>

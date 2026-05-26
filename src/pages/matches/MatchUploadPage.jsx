@@ -1,15 +1,26 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { analysisAPI } from '../../api/analysisAPI';
 import { useAuth } from '../../provider/AuthContext';
 import '../../styles/pages/MatchesPages.css';
 
+const MAX_UPLOAD_SIZE = 100 * 1024 * 1024;
+const SUPPORTED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+
+const formatFileSize = (size) => {
+  if (!size) return '-';
+  const mb = size / (1024 * 1024);
+  return `${mb >= 1 ? mb.toFixed(1) : (size / 1024).toFixed(0)}${mb >= 1 ? 'MB' : 'KB'}`;
+};
+
 const MatchUploadPage = () => {
   const { isAuthenticated, isLoading: isAuthLoading, user } = useAuth();
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
@@ -32,10 +43,23 @@ const MatchUploadPage = () => {
     return null;
   }
 
-  const handleFileChange = (event) => {
-    const file = event.target.files?.[0] ?? null;
+  const validateFile = (file) => {
+    if (!file) {
+      return '';
+    }
 
-    setSelectedFile(file);
+    if (!SUPPORTED_IMAGE_TYPES.includes(file.type)) {
+      return 'PNG, JPG, WEBP 이미지 파일만 업로드할 수 있습니다.';
+    }
+
+    if (file.size > MAX_UPLOAD_SIZE) {
+      return '100MB 이하의 이미지만 업로드할 수 있습니다.';
+    }
+
+    return '';
+  };
+
+  const applySelectedFile = (file) => {
     setErrorMessage('');
 
     if (previewUrl) {
@@ -43,11 +67,34 @@ const MatchUploadPage = () => {
     }
 
     if (!file) {
+      setSelectedFile(null);
       setPreviewUrl('');
       return;
     }
 
+    const validationMessage = validateFile(file);
+    if (validationMessage) {
+      setSelectedFile(null);
+      setPreviewUrl('');
+      setErrorMessage(validationMessage);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      return;
+    }
+
+    setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleFileChange = (event) => {
+    applySelectedFile(event.target.files?.[0] ?? null);
+  };
+
+  const handleDrop = (event) => {
+    event.preventDefault();
+    setIsDragging(false);
+    applySelectedFile(event.dataTransfer.files?.[0] ?? null);
   };
 
   const handleSubmit = async (event) => {
@@ -106,8 +153,17 @@ const MatchUploadPage = () => {
             </div>
 
             <form className="match-upload__form" onSubmit={handleSubmit}>
-              <label className="match-upload__dropzone">
+              <label
+                className={`match-upload__dropzone ${isDragging ? 'match-upload__dropzone--dragging' : ''}`}
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragLeave={() => setIsDragging(false)}
+                onDrop={handleDrop}
+              >
                 <input
+                  ref={fileInputRef}
                   type="file"
                   accept="image/png,image/jpeg,image/jpg,image/webp"
                   className="match-upload__input"
@@ -125,13 +181,45 @@ const MatchUploadPage = () => {
                 </div>
               )}
 
+              {selectedFile && (
+                <div className="match-upload__file-meta">
+                  <div>
+                    <span>파일 형식</span>
+                    <strong>{selectedFile.type || 'image'}</strong>
+                  </div>
+                  <div>
+                    <span>파일 크기</span>
+                    <strong>{formatFileSize(selectedFile.size)}</strong>
+                  </div>
+                </div>
+              )}
+
+              {isSubmitting && (
+                <div className="match-upload__progress">
+                  <span className="match-upload__progress-dot" />
+                  <div>
+                    <strong>업로드 처리 중</strong>
+                    <p>등록이 끝나면 내 전적 확인으로 이동합니다.</p>
+                  </div>
+                </div>
+              )}
+
               {errorMessage && <p className="match-upload__error">{errorMessage}</p>}
 
-              <button type="submit" className="match-upload__submit" disabled={isSubmitting}>
+              <button type="submit" className="match-upload__submit" disabled={isSubmitting || !selectedFile}>
                 {isSubmitting ? '등록 중...' : '내전 기록 등록'}
               </button>
             </form>
           </div>
+
+          <aside className="match-upload__sidecard">
+            <h3>업로드 체크</h3>
+            <ul>
+              <li>지원 형식: PNG, JPG, WEBP</li>
+              <li>최대 용량: 100MB</li>
+              <li>분석 완료 후 검수 페이지에서 수정을 저장할 수 있습니다.</li>
+            </ul>
+          </aside>
         </div>
       </section>
     </div>

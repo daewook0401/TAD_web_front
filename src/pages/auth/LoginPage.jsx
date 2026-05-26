@@ -191,9 +191,9 @@ const LoginPage = () => {
         <div className="auth-footer">
           <p><Link to="/">홈으로 돌아가기</Link></p>
           <p>
-            <Link to="#">이용약관</Link>
+            <Link to="/terms">이용약관</Link>
             {' | '}
-            <Link to="#">개인정보처리방침</Link>
+            <Link to="/privacy">개인정보처리방침</Link>
           </p>
         </div>
       </div>

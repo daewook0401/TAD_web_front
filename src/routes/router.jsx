@@ -13,6 +13,8 @@ import MatchReviewPage from '../pages/matches/MatchReviewPage';
 import LoginPage from '../pages/auth/LoginPage';
 import SignupPage from '../pages/auth/SignupPage';
 import GoogleSignupPage from '../pages/auth/GoogleSignupPage';
+import TermsPage from '../pages/policy/TermsPage';
+import PrivacyPage from '../pages/policy/PrivacyPage';
 import MyPage from '../pages/MyPage';
 import AdminPage from '../pages/AdminPage';
 import RequireAdmin from '../components/auth/RequireAdmin';
@@ -42,6 +44,8 @@ export const router = createBrowserRouter([
       { path: '/login', element: <LoginPage /> },
       { path: '/signup', element: <SignupPage /> },
       { path: '/signup/google', element: <GoogleSignupPage /> },
+      { path: '/terms', element: <TermsPage /> },
+      { path: '/privacy', element: <PrivacyPage /> },
       { path: '/mypage', element: <MyPage /> },
       {
         path: '/admin',

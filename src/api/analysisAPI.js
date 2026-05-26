@@ -15,6 +15,10 @@ export const analysisAPI = {
 
   getMyRecords: () => api.get('/analyze/my-records'),
 
+  getAdminRecords: (params) => api.get('/analyze/admin/records', {
+    params: params ?? {},
+  }),
+
   getRankings: (params) => api.get('/analyze/rankings', {
     params: params ?? {},
   }),

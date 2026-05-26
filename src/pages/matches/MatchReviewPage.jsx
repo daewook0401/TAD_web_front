@@ -24,6 +24,7 @@ const MatchReviewPage = () => {
   const [isConfirming, setIsConfirming] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [statusMessage, setStatusMessage] = useState('');
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
     if (isAuthLoading) {
@@ -42,6 +43,7 @@ const MatchReviewPage = () => {
       try {
         const response = await analysisAPI.getRecordDetail(gameId);
         setRecord(response.data);
+        setHasUnsavedChanges(false);
       } catch (error) {
         setErrorMessage(error.response?.data?.message || '검수할 내전 기록을 불러오지 못했습니다.');
       } finally {
@@ -56,10 +58,42 @@ const MatchReviewPage = () => {
   const isProcessing = record.status === 'PROCESSING';
   const isFailed = record.status === 'FAILED';
 
+  const allPlayers = useMemo(() => [
+    ...(record.team1?.players ?? []),
+    ...(record.team2?.players ?? []),
+  ], [record]);
+
   const recognizedPlayers = useMemo(() => {
-    const allPlayers = [...(record.team1?.players ?? []), ...(record.team2?.players ?? [])];
     return allPlayers.filter((player) => player?.name?.trim()).length;
-  }, [record]);
+  }, [allPlayers]);
+
+  const reviewValidation = useMemo(() => {
+    const numericFields = ['kills', 'deaths', 'assists', 'cs', 'gold'];
+    const emptyNameCount = allPlayers.filter((player) => !player?.name?.trim()).length;
+    const invalidNumberCount = allPlayers.filter((player) => (
+      numericFields.some((field) => player?.[field] != null && Number(player[field]) < 0)
+    )).length;
+
+    return {
+      emptyNameCount,
+      invalidNumberCount,
+      canSubmit: invalidNumberCount === 0,
+    };
+  }, [allPlayers]);
+
+  useEffect(() => {
+    if (!hasUnsavedChanges) {
+      return undefined;
+    }
+
+    const handleBeforeUnload = (event) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   const getStatusLabel = (status) => {
     switch (status) {
@@ -111,6 +145,7 @@ const MatchReviewPage = () => {
   };
 
   const updatePlayer = (teamKey, playerIndex, field, value) => {
+    setHasUnsavedChanges(true);
     setRecord((current) => {
       const team = current[teamKey];
       const nextPlayers = [...(team?.players ?? [])];
@@ -160,6 +195,11 @@ const MatchReviewPage = () => {
   });
 
   const handleSave = async () => {
+    if (!reviewValidation.canSubmit) {
+      setErrorMessage('0보다 작은 전적 수치를 수정해주세요.');
+      return;
+    }
+
     setIsSaving(true);
     setErrorMessage('');
     setStatusMessage('');
@@ -167,6 +207,7 @@ const MatchReviewPage = () => {
     try {
       const response = await analysisAPI.updateDraft(gameId, buildDraftPayload());
       setRecord(response.data);
+      setHasUnsavedChanges(false);
       setStatusMessage('수정 내용이 저장되었습니다. 문제가 없으면 최종 확정을 진행해 주세요.');
     } catch (error) {
       setErrorMessage(error.response?.data?.message || '검수 내용 저장에 실패했습니다.');
@@ -176,6 +217,11 @@ const MatchReviewPage = () => {
   };
 
   const handleConfirm = async () => {
+    if (!reviewValidation.canSubmit) {
+      setErrorMessage('0보다 작은 전적 수치를 수정해주세요.');
+      return;
+    }
+
     setIsConfirming(true);
     setErrorMessage('');
     setStatusMessage('');
@@ -184,6 +230,7 @@ const MatchReviewPage = () => {
       await analysisAPI.updateDraft(gameId, buildDraftPayload());
       const response = await analysisAPI.confirmDraft(gameId);
       setRecord(response.data);
+      setHasUnsavedChanges(false);
       setStatusMessage('내전 기록이 최종 확정되었습니다.');
     } catch (error) {
       setErrorMessage(error.response?.data?.message || '내전 기록 확정에 실패했습니다.');
@@ -203,7 +250,10 @@ const MatchReviewPage = () => {
           <button
             type="button"
             className={`match-review__winner-button ${record.winner === teamKey ? 'match-review__winner-button--active' : ''}`}
-            onClick={() => setRecord((current) => ({ ...current, winner: teamKey }))}
+            onClick={() => {
+              setHasUnsavedChanges(true);
+              setRecord((current) => ({ ...current, winner: teamKey }));
+            }}
           >
             {record.winner === teamKey ? '승리팀으로 선택됨' : `${teamLabel}을 승리팀으로 선택`}
           </button>
@@ -237,6 +287,8 @@ const MatchReviewPage = () => {
                 <td key={field} className="matches-table__td">
                   <input
                     type="number"
+                    min="0"
+                    inputMode="numeric"
                     className="match-review__input"
                     value={player[field] ?? ''}
                     onChange={(event) => updatePlayer(teamKey, index, field, event.target.value)}
@@ -310,6 +362,23 @@ const MatchReviewPage = () => {
         </div>
       </section>
 
+      <section className="match-review-summary">
+        <div className="match-review-summary__container">
+          <div className="match-review-summary__item">
+            <span>저장 상태</span>
+            <strong>{hasUnsavedChanges ? '저장 필요' : '저장됨'}</strong>
+          </div>
+          <div className="match-review-summary__item">
+            <span>빈 닉네임</span>
+            <strong>{reviewValidation.emptyNameCount}</strong>
+          </div>
+          <div className="match-review-summary__item">
+            <span>수치 오류</span>
+            <strong>{reviewValidation.invalidNumberCount}</strong>
+          </div>
+        </div>
+      </section>
+
       <section className="matches-table">
         <div className="matches-table__container">
           {isProcessing && <p className="match-upload__status">아직 분석 중입니다. 잠시 후 다시 확인해 주세요.</p>}
@@ -328,10 +397,18 @@ const MatchReviewPage = () => {
             </Link>
             {isDraft && (
               <>
-                <button className="match-review__secondary" onClick={handleSave} disabled={isSaving || isConfirming}>
+                <button
+                  className="match-review__secondary"
+                  onClick={handleSave}
+                  disabled={isSaving || isConfirming || !reviewValidation.canSubmit}
+                >
                   {isSaving ? '저장 중...' : '수정 저장'}
                 </button>
-                <button className="match-upload__submit match-review__confirm" onClick={handleConfirm} disabled={isSaving || isConfirming}>
+                <button
+                  className="match-upload__submit match-review__confirm"
+                  onClick={handleConfirm}
+                  disabled={isSaving || isConfirming || !reviewValidation.canSubmit}
+                >
                   {isConfirming ? '최종 확정 중...' : '이상 없으니 최종 확정'}
                 </button>
               </>

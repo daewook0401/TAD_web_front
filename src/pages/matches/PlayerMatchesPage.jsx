@@ -13,6 +13,7 @@ const PlayerMatchesPage = () => {
   const [detailLoading, setDetailLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [detailErrorMessage, setDetailErrorMessage] = useState('');
+  const [resultFilter, setResultFilter] = useState('ALL');
 
   useEffect(() => {
     const fetchPlayer = async () => {
@@ -37,6 +38,7 @@ const PlayerMatchesPage = () => {
 
         setSummary(matchedSummary);
         setRecords(recordsResponse.data ?? []);
+        setResultFilter('ALL');
       } catch (error) {
         setErrorMessage(error.response?.data?.message || '플레이어 전적을 불러오지 못했습니다.');
       } finally {
@@ -57,6 +59,56 @@ const PlayerMatchesPage = () => {
       ...(selectedGameDetail.team2?.players ?? []),
     ];
   }, [selectedGameDetail]);
+
+  const getKdaScore = (record) => {
+    const kills = record?.kills ?? 0;
+    const assists = record?.assists ?? 0;
+    const deaths = record?.deaths ?? 0;
+    return (kills + assists) / Math.max(1, deaths);
+  };
+
+  const filteredRecords = useMemo(() => {
+    if (resultFilter === 'ALL') {
+      return records;
+    }
+
+    return records.filter((record) => record.result === resultFilter);
+  }, [records, resultFilter]);
+
+  const playerInsights = useMemo(() => {
+    const recentRecords = records.slice(0, 5);
+    const recentWins = recentRecords.filter((record) => record.result === 'WIN').length;
+    const bestKdaRecord = records.reduce((best, record) => (
+      !best || getKdaScore(record) > getKdaScore(best) ? record : best
+    ), null);
+    const bestCsRecord = records.reduce((best, record) => (
+      !best || (record.cs ?? 0) > (best.cs ?? 0) ? record : best
+    ), null);
+
+    let streakResult = null;
+    let streakCount = 0;
+    for (const record of records) {
+      if (!streakResult) {
+        streakResult = record.result;
+        streakCount = 1;
+        continue;
+      }
+
+      if (record.result !== streakResult) {
+        break;
+      }
+      streakCount += 1;
+    }
+
+    return {
+      recentRecords,
+      recentWinRate: recentRecords.length > 0 ? Math.round((recentWins / recentRecords.length) * 100) : 0,
+      bestKdaRecord,
+      bestCsRecord,
+      streakResult,
+      streakCount,
+    };
+  }, [records]);
 
   const formatKda = (kills, deaths, assists) =>
     `${kills ?? 0} / ${deaths ?? 0} / ${assists ?? 0}`;
@@ -150,6 +202,77 @@ const PlayerMatchesPage = () => {
         </div>
       </section>
 
+      <section className="player-insights">
+        <div className="player-insights__container">
+          <div className="player-insights__grid">
+            <article className="player-insights__panel player-insights__panel--wide">
+              <div className="player-insights__header">
+                <div>
+                  <p className="matches-section-heading__eyebrow">Recent Form</p>
+                  <h2 className="matches-section-heading__title">최근 5경기</h2>
+                </div>
+                <strong>{playerInsights.recentWinRate}%</strong>
+              </div>
+              <div className="player-insights__form">
+                {playerInsights.recentRecords.length > 0 ? playerInsights.recentRecords.map((record) => (
+                  <span
+                    key={`${record.gameNumber}-${record.slotNumber}`}
+                    className={`player-insights__form-chip ${
+                      record.result === 'WIN'
+                        ? 'player-insights__form-chip--win'
+                        : 'player-insights__form-chip--loss'
+                    }`}
+                  >
+                    {record.result === 'WIN' ? 'W' : 'L'}
+                  </span>
+                )) : (
+                  <span className="player-insights__empty">기록 없음</span>
+                )}
+              </div>
+            </article>
+
+            <article className="player-insights__panel">
+              <span>최고 KDA</span>
+              <strong>
+                {playerInsights.bestKdaRecord
+                  ? formatKda(
+                    playerInsights.bestKdaRecord.kills,
+                    playerInsights.bestKdaRecord.deaths,
+                    playerInsights.bestKdaRecord.assists
+                  )
+                  : '-'}
+              </strong>
+              <button
+                type="button"
+                className="player-insights__meta"
+                disabled={!playerInsights.bestKdaRecord}
+                onClick={() => handleSelectGame(playerInsights.bestKdaRecord.gameNumber)}
+              >
+                {playerInsights.bestKdaRecord ? `#${playerInsights.bestKdaRecord.gameNumber}` : '경기 없음'}
+              </button>
+            </article>
+
+            <article className="player-insights__panel">
+              <span>최고 CS</span>
+              <strong>{formatNumber(playerInsights.bestCsRecord?.cs)}</strong>
+              <span className="player-insights__meta">
+                {playerInsights.bestCsRecord ? `#${playerInsights.bestCsRecord.gameNumber}` : '경기 없음'}
+              </span>
+            </article>
+
+            <article className="player-insights__panel">
+              <span>현재 흐름</span>
+              <strong>
+                {playerInsights.streakCount > 0
+                  ? `${playerInsights.streakResult === 'WIN' ? '승' : '패'} ${playerInsights.streakCount}`
+                  : '-'}
+              </strong>
+              <span className="player-insights__meta">최신 경기 기준</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
       <section className="matches-table">
         <div className="matches-table__container">
           {errorMessage && <p className="match-upload__error">{errorMessage}</p>}
@@ -165,7 +288,24 @@ const PlayerMatchesPage = () => {
               <p className="matches-section-heading__eyebrow">Match History</p>
               <h2 className="matches-section-heading__title">경기별 기록</h2>
             </div>
-            <p className="matches-section-heading__meta">최신 확정 경기순</p>
+            <div className="matches-filter-group" aria-label="경기 결과 필터">
+              {[
+                { key: 'ALL', label: '전체' },
+                { key: 'WIN', label: '승리' },
+                { key: 'LOSS', label: '패배' },
+              ].map((filter) => (
+                <button
+                  key={filter.key}
+                  type="button"
+                  className={`matches-filter-group__button ${
+                    resultFilter === filter.key ? 'matches-filter-group__button--active' : ''
+                  }`}
+                  onClick={() => setResultFilter(filter.key)}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="matches-table__wrapper">
@@ -182,8 +322,8 @@ const PlayerMatchesPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {records.length > 0 ? (
-                  records.map((record) => (
+                {filteredRecords.length > 0 ? (
+                  filteredRecords.map((record) => (
                     <tr key={`${record.gameNumber}-${record.slotNumber}`} className="matches-table__row">
                       <td className="matches-table__td">
                         <span
@@ -217,7 +357,7 @@ const PlayerMatchesPage = () => {
                 ) : (
                   <tr>
                     <td colSpan="7" className="matches-table__empty">
-                      표시할 경기 기록이 없습니다.
+                      선택한 조건에 맞는 경기 기록이 없습니다.
                     </td>
                   </tr>
                 )}

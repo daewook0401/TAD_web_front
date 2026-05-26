@@ -36,6 +36,9 @@ export const authAPI = {
 
   // 비밀번호 변경
   changePassword: (data) => authApi.put('/auth/me/password', data),
+
+  // 회원 탈퇴
+  withdrawAccount: () => authApi.delete('/auth/me'),
 };
 
 export default authAPI;
