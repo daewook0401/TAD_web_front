@@ -131,6 +131,123 @@
   gap: var(--spacing-3);
 }
 
+.header__notifications {
+  position: relative;
+}
+
+.header__notification-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: var(--color-gray-600);
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-fast);
+}
+
+.header__notification-btn:hover {
+  color: var(--color-primary);
+  background: var(--color-primary-50);
+}
+
+.header__notification-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.header__notification-count {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  color: var(--color-white);
+  background: var(--color-red-500, #ef4444);
+  border-radius: var(--radius-full, 9999px);
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  line-height: 18px;
+  text-align: center;
+}
+
+.header__notification-panel {
+  position: absolute;
+  top: calc(100% + var(--spacing-2));
+  right: 0;
+  width: min(320px, calc(100vw - 32px));
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-3);
+  animation: slideDown var(--transition-fast) ease-out;
+}
+
+.header__notification-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-3);
+  padding: 0 var(--spacing-1) var(--spacing-2);
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.header__notification-head strong {
+  color: var(--color-gray-900);
+  font-size: var(--font-size-sm);
+}
+
+.header__notification-head button {
+  padding: 0;
+  color: var(--color-primary);
+  background: transparent;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.header__notification-list {
+  display: grid;
+  gap: var(--spacing-1);
+  padding-top: var(--spacing-2);
+}
+
+.header__notification-item {
+  display: grid;
+  gap: 3px;
+  padding: var(--spacing-3);
+  color: var(--color-gray-700);
+  text-decoration: none;
+  border-radius: var(--radius-md);
+}
+
+.header__notification-item:hover {
+  background: var(--color-gray-50);
+}
+
+.header__notification-item--unread {
+  background: var(--color-primary-50);
+}
+
+.header__notification-item span,
+.header__notification-empty {
+  color: var(--color-gray-500);
+  font-size: var(--font-size-xs);
+}
+
+.header__notification-item strong {
+  color: var(--color-gray-900);
+  font-size: var(--font-size-sm);
+}
+
+.header__notification-empty {
+  margin: 0;
+  padding: var(--spacing-5) var(--spacing-3);
+  text-align: center;
+}
+
 .header__login-btn {
   padding: var(--spacing-2) var(--spacing-5);
   font-size: var(--font-size-sm);

@@ -142,7 +142,10 @@ const GoogleSignupPage = () => {
                   className="auth-checkbox"
                 />
                 <label htmlFor="googleAgreeTerms" className="auth-checkbox-label">
-                  이용약관 및 개인정보처리방침에 동의합니다
+                  <Link to="/terms">이용약관</Link>
+                  {' 및 '}
+                  <Link to="/privacy">개인정보처리방침</Link>
+                  에 동의합니다
                 </label>
               </div>
 
@@ -163,9 +166,9 @@ const GoogleSignupPage = () => {
         <div className="auth-footer">
           <p><Link to="/">홈으로 돌아가기</Link></p>
           <p>
-            <Link to="#">이용약관</Link>
+            <Link to="/terms">이용약관</Link>
             {' | '}
-            <Link to="#">개인정보처리방침</Link>
+            <Link to="/privacy">개인정보처리방침</Link>
           </p>
         </div>
       </div>

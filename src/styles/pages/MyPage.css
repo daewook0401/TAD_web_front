@@ -472,6 +472,48 @@ a.mypage__stat-card:hover,
   max-width: 360px;
 }
 
+.mypage__danger-card {
+  border-color: var(--color-red-200, #fecaca);
+  background: var(--color-red-50, #fef2f2);
+}
+
+.mypage__danger-card .mypage__card-title {
+  color: var(--color-red-700, #b91c1c);
+}
+
+.mypage__danger-text {
+  margin: 0 0 var(--spacing-4);
+  color: var(--color-red-700, #b91c1c);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}
+
+.mypage__withdraw-form {
+  display: grid;
+  gap: var(--spacing-3);
+}
+
+.mypage__danger-btn {
+  min-height: 38px;
+  padding: 0 var(--spacing-4);
+  color: var(--color-white);
+  background: var(--color-red-600, #dc2626);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.mypage__danger-btn:hover:not(:disabled) {
+  background: var(--color-red-700, #b91c1c);
+}
+
+.mypage__danger-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 @media (max-width: 960px) {
   .mypage__layout {
     grid-template-columns: 1fr;
