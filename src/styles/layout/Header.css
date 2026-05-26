@@ -472,6 +472,14 @@
   .header__user-name {
     display: none;
   }
+
+  .header__notification-panel {
+    position: fixed;
+    top: calc(var(--header-height) + var(--spacing-2));
+    left: var(--spacing-4);
+    right: var(--spacing-4);
+    width: auto;
+  }
   
   .header__mobile-menu-inner {
     padding: var(--spacing-4);
