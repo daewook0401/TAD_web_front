@@ -73,6 +73,37 @@
   border: 1px solid var(--color-red-200, #fecaca);
 }
 
+.admin-page__message--success {
+  color: var(--color-success);
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.22);
+}
+
+.admin-page__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-5);
+}
+
+.admin-page__tab {
+  min-height: 40px;
+  padding: 0 var(--spacing-4);
+  color: var(--color-gray-600);
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.admin-page__tab--active,
+.admin-page__tab:hover {
+  color: var(--color-white);
+  background: var(--color-gray-900);
+  border-color: var(--color-gray-900);
+}
+
 .admin-page__stats {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -108,9 +139,46 @@
   flex-wrap: wrap;
 }
 
+.admin-page__search,
+.admin-page__inline-form {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.admin-page__search input,
+.admin-page__inline-form input,
+.admin-page__inline-form select {
+  min-height: 38px;
+  padding: 0 var(--spacing-3);
+  color: var(--color-gray-800);
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.admin-page__search input {
+  width: min(320px, 58vw);
+}
+
+.admin-page__inline-form input {
+  min-width: 120px;
+}
+
+.admin-page__inline-form input:last-of-type {
+  flex: 1;
+  min-width: 220px;
+}
+
 .admin-page__filter,
 .admin-page__link,
-.admin-page__action {
+.admin-page__action,
+.admin-page__search button,
+.admin-page__inline-form button,
+.admin-page__action-button,
+.admin-page__row-actions button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -136,9 +204,34 @@
 }
 
 .admin-page__link,
-.admin-page__action {
+.admin-page__action,
+.admin-page__search button,
+.admin-page__inline-form button,
+.admin-page__action-button,
+.admin-page__row-actions button {
   color: var(--color-primary);
   background: var(--color-primary-50);
+  border: none;
+  cursor: pointer;
+}
+
+.admin-page__panel {
+  margin-bottom: var(--spacing-4);
+  padding: var(--spacing-4);
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-page__checkbox {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  gap: var(--spacing-2);
+  color: var(--color-gray-700);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
 }
 
 .admin-page__table-card {
@@ -157,6 +250,10 @@
   width: 100%;
   min-width: 860px;
   border-collapse: collapse;
+}
+
+.admin-page__table--wide {
+  min-width: 1080px;
 }
 
 .admin-page__table th,
@@ -203,9 +300,39 @@
 
 .admin-page__status--processing,
 .admin-page__status--failed,
+.admin-page__status--pending,
 .admin-page__status--default {
   color: var(--color-gray-600);
   background: var(--color-gray-100);
+}
+
+.admin-page__status--accepted {
+  color: var(--color-success);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.admin-page__status--rejected {
+  color: var(--color-red-600, #dc2626);
+  background: var(--color-red-50, #fef2f2);
+}
+
+.admin-page__sub-link {
+  width: fit-content;
+  margin-top: var(--spacing-1);
+  color: var(--color-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.admin-page__row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2);
+}
+
+.admin-page__row-actions .admin-page__danger {
+  color: var(--color-red-600, #dc2626);
+  background: var(--color-red-50, #fef2f2);
 }
 
 .admin-page__empty {
@@ -232,5 +359,22 @@
 
   .admin-page__stats {
     grid-template-columns: 1fr;
+  }
+
+  .admin-page__toolbar,
+  .admin-page__search,
+  .admin-page__inline-form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-page__search input,
+  .admin-page__inline-form input,
+  .admin-page__inline-form input:last-of-type,
+  .admin-page__inline-form select,
+  .admin-page__search button,
+  .admin-page__inline-form button {
+    width: 100%;
+    min-width: 0;
   }
 }

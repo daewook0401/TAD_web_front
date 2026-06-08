@@ -66,13 +66,17 @@ const CommentItem = ({
   onReplySubmit,
   onCommentEdit,
   onCommentDelete,
+  onReport,
   isAuthenticated,
   submittingReplyId,
   workingCommentId,
+  reportingTarget,
 }) => {
   const draft = replyDrafts[comment.id] || '';
   const attachedFiles = replyFiles[comment.id] || [];
   const canManageComment = !comment.deleted && canManageResource(user, comment.authorId);
+  const canReportComment = !comment.deleted && isAuthenticated && user?.id !== comment.authorId;
+  const isReportingComment = reportingTarget === `COMMENT:${comment.id}`;
 
   return (
     <div className={`board-comment ${depth > 0 ? 'board-comment--reply' : ''}`}>
@@ -86,6 +90,16 @@ const CommentItem = ({
           {!comment.deleted && isAuthenticated && (
             <button type="button" className="board-comment__reply-btn" onClick={() => onReplyToggle(comment.id)}>
               답글
+            </button>
+          )}
+          {canReportComment && (
+            <button
+              type="button"
+              className="board-comment__reply-btn board-comment__reply-btn--danger"
+              onClick={() => onReport('COMMENT', comment.id)}
+              disabled={isReportingComment}
+            >
+              {isReportingComment ? '신고 중...' : '신고'}
             </button>
           )}
           {canManageComment && (
@@ -184,9 +198,11 @@ const CommentItem = ({
             onReplySubmit={onReplySubmit}
             onCommentEdit={onCommentEdit}
             onCommentDelete={onCommentDelete}
+            onReport={onReport}
             isAuthenticated={isAuthenticated}
             submittingReplyId={submittingReplyId}
             workingCommentId={workingCommentId}
+            reportingTarget={reportingTarget}
           />
         ))}
     </div>
@@ -212,6 +228,7 @@ const BoardDetailPage = () => {
   const [submittingReplyId, setSubmittingReplyId] = useState(null);
   const [deletingPost, setDeletingPost] = useState(false);
   const [workingCommentId, setWorkingCommentId] = useState(null);
+  const [reportingTarget, setReportingTarget] = useState(null);
 
   const user = useMemo(() => authStorage.getUser(), []);
   const isAuthenticated = authStorage.hasAccessToken();
@@ -277,6 +294,7 @@ const BoardDetailPage = () => {
   const currentCategory = categories.find((item) => item.categoryKey === activeCategory);
   const contentHtml = useMemo(() => sanitizeHtml(normalizePostContent(post)), [post]);
   const canManagePost = canManageResource(user, post?.authorId);
+  const canReportPost = post?.id && isAuthenticated && user?.id !== post.authorId;
 
   const imageAttachments = (post?.attachments || []).filter((item) => item.contentType?.startsWith('image/'));
   const fileAttachments = (post?.attachments || []).filter((item) => !item.contentType?.startsWith('image/'));
@@ -481,6 +499,41 @@ const BoardDetailPage = () => {
     }
   };
 
+  const handleReport = async (targetType, targetId) => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+
+    const reasonDetail = window.prompt('신고 사유를 입력해주세요.');
+    if (reasonDetail === null) return;
+
+    const normalizedReason = reasonDetail.trim();
+    if (!normalizedReason) {
+      window.alert('신고 사유를 입력해주세요.');
+      return;
+    }
+
+    const targetKey = `${targetType}:${targetId}`;
+    setReportingTarget(targetKey);
+    setError('');
+
+    try {
+      await boardAPI.createReport({
+        targetType,
+        targetId,
+        reasonCode: 'USER_REPORT',
+        reasonDetail: normalizedReason,
+      });
+      window.alert('신고가 접수되었습니다.');
+    } catch (reportError) {
+      console.error('신고 접수 실패:', reportError);
+      setError(reportError.response?.data?.message || '신고 접수에 실패했습니다.');
+    } finally {
+      setReportingTarget(null);
+    }
+  };
+
   if (categoriesLoading || postLoading) {
     return (
       <div className="board-page">
@@ -530,6 +583,15 @@ const BoardDetailPage = () => {
                     {deletingPost ? '삭제 중...' : '삭제'}
                   </button>
                 </>
+              )}
+              {canReportPost && (
+                <button
+                  className="board-detail__report"
+                  onClick={() => handleReport('POST', post.id)}
+                  disabled={reportingTarget === `POST:${post.id}`}
+                >
+                  {reportingTarget === `POST:${post.id}` ? '신고 중...' : '신고'}
+                </button>
               )}
               <Link className="board-detail__write" to={`/board/${activeCategory}/write`}>
                 글쓰기
@@ -692,9 +754,11 @@ const BoardDetailPage = () => {
                           onReplySubmit={handleReplySubmit}
                           onCommentEdit={handleCommentEdit}
                           onCommentDelete={handleCommentDelete}
+                          onReport={handleReport}
                           isAuthenticated={isAuthenticated}
                           submittingReplyId={submittingReplyId}
                           workingCommentId={workingCommentId}
+                          reportingTarget={reportingTarget}
                         />
                       ))}
                     </div>
