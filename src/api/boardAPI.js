@@ -82,6 +82,22 @@ export const boardAPI = {
   likePost: (postId) => api.post(`/board/posts/${postId}/like`),
 
   unlikePost: (postId) => api.delete(`/board/posts/${postId}/like`),
+
+  createReport: (payload) => api.post('/board/reports', payload),
+
+  getAdminReports: (params) => api.get('/board/admin/reports', {
+    params: params ?? {},
+  }),
+
+  handleAdminReport: (reportId, payload) => api.put(`/board/admin/reports/${reportId}`, payload),
+
+  getAdminSanctions: (params) => api.get('/board/admin/sanctions', {
+    params: params ?? {},
+  }),
+
+  createAdminSanction: (payload) => api.post('/board/admin/sanctions', payload),
+
+  revokeAdminSanction: (sanctionId, payload) => api.post(`/board/admin/sanctions/${sanctionId}/revoke`, payload),
 };
 
 export default boardAPI;

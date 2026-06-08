@@ -18,7 +18,8 @@
 }
 
 .board-detail__back,
-.board-detail__write {
+.board-detail__write,
+.board-detail__report {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -48,6 +49,16 @@
 .board-detail__write:hover {
   color: var(--color-white);
   background: var(--color-primary-dark);
+}
+
+.board-detail__report {
+  color: var(--color-red-600, #dc2626);
+  background: var(--color-red-50, #fef2f2);
+  border: 1px solid var(--color-red-200, #fecaca);
+}
+
+.board-detail__report:hover {
+  background: var(--color-red-100, #fee2e2);
 }
 
 .board-detail__grid {
@@ -337,6 +348,11 @@
 .board-comment__reply-btn {
   background: var(--color-gray-100);
   color: var(--color-gray-700);
+}
+
+.board-comment__reply-btn--danger {
+  color: var(--color-red-600, #dc2626);
+  background: var(--color-red-50, #fef2f2);
 }
 
 .board-comments__list {
