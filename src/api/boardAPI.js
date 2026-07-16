@@ -1,4 +1,5 @@
 import api from './baseAPI';
+import { toDrivePublicUrl } from '../utils/drivePublicUrl';
 
 const appendJsonPart = (formData, value) => {
   formData.append(
@@ -10,7 +11,18 @@ const appendJsonPart = (formData, value) => {
 };
 
 export const boardAPI = {
-  getCategories: () => api.get('/board/categories'),
+  getCategories: async () => {
+    const response = await api.get('/board/categories');
+    return {
+      ...response,
+      data: Array.isArray(response.data)
+        ? response.data.map((category) => ({
+            ...category,
+            iconUrl: toDrivePublicUrl(category.iconUrl),
+          }))
+        : response.data,
+    };
+  },
 
   getPosts: (params = {}) => {
     const { categoryKey, postType, page = 0, size = 20 } = params;
